@@ -36,6 +36,9 @@ export function HeroContent() {
         <Button
           size="lg"
           className="relative text-base px-8 h-14 rounded-full shadow-lg hover:shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-500 group overflow-hidden"
+          onClick={() => {
+            window.location.href = "/login";
+          }}
         >
           <span className="relative z-10 flex items-center gap-2">
             Start Your Journey

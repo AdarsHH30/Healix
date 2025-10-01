@@ -1,24 +1,27 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Leaf, Heart, Users, BookOpen } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Leaf, Heart, Users, BookOpen } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function Header() {
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
-        isScrolled ? "bg-white/80 backdrop-blur-xl shadow-lg shadow-primary/5" : "bg-transparent"
+        isScrolled
+          ? "bg-background/80 backdrop-blur-xl shadow-lg shadow-primary/5 dark:bg-background/90"
+          : "bg-transparent"
       }`}
     >
       <nav className="container mx-auto flex items-center justify-center py-6 px-4">
@@ -60,6 +63,8 @@ export function Header() {
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
           </a>
 
+          <ThemeToggle />
+
           <Button
             variant="outline"
             size="sm"
@@ -70,5 +75,5 @@ export function Header() {
         </div>
       </nav>
     </header>
-  )
+  );
 }
