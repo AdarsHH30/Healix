@@ -2,12 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Leaf, Heart, Users, BookOpen } from "lucide-react";
+import { Leaf, Heart, Users, BookOpen, User, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,6 +21,28 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Check current auth state
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+    
+    checkUser();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
@@ -25,7 +51,7 @@ export function Header() {
           : "bg-transparent"
       }`}
     >
-      <nav className="container mx-auto flex items-center justify-center py-6 px-4">
+      <nav className="container mx-auto flex items-center justify-between py-6 px-4">
         <div className="flex items-center gap-8">
           <a
             href="#programs"
@@ -63,18 +89,32 @@ export function Header() {
             <span>Community</span>
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
           </a>
+        </div>
 
+        <div className="flex items-center gap-4">
           <ThemeToggle />
 
-          <Link href="/login">
+          {user ? (
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 bg-transparent"
+              onClick={handleSignOut}
+              className="rounded-full border-2 border-destructive/20 hover:border-destructive hover:bg-destructive/5 transition-all duration-300 bg-transparent"
             >
-              Sign In
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
             </Button>
-          </Link>
+          ) : (
+            <Link href="/login">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 bg-transparent"
+              >
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
       </nav>
     </header>

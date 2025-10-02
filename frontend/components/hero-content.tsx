@@ -2,8 +2,34 @@
 
 import { Button } from "@/components/ui/button";
 import { Video, ArrowRight, Heart, CheckCircle2, Shield } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export function HeroContent() {
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check current auth state
+    const checkUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+
+    checkUser();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   return (
     <div className="text-center relative z-10">
       <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-sm px-5 py-2.5 shadow-lg border border-primary/10 hover:shadow-xl hover:scale-105 transition-all duration-500">
@@ -33,26 +59,56 @@ export function HeroContent() {
       </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-        <Button
-          size="lg"
-          className="relative text-base px-8 h-14 rounded-full shadow-lg hover:shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-500 group overflow-hidden"
-          onClick={() => {
-            window.location.href = "/login";
-          }}
-        >
-          <span className="relative z-10 flex items-center gap-2">
-            Start Your Journey
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-          </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          className="text-base px-8 h-14 rounded-full border-2 border-primary/30 bg-white/50 backdrop-blur-sm hover:bg-white hover:border-primary hover:scale-105 transition-all duration-500"
-        >
-          Explore Tutorials
-        </Button>
+        {user ? (
+          <>
+            <Button
+              size="lg"
+              className="relative text-base px-8 h-14 rounded-full shadow-lg hover:shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-500 group overflow-hidden"
+              onClick={() => {
+                router.push("/dashboard");
+              }}
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                Go to Dashboard
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-base px-8 h-14 rounded-full border-2 border-primary/30 bg-white/50 backdrop-blur-sm hover:bg-white hover:border-primary hover:scale-105 transition-all duration-500"
+              onClick={() => {
+                router.push("/profile");
+              }}
+            >
+              View Profile
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              size="lg"
+              className="relative text-base px-8 h-14 rounded-full shadow-lg hover:shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-500 group overflow-hidden"
+              onClick={() => {
+                router.push("/login");
+              }}
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                Start Your Journey
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-base px-8 h-14 rounded-full border-2 border-primary/30 bg-white/50 backdrop-blur-sm hover:bg-white hover:border-primary hover:scale-105 transition-all duration-500"
+            >
+              Explore Tutorials
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-4 mb-8 text-sm text-muted-foreground">
