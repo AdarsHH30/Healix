@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, Phone, MessageCircle } from "lucide-react";
+import { ArrowLeft, User, Phone, MessageCircle, LogOut, Upload } from "lucide-react";
 import { useState, useEffect } from "react";
 import { ChatbotPopup } from "@/components/chatbot-popup";
+import { supabase } from "@/lib/supabase";
 
 const categories = [
   {
@@ -62,6 +63,19 @@ export default function Dashboard() {
     router.push("/profile");
   };
 
+  const handleUpload = () => {
+    router.push("/upload");
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   const toggleTheme = () => {
     setIsDark(!isDark);
     document.documentElement.classList.toggle("dark");
@@ -103,12 +117,30 @@ export default function Dashboard() {
             </button>
 
             <button
+              onClick={handleUpload}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/50 active:scale-95"
+              aria-label="Upload Exercise"
+            >
+              <Upload size={20} strokeWidth={2} />
+              <span className="font-medium hidden sm:inline">Upload</span>
+            </button>
+
+            <button
               onClick={handleProfile}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/50 active:scale-95"
               aria-label="Profile"
             >
               <User size={20} strokeWidth={2} />
               <span className="font-medium hidden sm:inline">Profile</span>
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-destructive/70 hover:text-destructive hover:bg-destructive/10 active:scale-95"
+              aria-label="Logout"
+            >
+              <LogOut size={20} strokeWidth={2} />
+              <span className="font-medium hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>

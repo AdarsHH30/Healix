@@ -61,8 +61,27 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired - required for Server Components
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Allow dashboard access without authentication (for now)
+  // Allow auth callback routes (for email confirmation)
+  if (request.nextUrl.pathname.startsWith('/auth/callback') || 
+      request.nextUrl.pathname.startsWith('/auth/confirm')) {
+    return response
+  }
+
+  // TEMPORARILY DISABLED - Allow access to dashboard without login for testing
+  // TODO: Re-enable authentication before production deployment
+  
+  // Protect dashboard routes - redirect to login if not authenticated
   // if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
+  //   return NextResponse.redirect(new URL('/login', request.url))
+  // }
+
+  // Protect upload route - redirect to login if not authenticated
+  // if (request.nextUrl.pathname.startsWith('/upload') && !user) {
+  //   return NextResponse.redirect(new URL('/login', request.url))
+  // }
+
+  // Protect profile route - redirect to login if not authenticated
+  // if (request.nextUrl.pathname.startsWith('/profile') && !user) {
   //   return NextResponse.redirect(new URL('/login', request.url))
   // }
 

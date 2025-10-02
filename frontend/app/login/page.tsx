@@ -14,8 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -23,6 +26,10 @@ const formSchema = z.object({
 });
 
 const Login03Page = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       email: "",
@@ -31,8 +38,68 @@ const Login03Page = () => {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      console.log('Attempting login with:', data.email);
+      
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      console.log('Login response:', { authData, authError });
+
+      if (authError) {
+        // Provide more helpful error messages
+        if (authError.message.includes("Email not confirmed")) {
+          setError("Please confirm your email address before logging in. Check your inbox for the confirmation link.");
+        } else if (authError.message.includes("Invalid login credentials")) {
+          setError("Invalid email or password. Please check your credentials and try again.");
+        } else if (authError.message.includes("Invalid")) {
+          setError("Invalid email or password. Make sure you've registered first.");
+        } else {
+          setError(authError.message);
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      if (authData.user && authData.session) {
+        console.log('Login successful, redirecting to dashboard...');
+        
+        // Create user profile if it doesn't exist
+        const { data: existingProfile } = await supabase
+          .from("users")
+          .select("id")
+          .eq("id", authData.user.id)
+          .single();
+
+        if (!existingProfile) {
+          console.log('Creating user profile...');
+          await supabase.from("users").insert({
+            id: authData.user.id,
+            email: authData.user.email,
+          });
+        }
+
+        // Force a small delay to ensure session is set
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Redirect to dashboard
+        router.push("/dashboard");
+        router.refresh();
+      } else {
+        setError("Login failed. Please try again.");
+        setIsLoading(false);
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || "An error occurred during login");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -43,6 +110,12 @@ const Login03Page = () => {
           <p className="mt-4 text-xl font-semibold tracking-tight">
             Log in to First Aid
           </p>
+
+          {error && (
+            <div className="mt-4 w-full p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+              {error}
+            </div>
+          )}
 
           <Button className="mt-8 w-full gap-3">
             <GoogleLogo />
@@ -96,22 +169,22 @@ const Login03Page = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="mt-4 w-full">
-                Continue with Email
+              <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
+                {isLoading ? "Logging in..." : "Continue with Email"}
               </Button>
             </form>
           </Form>
 
           <div className="mt-5 space-y-5">
             <Link
-              href="#"
+              href="/register"
               className="text-sm block underline text-muted-foreground text-center"
             >
               Forgot your password?
             </Link>
             <p className="text-sm text-center">
               Don&apos;t have an account?
-              <Link href="#" className="ml-1 underline text-muted-foreground">
+              <Link href="/register" className="ml-1 underline text-muted-foreground">
                 Create account
               </Link>
             </p>

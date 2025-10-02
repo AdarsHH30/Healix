@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Upload, Check, AlertCircle } from "lucide-react";
+import { ArrowLeft, Upload, Check, AlertCircle, ImagePlus } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 type ExerciseType = "physical" | "mental" | "breathing" | "nutrition";
@@ -12,7 +12,7 @@ interface ExerciseFormData {
   name: string;
   description: string;
   imageUrl: string;
-  gifUrl: string;
+  imageFile: File | null;
   youtubeUrl: string;
   duration: string;
   difficulty: Difficulty;
@@ -23,6 +23,7 @@ interface ExerciseFormData {
 export default function UploadPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -32,7 +33,7 @@ export default function UploadPage() {
     name: "",
     description: "",
     imageUrl: "",
-    gifUrl: "",
+    imageFile: null,
     youtubeUrl: "",
     duration: "",
     difficulty: "Beginner",
@@ -49,23 +50,95 @@ export default function UploadPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setMessage({
+          type: "error",
+          text: "Please select a valid image file",
+        });
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setMessage({
+          type: "error",
+          text: "Image file size should be less than 5MB",
+        });
+        return;
+      }
+      setFormData((prev) => ({ ...prev, imageFile: file, imageUrl: "" }));
+      setMessage(null);
+    }
+  };
+
+  const uploadImageToStorage = async (file: File): Promise<string | null> => {
+    try {
+      setIsUploadingImage(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `exercise-images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('exercises')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('exercises')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error: any) {
+      console.error('Error uploading image:', error);
+      setMessage({
+        type: "error",
+        text: "Failed to upload image. Using URL instead if provided.",
+      });
+      return null;
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setMessage(null);
 
     try {
+      let finalImageUrl = formData.imageUrl;
+
+      // If user uploaded a file, upload it to Supabase Storage
+      if (formData.imageFile) {
+        const uploadedUrl = await uploadImageToStorage(formData.imageFile);
+        if (uploadedUrl) {
+          finalImageUrl = uploadedUrl;
+        } else if (!formData.imageUrl) {
+          throw new Error("Please provide either an image file or URL");
+        }
+      }
+
+      if (!finalImageUrl) {
+        throw new Error("Please provide either an image file or URL");
+      }
+
       // Get current user (optional - can be null)
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      // Insert exercise into database (anyone can upload for now)
+      // Insert exercise into database
       const { data, error } = await supabase.from("exercises").insert({
         name: formData.name,
         description: formData.description,
-        image_url: formData.imageUrl,
-        gif_url: formData.gifUrl || null,
+        image_url: finalImageUrl,
+        gif_url: null, // GIF is now optional and not exposed in UI
         youtube_url: formData.youtubeUrl,
         duration: formData.duration || null,
         difficulty: formData.difficulty,
@@ -86,7 +159,7 @@ export default function UploadPage() {
         name: "",
         description: "",
         imageUrl: "",
-        gifUrl: "",
+        imageFile: null,
         youtubeUrl: "",
         duration: "",
         difficulty: "Beginner",
@@ -267,35 +340,60 @@ export default function UploadPage() {
               />
             </div>
 
-            {/* Image URL */}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Image URL *
+            {/* Image Upload - File or URL */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-foreground">
+                Exercise Image *
               </label>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* File Upload */}
+                <div>
+                  <label
+                    htmlFor="imageFile"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-chart-1 transition-colors bg-background/50"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <ImagePlus className="w-8 h-8 mb-2 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">
+                        <span className="font-semibold">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, WebP (max 5MB)</p>
+                    </div>
+                    <input
+                      id="imageFile"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {formData.imageFile && (
+                    <p className="mt-2 text-sm text-green-500">
+                      ✓ {formData.imageFile.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* OR Separator */}
+                <div className="flex items-center justify-center md:col-span-1">
+                  <span className="text-sm text-muted-foreground font-medium">OR</span>
+                </div>
+              </div>
+
+              {/* URL Input */}
               <input
                 type="url"
                 name="imageUrl"
                 value={formData.imageUrl}
                 onChange={handleInputChange}
-                required
+                disabled={!!formData.imageFile}
                 placeholder="https://images.unsplash.com/..."
-                className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-chart-1 text-foreground placeholder:text-muted-foreground"
+                className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-chart-1 text-foreground placeholder:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed"
               />
-            </div>
-
-            {/* GIF URL */}
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                GIF URL (Optional)
-              </label>
-              <input
-                type="url"
-                name="gifUrl"
-                value={formData.gifUrl}
-                onChange={handleInputChange}
-                placeholder="https://media.giphy.com/..."
-                className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-chart-1 text-foreground placeholder:text-muted-foreground"
-              />
+              <p className="text-xs text-muted-foreground">
+                Provide either an image file or a URL
+              </p>
             </div>
 
             {/* YouTube URL */}
@@ -318,13 +416,13 @@ export default function UploadPage() {
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isUploadingImage}
                 className="w-full px-6 py-4 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-chart-1/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
               >
-                {isSubmitting ? (
+                {isSubmitting || isUploadingImage ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Uploading...
+                    {isUploadingImage ? "Uploading Image..." : "Uploading Exercise..."}
                   </>
                 ) : (
                   <>
@@ -344,8 +442,8 @@ export default function UploadPage() {
             Tips for uploading exercises
           </h3>
           <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
-            <li>Use high-quality images from Unsplash or similar sources</li>
-            <li>GIFs should demonstrate the exercise in action (optional)</li>
+            <li>Upload images directly or use URLs from Unsplash or similar sources</li>
+            <li>Images should be high-quality and clearly show the exercise</li>
             <li>YouTube links should point to quality tutorial videos</li>
             <li>Write clear, helpful descriptions with proper form tips</li>
             <li>

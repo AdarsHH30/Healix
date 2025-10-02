@@ -170,3 +170,13 @@
 .animate-breathe {
   animation: breathe 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
+
+/* Loading progress bar animation */
+@keyframes loading {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}

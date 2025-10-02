@@ -13,8 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 
 const formSchema = z
   .object({
@@ -38,6 +41,11 @@ const formSchema = z
   });
 
 const RegisterPage = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       email: "",
@@ -49,8 +57,60 @@ const RegisterPage = () => {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      // Sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            emergency_phone_1: data.emergencyPhone1,
+            emergency_phone_2: data.emergencyPhone2,
+          },
+        },
+      });
+
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      if (authData.user) {
+        // Check if email confirmation is required
+        if (authData.session) {
+          // No email confirmation required - user is logged in
+          // Create user profile in the users table
+          const { error: profileError } = await supabase.from("users").insert({
+            id: authData.user.id,
+            email: data.email,
+          });
+
+          if (profileError) {
+            console.error("Error creating user profile:", profileError);
+          }
+
+          // Redirect to dashboard
+          router.push("/dashboard");
+        } else {
+          // Email confirmation required
+          setSuccess(
+            "Registration successful! Please check your email to confirm your account before logging in."
+          );
+          // Clear the form
+          form.reset();
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred during registration");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -67,6 +127,18 @@ const RegisterPage = () => {
             Join First Aid to access emergency resources and save important
             contacts
           </p>
+
+          {error && (
+            <div className="mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mt-4 p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 text-sm">
+              {success}
+            </div>
+          )}
         </div>
 
         {/* Form Card */}
@@ -183,8 +255,8 @@ const RegisterPage = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full h-11 text-base">
-                Create Account
+              <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+                {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
           </Form>

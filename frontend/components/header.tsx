@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Leaf, Heart, Users, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,13 +66,15 @@ export function Header() {
 
           <ThemeToggle />
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 bg-transparent"
-          >
-            Sign In
-          </Button>
+          <Link href="/login">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 bg-transparent"
+            >
+              Sign In
+            </Button>
+          </Link>
         </div>
       </nav>
     </header>
