@@ -2,15 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Leaf, Heart, Users, BookOpen, User, LogOut } from "lucide-react";
+import { Leaf, Heart, Users, BookOpen, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,14 +25,18 @@ export function Header() {
   useEffect(() => {
     // Check current auth state
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
     };
-    
+
     checkUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -40,7 +45,7 @@ export function Header() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/');
+    router.push("/");
   };
 
   return (
@@ -52,6 +57,7 @@ export function Header() {
       }`}
     >
       <nav className="container mx-auto flex items-center justify-between py-6 px-4">
+        {/* Left side navigation */}
         <div className="flex items-center gap-8">
           <a
             href="#programs"
@@ -70,17 +76,21 @@ export function Header() {
             <span>Instructors</span>
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
           </a>
+        </div>
 
-          <div className="flex items-center gap-2 mx-4">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30">
-              <Leaf className="h-5 w-5 text-primary-foreground" />
-              <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
-            </div>
-            <span className="text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Holistic Wellness
-            </span>
+        {/* Center logo */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30">
+            <Leaf className="h-5 w-5 text-primary-foreground" />
+            <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
           </div>
+          <span className="text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Holistic Wellness
+          </span>
+        </div>
 
+        {/* Right side navigation */}
+        <div className="flex items-center gap-8">
           <a
             href="#community"
             className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
@@ -89,9 +99,7 @@ export function Header() {
             <span>Community</span>
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
           </a>
-        </div>
 
-        <div className="flex items-center gap-4">
           <ThemeToggle />
 
           {user ? (

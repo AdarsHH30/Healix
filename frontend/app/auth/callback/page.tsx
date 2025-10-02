@@ -28,7 +28,12 @@ function AuthCallbackContent() {
           // Exchange the token for a session
           const { data, error } = await supabase.auth.verifyOtp({
             token_hash,
-            type: type as any,
+            type: type as
+              | "signup"
+              | "email"
+              | "recovery"
+              | "invite"
+              | "magiclink",
           });
 
           if (error) {
@@ -109,7 +114,7 @@ function AuthCallbackContent() {
             );
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error confirming email:", error);
         setStatus("error");
         setMessage("Email confirmed! Please log in to continue.");

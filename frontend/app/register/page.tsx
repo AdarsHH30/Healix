@@ -106,8 +106,12 @@ const RegisterPage = () => {
           form.reset();
         }
       }
-    } catch (err: any) {
-      setError(err.message || "An error occurred during registration");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred during registration"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -255,7 +259,11 @@ const RegisterPage = () => {
                 />
               </div>
 
-              <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full h-11 text-base"
+                disabled={isLoading}
+              >
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>

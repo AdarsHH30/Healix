@@ -54,7 +54,7 @@ export default function UploadPage() {
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith("image/")) {
         setMessage({
           type: "error",
           text: "Please select a valid image file",
@@ -77,25 +77,27 @@ export default function UploadPage() {
   const uploadImageToStorage = async (file: File): Promise<string | null> => {
     try {
       setIsUploadingImage(true);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()
+        .toString(36)
+        .substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = `exercise-images/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('exercises')
+        .from("exercises")
         .upload(filePath, file);
 
       if (uploadError) {
         throw uploadError;
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('exercises')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("exercises").getPublicUrl(filePath);
 
       return publicUrl;
-    } catch (error: any) {
-      console.error('Error uploading image:', error);
+    } catch (error: unknown) {
+      console.error("Error uploading image:", error);
       setMessage({
         type: "error",
         text: "Failed to upload image. Using URL instead if provided.",
@@ -169,10 +171,11 @@ export default function UploadPage() {
 
       // Scroll to top to show message
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (error: any) {
+    } catch (error: unknown) {
       setMessage({
         type: "error",
-        text: error.message || "Failed to upload exercise",
+        text:
+          error instanceof Error ? error.message : "Failed to upload exercise",
       });
     } finally {
       setIsSubmitting(false);
@@ -345,7 +348,7 @@ export default function UploadPage() {
               <label className="block text-sm font-medium text-foreground">
                 Exercise Image *
               </label>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* File Upload */}
                 <div>
@@ -356,9 +359,12 @@ export default function UploadPage() {
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <ImagePlus className="w-8 h-8 mb-2 text-muted-foreground" />
                       <p className="text-xs text-muted-foreground">
-                        <span className="font-semibold">Click to upload</span> or drag and drop
+                        <span className="font-semibold">Click to upload</span>{" "}
+                        or drag and drop
                       </p>
-                      <p className="text-xs text-muted-foreground">PNG, JPG, WebP (max 5MB)</p>
+                      <p className="text-xs text-muted-foreground">
+                        PNG, JPG, WebP (max 5MB)
+                      </p>
                     </div>
                     <input
                       id="imageFile"
@@ -377,7 +383,9 @@ export default function UploadPage() {
 
                 {/* OR Separator */}
                 <div className="flex items-center justify-center md:col-span-1">
-                  <span className="text-sm text-muted-foreground font-medium">OR</span>
+                  <span className="text-sm text-muted-foreground font-medium">
+                    OR
+                  </span>
                 </div>
               </div>
 
@@ -422,7 +430,9 @@ export default function UploadPage() {
                 {isSubmitting || isUploadingImage ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    {isUploadingImage ? "Uploading Image..." : "Uploading Exercise..."}
+                    {isUploadingImage
+                      ? "Uploading Image..."
+                      : "Uploading Exercise..."}
                   </>
                 ) : (
                   <>
@@ -442,7 +452,10 @@ export default function UploadPage() {
             Tips for uploading exercises
           </h3>
           <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
-            <li>Upload images directly or use URLs from Unsplash or similar sources</li>
+            <li>
+              Upload images directly or use URLs from Unsplash or similar
+              sources
+            </li>
             <li>Images should be high-quality and clearly show the exercise</li>
             <li>YouTube links should point to quality tutorial videos</li>
             <li>Write clear, helpful descriptions with proper form tips</li>

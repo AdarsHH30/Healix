@@ -124,7 +124,7 @@ export function Testimonials() {
                         </div>
 
                         <blockquote className="text-xl md:text-2xl text-foreground font-medium mb-6 leading-relaxed">
-                          "{testimonial.quote}"
+                          &ldquo;{testimonial.quote}&rdquo;
                         </blockquote>
 
                         <div className="flex flex-col md:flex-row items-center md:items-start gap-4">

@@ -43,23 +43,30 @@ const Login03Page = () => {
     setError(null);
 
     try {
-      console.log('Attempting login with:', data.email);
-      
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
+      console.log("Attempting login with:", data.email);
 
-      console.log('Login response:', { authData, authError });
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        });
+
+      console.log("Login response:", { authData, authError });
 
       if (authError) {
         // Provide more helpful error messages
         if (authError.message.includes("Email not confirmed")) {
-          setError("Please confirm your email address before logging in. Check your inbox for the confirmation link.");
+          setError(
+            "Please confirm your email address before logging in. Check your inbox for the confirmation link."
+          );
         } else if (authError.message.includes("Invalid login credentials")) {
-          setError("Invalid email or password. Please check your credentials and try again.");
+          setError(
+            "Invalid email or password. Please check your credentials and try again."
+          );
         } else if (authError.message.includes("Invalid")) {
-          setError("Invalid email or password. Make sure you've registered first.");
+          setError(
+            "Invalid email or password. Make sure you've registered first."
+          );
         } else {
           setError(authError.message);
         }
@@ -68,8 +75,8 @@ const Login03Page = () => {
       }
 
       if (authData.user && authData.session) {
-        console.log('Login successful, redirecting to dashboard...');
-        
+        console.log("Login successful, redirecting to dashboard...");
+
         // Create user profile if it doesn't exist
         const { data: existingProfile } = await supabase
           .from("users")
@@ -78,7 +85,7 @@ const Login03Page = () => {
           .single();
 
         if (!existingProfile) {
-          console.log('Creating user profile...');
+          console.log("Creating user profile...");
           await supabase.from("users").insert({
             id: authData.user.id,
             email: authData.user.email,
@@ -86,8 +93,8 @@ const Login03Page = () => {
         }
 
         // Force a small delay to ensure session is set
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         // Redirect to dashboard
         router.push("/dashboard");
         router.refresh();
@@ -95,9 +102,11 @@ const Login03Page = () => {
         setError("Login failed. Please try again.");
         setIsLoading(false);
       }
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || "An error occurred during login");
+    } catch (err: unknown) {
+      console.error("Login error:", err);
+      setError(
+        err instanceof Error ? err.message : "An error occurred during login"
+      );
       setIsLoading(false);
     }
   };
@@ -169,7 +178,11 @@ const Login03Page = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="mt-4 w-full"
+                disabled={isLoading}
+              >
                 {isLoading ? "Logging in..." : "Continue with Email"}
               </Button>
             </form>
@@ -184,7 +197,10 @@ const Login03Page = () => {
             </Link>
             <p className="text-sm text-center">
               Don&apos;t have an account?
-              <Link href="/register" className="ml-1 underline text-muted-foreground">
+              <Link
+                href="/register"
+                className="ml-1 underline text-muted-foreground"
+              >
                 Create account
               </Link>
             </p>

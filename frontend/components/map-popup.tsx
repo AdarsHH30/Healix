@@ -45,9 +45,9 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userIcon, setUserIcon] = useState<any>(null);
-  const [hospitalIcon, setHospitalIcon] = useState<any>(null);
-  const [L, setL] = useState<any>(null);
+  const [userIcon, setUserIcon] = useState<L.Icon | null>(null);
+  const [hospitalIcon, setHospitalIcon] = useState<L.Icon | null>(null);
+  const [L, setL] = useState<typeof import("leaflet") | null>(null);
 
   // Initialize Leaflet and custom icons
   useEffect(() => {
@@ -157,118 +157,129 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
       }
 
       const hospitalData: Hospital[] = data.elements
-        .map((element: any, index: number) => {
-          // Get coordinates - handle different element types
-          let lat = 0;
-          let lng = 0;
+        .map(
+          (
+            element: {
+              id?: number;
+              lat?: number;
+              lon?: number;
+              center?: { lat: number; lon: number };
+              tags?: Record<string, string>;
+            },
+            index: number
+          ) => {
+            // Get coordinates - handle different element types
+            let lat = 0;
+            let lng = 0;
 
-          if (element.lat && element.lon) {
-            // For nodes
-            lat = element.lat;
-            lng = element.lon;
-          } else if (element.center) {
-            // For ways and relations with center
-            lat = element.center.lat;
-            lng = element.center.lon;
-          }
+            if (element.lat && element.lon) {
+              // For nodes
+              lat = element.lat;
+              lng = element.lon;
+            } else if (element.center) {
+              // For ways and relations with center
+              lat = element.center.lat;
+              lng = element.center.lon;
+            }
 
-          // Skip if no valid coordinates
-          if (lat === 0 || lng === 0) {
-            return null;
-          }
+            // Skip if no valid coordinates
+            if (lat === 0 || lng === 0) {
+              return null;
+            }
 
-          const tags = element.tags || {};
+            const tags = element.tags || {};
 
-          // Determine facility type with priority
-          let type = "medical";
-          if (
-            tags.amenity === "hospital" ||
-            tags.healthcare === "hospital" ||
-            tags.building === "hospital"
-          ) {
-            type = "hospital";
-          } else if (
-            tags.amenity === "clinic" ||
-            tags.healthcare === "clinic"
-          ) {
-            type = "clinic";
-          } else if (
-            tags.amenity === "doctors" ||
-            tags.healthcare === "doctor"
-          ) {
-            type = "doctors";
-          } else if (tags.amenity === "dentist") {
-            type = "dentist";
-          } else if (tags.healthcare === "centre") {
-            type = "medical center";
-          }
+            // Determine facility type with priority
+            let type = "medical";
+            if (
+              tags.amenity === "hospital" ||
+              tags.healthcare === "hospital" ||
+              tags.building === "hospital"
+            ) {
+              type = "hospital";
+            } else if (
+              tags.amenity === "clinic" ||
+              tags.healthcare === "clinic"
+            ) {
+              type = "clinic";
+            } else if (
+              tags.amenity === "doctors" ||
+              tags.healthcare === "doctor"
+            ) {
+              type = "doctors";
+            } else if (tags.amenity === "dentist") {
+              type = "dentist";
+            } else if (tags.healthcare === "centre") {
+              type = "medical center";
+            }
 
-          // Get name - be more flexible but filter out unnamed
-          const name =
-            tags.name ||
-            tags["name:en"] ||
-            tags.official_name ||
-            tags.alt_name ||
-            tags.operator ||
-            null;
+            // Get name - be more flexible but filter out unnamed
+            const name =
+              tags.name ||
+              tags["name:en"] ||
+              tags.official_name ||
+              tags.alt_name ||
+              tags.operator ||
+              null;
 
-          // Skip facilities without proper names
-          if (
-            !name ||
-            name.toLowerCase().includes("unnamed") ||
-            name.toLowerCase().includes("untitled")
-          ) {
-            return null;
-          }
+            // Skip facilities without proper names
+            if (
+              !name ||
+              name.toLowerCase().includes("unnamed") ||
+              name.toLowerCase().includes("untitled")
+            ) {
+              return null;
+            }
 
-          // Build comprehensive address
-          let address = "";
-          const addressParts = [];
+            // Build comprehensive address
+            let address = "";
+            const addressParts = [];
 
-          if (tags["addr:housenumber"] && tags["addr:street"]) {
-            addressParts.push(
-              `${tags["addr:housenumber"]} ${tags["addr:street"]}`
+            if (tags["addr:housenumber"] && tags["addr:street"]) {
+              addressParts.push(
+                `${tags["addr:housenumber"]} ${tags["addr:street"]}`
+              );
+            } else if (tags["addr:street"]) {
+              addressParts.push(tags["addr:street"]);
+            }
+
+            if (tags["addr:city"]) {
+              addressParts.push(tags["addr:city"]);
+            }
+
+            if (tags["addr:state"]) {
+              addressParts.push(tags["addr:state"]);
+            }
+
+            if (tags["addr:postcode"]) {
+              addressParts.push(tags["addr:postcode"]);
+            }
+
+            address =
+              addressParts.length > 0
+                ? addressParts.join(", ")
+                : "Address not available";
+
+            const distance = calculateDistance(
+              location.lat,
+              location.lng,
+              lat,
+              lng
             );
-          } else if (tags["addr:street"]) {
-            addressParts.push(tags["addr:street"]);
+
+            const hospital: Hospital = {
+              id: element.id?.toString() || `facility-${index}`,
+              name,
+              lat,
+              lng,
+              address,
+              type,
+              distance,
+            };
+
+            return hospital;
           }
-
-          if (tags["addr:city"]) {
-            addressParts.push(tags["addr:city"]);
-          }
-
-          if (tags["addr:state"]) {
-            addressParts.push(tags["addr:state"]);
-          }
-
-          if (tags["addr:postcode"]) {
-            addressParts.push(tags["addr:postcode"]);
-          }
-
-          address =
-            addressParts.length > 0
-              ? addressParts.join(", ")
-              : "Address not available";
-
-          const distance = calculateDistance(
-            location.lat,
-            location.lng,
-            lat,
-            lng
-          );
-
-          const hospital: Hospital = {
-            id: element.id?.toString() || `facility-${index}`,
-            name,
-            lat,
-            lng,
-            address,
-            type,
-            distance,
-          };
-
-          return hospital;
-        })
+        )
         .filter(
           (h: Hospital | null): h is Hospital =>
             h !== null && h.distance !== undefined
@@ -348,39 +359,49 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
           const results = await response.json();
           console.log(`📍 Nominatim "${term}" found:`, results.length);
 
-          results.forEach((result: any) => {
-            const lat = parseFloat(result.lat);
-            const lng = parseFloat(result.lon);
-            const distance = calculateDistance(
-              location.lat,
-              location.lng,
-              lat,
-              lng
-            );
-
-            // Only include results within 15km
-            if (distance <= 15) {
-              // Determine type from search term
-              let type = "medical";
-              if (term.includes("hospital") || result.type === "hospital") {
-                type = "hospital";
-              } else if (term.includes("clinic")) {
-                type = "clinic";
-              } else if (term.includes("urgent")) {
-                type = "urgent care";
-              }
-
-              allResults.push({
-                id: `nominatim-${result.place_id}`,
-                name: result.display_name.split(",")[0] || result.name || term,
+          results.forEach(
+            (result: {
+              lat: string;
+              lon: string;
+              display_name: string;
+              type?: string;
+              place_id?: string;
+              name?: string;
+            }) => {
+              const lat = parseFloat(result.lat);
+              const lng = parseFloat(result.lon);
+              const distance = calculateDistance(
+                location.lat,
+                location.lng,
                 lat,
-                lng,
-                address: result.display_name,
-                type,
-                distance,
-              });
+                lng
+              );
+
+              // Only include results within 15km
+              if (distance <= 15) {
+                // Determine type from search term
+                let type = "medical";
+                if (term.includes("hospital") || result.type === "hospital") {
+                  type = "hospital";
+                } else if (term.includes("clinic")) {
+                  type = "clinic";
+                } else if (term.includes("urgent")) {
+                  type = "urgent care";
+                }
+
+                allResults.push({
+                  id: `nominatim-${result.place_id}`,
+                  name:
+                    result.display_name.split(",")[0] || result.name || term,
+                  lat,
+                  lng,
+                  address: result.display_name,
+                  type,
+                  distance,
+                });
+              }
             }
-          });
+          );
         }
 
         // Small delay to respect rate limits
