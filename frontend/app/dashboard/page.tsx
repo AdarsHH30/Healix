@@ -1,9 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, Phone, MessageCircle, LogOut, Upload } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  Phone,
+  MessageCircle,
+  LogOut,
+  Upload,
+  MapPin,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { ChatbotPopup } from "@/components/chatbot-popup";
+import { MapPopup } from "@/components/map-popup";
 import { supabase } from "@/lib/supabase";
 
 const categories = [
@@ -45,6 +54,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [isDark, setIsDark] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains("dark");
@@ -87,6 +97,10 @@ export default function Dashboard() {
 
   const toggleChatbot = () => {
     setIsChatbotOpen(!isChatbotOpen);
+  };
+
+  const toggleMap = () => {
+    setIsMapOpen(!isMapOpen);
   };
 
   return (
@@ -184,20 +198,35 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Floating Chatbot Button */}
-      <button
-        onClick={toggleChatbot}
-        className="fixed bottom-6 right-6 z-40 w-16 h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
-        aria-label="Open Chatbot"
-      >
-        <MessageCircle size={28} strokeWidth={2} />
-      </button>
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-4">
+        {/* Map Button */}
+        <button
+          onClick={toggleMap}
+          className="w-16 h-16 bg-gradient-to-r from-chart-2 to-chart-4 text-white rounded-full shadow-2xl hover:shadow-chart-2/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          aria-label="Open Hospital Map"
+        >
+          <MapPin size={28} strokeWidth={2} />
+        </button>
+
+        {/* Chatbot Button */}
+        <button
+          onClick={toggleChatbot}
+          className="w-16 h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          aria-label="Open Chatbot"
+        >
+          <MessageCircle size={28} strokeWidth={2} />
+        </button>
+      </div>
 
       {/* Chatbot Popup */}
       <ChatbotPopup
         isOpen={isChatbotOpen}
         onClose={() => setIsChatbotOpen(false)}
       />
+
+      {/* Map Popup */}
+      <MapPopup isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
     </div>
   );
 }
