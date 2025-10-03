@@ -25,9 +25,22 @@ import { VisualHero } from "./visual-hero";
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [show3D, setShow3D] = useState(true);
 
   useEffect(() => {
     setIsVisible(true);
+
+    // Check if running in a browser that supports WebGL
+    try {
+      const canvas = document.createElement("canvas");
+      const gl =
+        canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      if (!gl) {
+        setShow3D(false);
+      }
+    } catch (e) {
+      setShow3D(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -43,7 +56,7 @@ export function HeroSection() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-muted/30 to-accent/10">
-      <Background3DScene mousePosition={mousePosition} />
+      {show3D && <Background3DScene mousePosition={mousePosition} />}
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
