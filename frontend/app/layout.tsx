@@ -15,9 +15,9 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "First Aid - Your Wellness Companion",
+  title: "Healix – Intelligent Care for a Healthier You",
   description:
-    "A comprehensive wellness platform offering exercises for physical health, mental health, breathing techniques, and nutrition guidance. Start your journey to holistic wellness today.",
+    "A comprehensive wellness platform offering exercises for physical health, mental health, breathing techniques, and nutrition guidance. Start your journey to Healix today.",
 };
 
 export default function RootLayout({
@@ -30,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider defaultTheme="system" storageKey="first-aid-theme">
+        <ThemeProvider defaultTheme="system" storageKey="healix-theme">
           {children}
         </ThemeProvider>
       </body>

@@ -48,7 +48,7 @@ export function HeroContent() {
         <span className="text-foreground">Transform Your Life Through</span>
         <br />
         <span className="inline-block bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
-          Holistic Wellness
+          Healix
         </span>
       </h1>
 

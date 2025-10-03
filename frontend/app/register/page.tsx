@@ -128,7 +128,7 @@ const RegisterPage = () => {
           </h1>
 
           <p className="mt-3 text-sm text-muted-foreground">
-            Join First Aid to access emergency resources and save important
+            Join Healix to access emergency resources and save important
             contacts
           </p>
 

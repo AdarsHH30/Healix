@@ -117,7 +117,7 @@ const Login03Page = () => {
         <div className="max-w-xs m-auto w-full flex flex-col items-center">
           <Logo className="h-9 w-9" />
           <p className="mt-4 text-xl font-semibold tracking-tight">
-            Log in to First Aid
+            Log in to Healix
           </p>
 
           {error && (

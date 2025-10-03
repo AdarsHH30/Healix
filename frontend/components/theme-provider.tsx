@@ -26,7 +26,7 @@ const ThemeProviderContext =
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "first-aid-theme",
+  storageKey = "healix-theme",
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = React.useState<Theme>(

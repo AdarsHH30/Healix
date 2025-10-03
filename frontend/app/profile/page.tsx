@@ -1,7 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, Mail, Calendar, LogOut, Upload as UploadIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Calendar,
+  LogOut,
+  Upload as UploadIcon,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -128,9 +135,7 @@ export default function ProfilePage() {
                   <h2 className="text-2xl font-bold text-foreground">
                     {profile?.full_name || "User"}
                   </h2>
-                  <p className="text-muted-foreground">
-                    Welcome to First Aid Wellness
-                  </p>
+                  <p className="text-muted-foreground">Welcome to Healix</p>
                 </div>
 
                 <div className="space-y-2">
@@ -140,7 +145,9 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar size={16} />
-                    <span>Member since {formatDate(profile?.created_at || "")}</span>
+                    <span>
+                      Member since {formatDate(profile?.created_at || "")}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -213,16 +220,17 @@ export default function ProfilePage() {
             </h3>
             <div className="space-y-4 text-sm text-muted-foreground">
               <p>
-                Your First Aid Wellness account gives you access to a comprehensive
+                Your Healix account gives you access to a comprehensive
                 collection of health and wellness exercises.
               </p>
               <p>
                 You can browse exercises across different categories including
-                Physical Health, Mental Health, Breathing Exercises, and Nutrition.
+                Physical Health, Mental Health, Breathing Exercises, and
+                Nutrition.
               </p>
               <p>
-                As a registered user, you can also contribute to the community by
-                uploading new exercises through the Upload page.
+                As a registered user, you can also contribute to the community
+                by uploading new exercises through the Upload page.
               </p>
             </div>
           </div>

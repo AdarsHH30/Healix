@@ -85,7 +85,7 @@ export function Header() {
             <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
           </div>
           <span className="text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Holistic Wellness
+            Healix
           </span>
         </div>
 

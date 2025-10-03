@@ -1,21 +1,30 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Leaf, Facebook, Instagram, Youtube, Twitter, Shield, Lock, Mail } from "lucide-react"
-import { useState } from "react"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Leaf,
+  Facebook,
+  Instagram,
+  Youtube,
+  Twitter,
+  Shield,
+  Lock,
+  Mail,
+} from "lucide-react";
+import { useState } from "react";
 
 export function Footer() {
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("");
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle newsletter signup
-    console.log("Newsletter signup:", email)
-    setEmail("")
-  }
+    console.log("Newsletter signup:", email);
+    setEmail("");
+  };
 
   return (
     <footer className="bg-gradient-to-b from-muted/30 to-muted/50 border-t border-border">
@@ -28,21 +37,26 @@ export function Footer() {
                 <Leaf className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Holistic Wellness
+                Healix
               </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-md">
-              Empowering your journey to complete wellness through expert-guided yoga, meditation, and fitness programs.
-              Transform your life with science-backed practices and certified instructors.
+              Empowering your journey to complete wellness through expert-guided
+              yoga, meditation, and fitness programs. Transform your life with
+              science-backed practices and certified instructors.
             </p>
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10">
                 <Shield className="h-4 w-4 text-primary" />
-                <span className="text-xs font-medium text-primary">SSL Secure</span>
+                <span className="text-xs font-medium text-primary">
+                  SSL Secure
+                </span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10">
                 <Lock className="h-4 w-4 text-accent" />
-                <span className="text-xs font-medium text-accent">Privacy Protected</span>
+                <span className="text-xs font-medium text-accent">
+                  Privacy Protected
+                </span>
               </div>
             </div>
           </div>
@@ -194,12 +208,18 @@ export function Footer() {
           <div className="max-w-2xl mx-auto text-center">
             <div className="flex items-center justify-center gap-2 mb-3">
               <Mail className="h-5 w-5 text-primary" />
-              <h3 className="text-xl font-semibold text-foreground">Join Our Wellness Community</h3>
+              <h3 className="text-xl font-semibold text-foreground">
+                Join Our Wellness Community
+              </h3>
             </div>
             <p className="text-sm text-muted-foreground mb-6">
-              Get weekly wellness tips, exclusive content, and early access to new programs
+              Get weekly wellness tips, exclusive content, and early access to
+              new programs
             </p>
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <form
+              onSubmit={handleNewsletterSubmit}
+              className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+            >
               <Input
                 type="email"
                 placeholder="Enter your email"
@@ -216,7 +236,8 @@ export function Footer() {
               </Button>
             </form>
             <p className="text-xs text-muted-foreground mt-3">
-              Unsubscribe anytime. We respect your privacy and never share your data.
+              Unsubscribe anytime. We respect your privacy and never share your
+              data.
             </p>
           </div>
         </div>
@@ -260,11 +281,17 @@ export function Footer() {
                 Terms of Service
               </a>
               <span>•</span>
-              <a href="#privacy" className="hover:text-primary transition-colors">
+              <a
+                href="#privacy"
+                className="hover:text-primary transition-colors"
+              >
                 Privacy Policy
               </a>
               <span>•</span>
-              <a href="#cookies" className="hover:text-primary transition-colors">
+              <a
+                href="#cookies"
+                className="hover:text-primary transition-colors"
+              >
                 Cookie Policy
               </a>
             </div>
@@ -273,21 +300,25 @@ export function Footer() {
           {/* Medical Disclaimer */}
           <div className="mt-8 p-4 rounded-2xl bg-muted/50 border border-border">
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
-              <strong className="text-foreground">Medical Disclaimer:</strong> The content provided on this platform is
-              for informational and educational purposes only. It is not intended as a substitute for professional
-              medical advice, diagnosis, or treatment. Always consult your physician or qualified healthcare provider
-              before starting any wellness program, especially if you have pre-existing health conditions.
+              <strong className="text-foreground">Medical Disclaimer:</strong>{" "}
+              The content provided on this platform is for informational and
+              educational purposes only. It is not intended as a substitute for
+              professional medical advice, diagnosis, or treatment. Always
+              consult your physician or qualified healthcare provider before
+              starting any wellness program, especially if you have pre-existing
+              health conditions.
             </p>
           </div>
 
           {/* Copyright */}
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Holistic Wellness. All rights reserved. Made with care for your wellbeing.
+              © {new Date().getFullYear()} Healix. All rights reserved. Made
+              with care for your wellbeing.
             </p>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

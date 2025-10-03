@@ -1,6 +1,6 @@
 # Supabase Database Schema
 
-This document outlines the database schema for the First Aid wellness application.
+This document outlines the database schema for the Healix wellness application.
 
 ## Setup Instructions
 

@@ -350,7 +350,7 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
             `&addressdetails=1`,
           {
             headers: {
-              "User-Agent": "FirstAidApp/1.0",
+              "User-Agent": "HealixApp/1.0",
             },
           }
         );
