@@ -85,11 +85,19 @@ const RegisterPage = () => {
         // Check if email confirmation is required
         if (authData.session) {
           // No email confirmation required - user is logged in
-          // Create user profile in the users table
-          const { error: profileError } = await supabase.from("users").insert({
-            id: authData.user.id,
-            email: data.email,
-          });
+          // Update user profile in the users table with emergency contacts
+          // Using upsert in case the trigger already created the profile
+          const { error: profileError } = await supabase.from("users").upsert(
+            {
+              id: authData.user.id,
+              email: data.email,
+              emergency_phone_1: data.emergencyPhone1 || null,
+              emergency_phone_2: data.emergencyPhone2 || null,
+            },
+            {
+              onConflict: "id",
+            }
+          );
 
           if (profileError) {
             console.error("Error creating user profile:", profileError);

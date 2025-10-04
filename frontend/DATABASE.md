@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS public.users (
   email TEXT UNIQUE NOT NULL,
   full_name TEXT,
   avatar_url TEXT,
+  emergency_phone_1 TEXT,
+  emergency_phone_2 TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -149,12 +151,14 @@ CREATE POLICY "Users can delete their own progress"
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id, email, full_name, avatar_url)
+  INSERT INTO public.users (id, email, full_name, avatar_url, emergency_phone_1, emergency_phone_2)
   VALUES (
     NEW.id,
     NEW.email,
     NEW.raw_user_meta_data->>'full_name',
-    NEW.raw_user_meta_data->>'avatar_url'
+    NEW.raw_user_meta_data->>'avatar_url',
+    NEW.raw_user_meta_data->>'emergency_phone_1',
+    NEW.raw_user_meta_data->>'emergency_phone_2'
   );
   RETURN NEW;
 END;
