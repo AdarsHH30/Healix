@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Filter } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ExerciseCard } from "@/components/exercise-card";
 import { ExerciseSearch } from "@/components/exercise-search";
+import { supabase } from "@/lib/supabase";
 
 interface Exercise {
   id: string;
@@ -18,157 +19,56 @@ interface Exercise {
   category: string;
 }
 
-const exercises: Exercise[] = [
-  {
-    id: "1",
-    name: "Box Breathing",
-    description:
-      "Also known as square breathing, this Navy SEAL technique reduces stress and improves focus. Breathe in for 4, hold for 4, out for 4, hold for 4. Perfect for calming anxiety.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=tEmt1Znux58",
-    duration: "5-10 min",
-    difficulty: "Beginner",
-    category: "stress relief",
-  },
-  {
-    id: "2",
-    name: "4-7-8 Breathing",
-    description:
-      "Dr. Andrew Weil's relaxation technique. Inhale for 4 counts, hold for 7, exhale for 8. Activates the parasympathetic nervous system for instant calm.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1499728603263-13726abce5fd?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=gz4G31LGyog",
-    duration: "5 min",
-    difficulty: "Beginner",
-    category: "relaxation",
-  },
-  {
-    id: "3",
-    name: "Diaphragmatic Breathing",
-    description:
-      "Deep belly breathing that engages your diaphragm. Increases oxygen intake, reduces blood pressure, and promotes full-body relaxation.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1545389336-cf090694435e?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=nJkWbAHL1XY",
-    duration: "10 min",
-    difficulty: "Beginner",
-    category: "foundation",
-  },
-  {
-    id: "4",
-    name: "Alternate Nostril Breathing",
-    description:
-      "Ancient yogic technique (Nadi Shodhana) that balances left and right brain hemispheres. Reduces anxiety, improves focus, and harmonizes energy.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=8VwufJrUhic",
-    duration: "5-10 min",
-    difficulty: "Intermediate",
-    category: "balance",
-  },
-  {
-    id: "5",
-    name: "Breath of Fire",
-    description:
-      "Powerful Kundalini yoga breathing technique. Rapid, rhythmic breaths that energize, detoxify, and strengthen the nervous system. Not for beginners.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1588286840104-8957b019727f?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=0jCo9qVwA_k",
-    duration: "3-5 min",
-    difficulty: "Advanced",
-    category: "energizing",
-  },
-  {
-    id: "6",
-    name: "Coherent Breathing",
-    description:
-      "Breathe at 5 breaths per minute (6-second inhale, 6-second exhale) to achieve optimal heart rate variability. Scientifically proven to reduce stress.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=wfDTp2GogaQ",
-    duration: "10-20 min",
-    difficulty: "Beginner",
-    category: "stress relief",
-  },
-  {
-    id: "7",
-    name: "Wim Hof Method",
-    description:
-      "Powerful breathing technique combined with cold exposure. Boosts immune system, increases energy, and improves mental resilience. Advanced practice.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=tybOi4hjZFQ",
-    duration: "10-15 min",
-    difficulty: "Advanced",
-    category: "energizing",
-  },
-  {
-    id: "8",
-    name: "Ujjayi Breathing",
-    description:
-      "Ocean breath used in yoga practice. Creates soft sound by slightly constricting the throat. Builds heat, improves concentration, and calms the mind.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=nJkWbAHL1XY",
-    duration: "5-15 min",
-    difficulty: "Intermediate",
-    category: "focus",
-  },
-  {
-    id: "9",
-    name: "Buteyko Breathing",
-    description:
-      "Reduces chronic hyperventilation through controlled breathing. Helps with asthma, anxiety, and sleep issues by normalizing CO2 levels.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=mBqmP6KZTYA",
-    duration: "10-15 min",
-    difficulty: "Intermediate",
-    category: "therapeutic",
-  },
-  {
-    id: "10",
-    name: "Pursed Lip Breathing",
-    description:
-      "Simple technique that slows breathing and improves oxygen exchange. Especially helpful for those with COPD or during panic attacks.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=FPq0BjYYWek",
-    duration: "5 min",
-    difficulty: "Beginner",
-    category: "therapeutic",
-  },
-  {
-    id: "11",
-    name: "Resonance Breathing",
-    description:
-      "Breathe at your body's natural resonant frequency (typically 5-6 breaths/min). Maximizes heart rate variability and emotional balance.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1499728603263-13726abce5fd?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=ZXAScFnNnwQ",
-    duration: "10 min",
-    difficulty: "Beginner",
-    category: "relaxation",
-  },
-  {
-    id: "12",
-    name: "Physiological Sigh",
-    description:
-      "Stanford neuroscience technique: double inhale through nose, long exhale through mouth. Instantly reduces stress and anxiety in real-time.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1545389336-cf090694435e?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=rBdhqBGqiMc",
-    duration: "1-2 min",
-    difficulty: "Beginner",
-    category: "stress relief",
-  },
-];
-
 export default function BreathingExercisesPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch exercises from Supabase
+  useEffect(() => {
+    async function fetchExercises() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const { data, error: fetchError } = await supabase
+          .from("exercises")
+          .select("*")
+          .eq("exercise_type", "breathing")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false });
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        // Transform data to match the Exercise interface
+        const transformedData: Exercise[] = (data || []).map((exercise) => ({
+          id: exercise.id,
+          name: exercise.name,
+          description: exercise.description,
+          imageUrl: exercise.image_url,
+          gifUrl: exercise.gif_url || undefined,
+          youtubeUrl: exercise.youtube_url,
+          duration: exercise.duration || undefined,
+          difficulty: exercise.difficulty || undefined,
+          category: exercise.category,
+        }));
+
+        setExercises(transformedData);
+      } catch (err) {
+        console.error("Error fetching exercises:", err);
+        setError("Failed to load exercises. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchExercises();
+  }, []);
 
   const filteredExercises = useMemo(() => {
     return exercises.filter((exercise) => {
@@ -262,8 +162,29 @@ export default function BreathingExercisesPage() {
           </p>
         </div>
 
-        {/* Exercise Cards Grid */}
-        {filteredExercises.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-chart-2 mb-4"></div>
+            <p className="text-muted-foreground">Loading techniques...</p>
+          </div>
+        ) : error ? (
+          /* Error State */
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h3 className="text-2xl font-semibold text-foreground mb-2">
+              Something went wrong
+            </h3>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-chart-2 text-white rounded-lg hover:bg-chart-2/90 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : filteredExercises.length > 0 ? (
+          /* Exercise Cards Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredExercises.map((exercise) => (
               <ExerciseCard
@@ -279,6 +200,7 @@ export default function BreathingExercisesPage() {
             ))}
           </div>
         ) : (
+          /* No Results State */
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🌬️</div>
             <h3 className="text-2xl font-semibold text-foreground mb-2">

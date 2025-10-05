@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Filter } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ExerciseCard } from "@/components/exercise-card";
 import { ExerciseSearch } from "@/components/exercise-search";
+import { supabase } from "@/lib/supabase";
 
 interface Exercise {
   id: string;
@@ -18,157 +19,56 @@ interface Exercise {
   category: string;
 }
 
-const exercises: Exercise[] = [
-  {
-    id: "1",
-    name: "Guided Meditation",
-    description:
-      "Learn the fundamentals of meditation to calm your mind, reduce stress, and improve focus. Perfect for beginners looking to start a mindfulness practice.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=inpok4MKVLM",
-    duration: "10-20 min",
-    difficulty: "Beginner",
-    category: "meditation",
-  },
-  {
-    id: "2",
-    name: "Mindfulness Practice",
-    description:
-      "Develop present-moment awareness through mindfulness exercises. Learn to observe thoughts without judgment and cultivate inner peace.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=6p_yaNFSYao",
-    duration: "15 min",
-    difficulty: "Beginner",
-    category: "mindfulness",
-  },
-  {
-    id: "3",
-    name: "Anxiety Relief Techniques",
-    description:
-      "Evidence-based techniques to manage anxiety and panic. Learn grounding exercises, cognitive strategies, and calming methods for immediate relief.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=O-6f5wQXSu8",
-    duration: "10 min",
-    difficulty: "Beginner",
-    category: "anxiety",
-  },
-  {
-    id: "4",
-    name: "Body Scan Meditation",
-    description:
-      "Progressive relaxation technique that promotes deep relaxation and body awareness. Releases tension and improves mind-body connection.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1545389336-cf090694435e?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=15q-N-_kkrU",
-    duration: "20-30 min",
-    difficulty: "Intermediate",
-    category: "meditation",
-  },
-  {
-    id: "5",
-    name: "Positive Affirmations",
-    description:
-      "Rewire your thought patterns with powerful affirmations. Build self-esteem, confidence, and a positive mindset through daily practice.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1499728603263-13726abce5fd?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=M7pAYDMi5lE",
-    duration: "10 min",
-    difficulty: "Beginner",
-    category: "affirmations",
-  },
-  {
-    id: "6",
-    name: "Sleep Meditation",
-    description:
-      "Gentle guided meditation designed to help you fall asleep naturally. Release the day's stress and drift into peaceful, restorative sleep.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1520206183501-b80df61043c2?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=aEqlQvczMJQ",
-    duration: "30-45 min",
-    difficulty: "Beginner",
-    category: "sleep",
-  },
-  {
-    id: "7",
-    name: "Stress Management",
-    description:
-      "Comprehensive strategies for managing daily stress. Learn practical tools to maintain emotional balance and resilience in challenging situations.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1499728603263-13726abce5fd?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=aNXKjGFLpJQ",
-    duration: "15 min",
-    difficulty: "Intermediate",
-    category: "stress",
-  },
-  {
-    id: "8",
-    name: "Loving-Kindness Meditation",
-    description:
-      "Cultivate compassion and love for yourself and others. This ancient practice reduces negative emotions and increases feelings of connection.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=sz7cpV7ERsM",
-    duration: "15-20 min",
-    difficulty: "Intermediate",
-    category: "meditation",
-  },
-  {
-    id: "9",
-    name: "Gratitude Practice",
-    description:
-      "Transform your mindset through daily gratitude exercises. Scientific studies show gratitude practice significantly improves mental health and happiness.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=nj2ofrX7jAk",
-    duration: "5-10 min",
-    difficulty: "Beginner",
-    category: "gratitude",
-  },
-  {
-    id: "10",
-    name: "Yoga Nidra",
-    description:
-      "Yogic sleep meditation that induces deep relaxation while maintaining awareness. Perfect for stress relief, better sleep, and emotional healing.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=M0u9GST_j3s",
-    duration: "30-45 min",
-    difficulty: "Advanced",
-    category: "meditation",
-  },
-  {
-    id: "11",
-    name: "Emotional Release",
-    description:
-      "Guided practice for processing and releasing stored emotions. Learn healthy ways to acknowledge, express, and let go of difficult feelings.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1502301103665-0b95cc738daf?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=2ZYCMjzF7OE",
-    duration: "20 min",
-    difficulty: "Intermediate",
-    category: "emotional",
-  },
-  {
-    id: "12",
-    name: "Focus & Concentration",
-    description:
-      "Train your mind to maintain sustained attention. Improve productivity, mental clarity, and cognitive performance through focused meditation.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=800&h=600&fit=crop",
-    youtubeUrl: "https://www.youtube.com/watch?v=u4gZgnCy5ew",
-    duration: "15 min",
-    difficulty: "Intermediate",
-    category: "focus",
-  },
-];
-
 export default function MentalHealthPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch exercises from Supabase
+  useEffect(() => {
+    async function fetchExercises() {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const { data, error: fetchError } = await supabase
+          .from("exercises")
+          .select("*")
+          .eq("exercise_type", "mental")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false });
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        // Transform data to match the Exercise interface
+        const transformedData: Exercise[] = (data || []).map((exercise) => ({
+          id: exercise.id,
+          name: exercise.name,
+          description: exercise.description,
+          imageUrl: exercise.image_url,
+          gifUrl: exercise.gif_url || undefined,
+          youtubeUrl: exercise.youtube_url,
+          duration: exercise.duration || undefined,
+          difficulty: exercise.difficulty || undefined,
+          category: exercise.category,
+        }));
+
+        setExercises(transformedData);
+      } catch (err) {
+        console.error("Error fetching exercises:", err);
+        setError("Failed to load exercises. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchExercises();
+  }, []);
 
   const filteredExercises = useMemo(() => {
     return exercises.filter((exercise) => {
@@ -258,8 +158,29 @@ export default function MentalHealthPage() {
           </p>
         </div>
 
-        {/* Exercise Cards Grid */}
-        {filteredExercises.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mb-4"></div>
+            <p className="text-muted-foreground">Loading practices...</p>
+          </div>
+        ) : error ? (
+          /* Error State */
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h3 className="text-2xl font-semibold text-foreground mb-2">
+              Something went wrong
+            </h3>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : filteredExercises.length > 0 ? (
+          /* Exercise Cards Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredExercises.map((exercise) => (
               <ExerciseCard
@@ -275,6 +196,7 @@ export default function MentalHealthPage() {
             ))}
           </div>
         ) : (
+          /* No Results State */
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🧘</div>
             <h3 className="text-2xl font-semibold text-foreground mb-2">

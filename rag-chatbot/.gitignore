@@ -1,0 +1,22 @@
+# .gitignore for rag-chatbot
+venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+*.swp
+*.swo
+# VSCode
+.vscode/
+# OS
+Thumbs.db
+ehthumbs.db
+# Python
+*.pyo
+*.pyd
+# Misc
+*.bak
+*.tmp

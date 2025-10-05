@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Filter } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ExerciseCard } from "@/components/exercise-card";
 import { ExerciseSearch } from "@/components/exercise-search";
+import { supabase } from "@/lib/supabase";
 
 interface Exercise {
   id: string;
@@ -18,181 +19,56 @@ interface Exercise {
   category: string;
 }
 
-const exercises: Exercise[] = [
-  {
-    id: "1",
-    name: "Push-Ups",
-    description:
-      "A classic upper body exercise that strengthens your chest, shoulders, triceps, and core. Perfect for building overall upper body strength and can be modified for all fitness levels.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/3oEduT5vXOXR3XT8DC/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=IODxDxX7oi4",
-    duration: "3-4 sets",
-    difficulty: "Beginner",
-    category: "upper body",
-  },
-  {
-    id: "2",
-    name: "Squats",
-    description:
-      "The king of leg exercises! Squats work your quads, hamstrings, glutes, and core. Essential for building lower body strength and improving mobility.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/1qfDuNIDlobOJyBc00/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=aclHkVaku9U",
-    duration: "3-4 sets",
-    difficulty: "Beginner",
-    category: "lower body",
-  },
-  {
-    id: "3",
-    name: "Plank",
-    description:
-      "An isometric core exercise that builds endurance in your abs, back, and stabilizer muscles. Improves posture and reduces back pain.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/3oEduVHamwmt0R9kNq/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=pvIjsG5Svck",
-    duration: "30-60 sec",
-    difficulty: "Beginner",
-    category: "core",
-  },
-  {
-    id: "4",
-    name: "Burpees",
-    description:
-      "A full-body cardio powerhouse that combines a squat, plank, push-up, and jump. Burns calories fast and builds explosive strength and endurance.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/4Hx5nJBfi8FzFWxztb/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=JZQA08SlJnM",
-    duration: "3-4 sets",
-    difficulty: "Advanced",
-    category: "full body",
-  },
-  {
-    id: "5",
-    name: "Lunges",
-    description:
-      "Unilateral leg exercise that targets quads, glutes, and hamstrings while improving balance and coordination. Great for functional fitness.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/3o7TKPxbMLKWTulDq0/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=QOVaHwm-Q6U",
-    duration: "3 sets",
-    difficulty: "Beginner",
-    category: "lower body",
-  },
-  {
-    id: "6",
-    name: "Pull-Ups",
-    description:
-      "The ultimate back and bicep builder. Pull-ups develop upper body pulling strength and create a strong, defined back and arms.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/5t9IcoRJ4RikXzJCN6/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=eGo4IYlbE5g",
-    duration: "3-4 sets",
-    difficulty: "Intermediate",
-    category: "upper body",
-  },
-  {
-    id: "7",
-    name: "Mountain Climbers",
-    description:
-      "Dynamic cardio exercise that engages your core, shoulders, and legs. Excellent for building cardiovascular endurance and core strength simultaneously.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/3oEduU6VEgVE3uRqko/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=nmwgirgXLYM",
-    duration: "3-4 sets",
-    difficulty: "Intermediate",
-    category: "cardio",
-  },
-  {
-    id: "8",
-    name: "Deadlifts",
-    description:
-      "A compound exercise that works nearly every muscle in your body. Builds massive strength in your posterior chain, including glutes, hamstrings, and back.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1532029837206-abbe2b7620e3?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/3oEduVHamwmt0R9kNq/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=op9kVnSso6Q",
-    duration: "3-4 sets",
-    difficulty: "Advanced",
-    category: "full body",
-  },
-  {
-    id: "9",
-    name: "Bicycle Crunches",
-    description:
-      "Effective core exercise targeting obliques and rectus abdominis. Great for building rotational strength and defining your midsection.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/3oEduVHamwmt0R9kNq/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=Iwyvozckjak",
-    duration: "3 sets",
-    difficulty: "Beginner",
-    category: "core",
-  },
-  {
-    id: "10",
-    name: "Jump Rope",
-    description:
-      "High-intensity cardio that improves coordination, burns calories, and strengthens your calves. Perfect for warming up or standalone cardio sessions.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/xT0xeBXHFg3BLth9n2/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=FJmRQ5iTXKE",
-    duration: "10-15 min",
-    difficulty: "Intermediate",
-    category: "cardio",
-  },
-  {
-    id: "11",
-    name: "Dips",
-    description:
-      "Compound upper body exercise that targets triceps, chest, and shoulders. Excellent for building upper body pushing strength and muscle mass.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/3o7TKPxbMLKWTulDq0/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=2z8JmcrW-As",
-    duration: "3 sets",
-    difficulty: "Intermediate",
-    category: "upper body",
-  },
-  {
-    id: "12",
-    name: "Running",
-    description:
-      "Classic cardiovascular exercise that builds endurance, burns calories, and strengthens your heart. Accessible and effective for overall fitness.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800&h=600&fit=crop",
-    gifUrl:
-      "https://media.giphy.com/media/3o7TKPxbMLKWTulDq0/giphy.gif",
-    youtubeUrl: "https://www.youtube.com/watch?v=RRoUJVjSikQ",
-    duration: "20-30 min",
-    difficulty: "Beginner",
-    category: "cardio",
-  },
-];
-
 export default function PhysicalHealthPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch exercises from Supabase
+  useEffect(() => {
+    async function fetchExercises() {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const { data, error: fetchError } = await supabase
+          .from("exercises")
+          .select("*")
+          .eq("exercise_type", "physical")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false });
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        // Transform data to match the Exercise interface
+        const transformedData: Exercise[] = (data || []).map((exercise) => ({
+          id: exercise.id,
+          name: exercise.name,
+          description: exercise.description,
+          imageUrl: exercise.image_url,
+          gifUrl: exercise.gif_url || undefined,
+          youtubeUrl: exercise.youtube_url,
+          duration: exercise.duration || undefined,
+          difficulty: exercise.difficulty || undefined,
+          category: exercise.category,
+        }));
+
+        setExercises(transformedData);
+      } catch (err) {
+        console.error("Error fetching exercises:", err);
+        setError("Failed to load exercises. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchExercises();
+  }, []);
 
   const filteredExercises = useMemo(() => {
     return exercises.filter((exercise) => {
@@ -282,8 +158,29 @@ export default function PhysicalHealthPage() {
           </p>
         </div>
 
-        {/* Exercise Cards Grid */}
-        {filteredExercises.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-chart-1 mb-4"></div>
+            <p className="text-muted-foreground">Loading exercises...</p>
+          </div>
+        ) : error ? (
+          /* Error State */
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h3 className="text-2xl font-semibold text-foreground mb-2">
+              Something went wrong
+            </h3>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-chart-1 text-white rounded-lg hover:bg-chart-1/90 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        ) : filteredExercises.length > 0 ? (
+          /* Exercise Cards Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredExercises.map((exercise) => (
               <ExerciseCard
@@ -299,6 +196,7 @@ export default function PhysicalHealthPage() {
             ))}
           </div>
         ) : (
+          /* No Results State */
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-2xl font-semibold text-foreground mb-2">

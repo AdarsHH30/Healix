@@ -26,13 +26,20 @@ export default function CallNowButton({
 }: CallNowButtonProps) {
   const [showDesktopMessage, setShowDesktopMessage] = useState(false);
   const [showContactList, setShowContactList] = useState(false);
-  const [selectedContact, setSelectedContact] = useState<EmergencyContact | null>(null);
+  const [selectedContact, setSelectedContact] =
+    useState<EmergencyContact | null>(null);
 
   // Use emergency contacts if available, otherwise use default phone number
   const contacts: EmergencyContact[] =
     emergencyContacts.length > 0
       ? emergencyContacts
-      : [{ number: phoneNumber, displayNumber: displayNumber, label: "Emergency Contact" }];
+      : [
+          {
+            number: phoneNumber,
+            displayNumber: displayNumber,
+            label: "Emergency Contact",
+          },
+        ];
 
   const handleCall = (contact: EmergencyContact) => {
     // Check if device is mobile
@@ -40,7 +47,7 @@ export default function CallNowButton({
 
     // Close the contact list
     setShowContactList(false);
-    
+
     // Save selected contact for desktop message
     setSelectedContact(contact);
 
@@ -91,7 +98,9 @@ export default function CallNowButton({
           <div className="p-2">
             <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700">
               <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {contacts.length > 1 ? "Select Contact to Call" : "Confirm Call"}
+                {contacts.length > 1
+                  ? "Select Contact to Call"
+                  : "Confirm Call"}
               </span>
               <button
                 onClick={() => setShowContactList(false)}
@@ -159,4 +168,3 @@ export default function CallNowButton({
     </div>
   );
 }
-

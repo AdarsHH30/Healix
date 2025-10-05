@@ -1,0 +1,29 @@
+# LangChain and related packages
+langchain==0.3.7
+langchain-community==0.3.5
+langchain-huggingface==0.1.0
+langchain-groq==0.3.8
+langchain-chroma==0.2.6
+
+# Vector Store
+chromadb>=1.0.20
+
+# Embeddings
+sentence-transformers==3.2.1
+
+# Document Processing
+unstructured[md]==0.16.5
+python-magic-bin==0.4.14
+
+# Environment Management
+python-dotenv==1.0.1
+
+# Groq API
+groq==0.32.0
+
+# Flask
+flask==3.0.0
+flask-cors==4.0.0
+
+# Utilities
+tqdm==4.66.5
