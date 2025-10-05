@@ -33,7 +33,16 @@ export default function PhysicalHealthPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
+        console.log("Fetching exercises from Supabase...");
+
+        // First, let's try to fetch all exercises to debug
+        const { data: allData, error: allError } = await supabase
+          .from("exercises")
+          .select("*");
+
+        console.log("All exercises (debug):", allData, "Error:", allError);
+
         const { data, error: fetchError } = await supabase
           .from("exercises")
           .select("*")
@@ -41,7 +50,10 @@ export default function PhysicalHealthPage() {
           .eq("is_active", true)
           .order("created_at", { ascending: false });
 
+        console.log("Filtered exercises:", data, "Error:", fetchError);
+
         if (fetchError) {
+          console.error("Supabase error details:", fetchError);
           throw fetchError;
         }
 
@@ -58,10 +70,13 @@ export default function PhysicalHealthPage() {
           category: exercise.category,
         }));
 
+        console.log("Transformed exercises:", transformedData);
         setExercises(transformedData);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error fetching exercises:", err);
-        setError("Failed to load exercises. Please try again later.");
+        const errorMessage =
+          err?.message || "Failed to load exercises. Please try again later.";
+        setError(`Failed to load exercises: ${errorMessage}`);
       } finally {
         setLoading(false);
       }
@@ -71,10 +86,16 @@ export default function PhysicalHealthPage() {
   }, []);
 
   const filteredExercises = useMemo(() => {
-    return exercises.filter((exercise) => {
+    console.log("Filtering exercises. Total:", exercises.length);
+    console.log("Search query:", searchQuery);
+    console.log("Selected difficulty:", selectedDifficulty);
+
+    const filtered = exercises.filter((exercise) => {
       const matchesSearch =
         exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        exercise.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        exercise.description
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
         exercise.category.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesDifficulty =
@@ -83,7 +104,10 @@ export default function PhysicalHealthPage() {
 
       return matchesSearch && matchesDifficulty;
     });
-  }, [searchQuery, selectedDifficulty]);
+
+    console.log("Filtered exercises count:", filtered.length);
+    return filtered;
+  }, [exercises, searchQuery, selectedDifficulty]);
 
   const handleGoBack = () => {
     router.push("/dashboard");
@@ -103,11 +127,9 @@ export default function PhysicalHealthPage() {
               <ArrowLeft size={20} strokeWidth={2} />
               <span className="font-medium">Back</span>
             </button>
-
             <h1 className="text-2xl font-bold text-foreground/90 tracking-tight">
               Physical Training
             </h1>
-
             <div className="w-[100px]" /> {/* Spacer for centering */}
           </div>
         </div>
@@ -153,7 +175,11 @@ export default function PhysicalHealthPage() {
         {/* Results Count */}
         <div className="mb-6 text-center">
           <p className="text-muted-foreground">
-            Showing <span className="font-semibold text-foreground">{filteredExercises.length}</span> exercise
+            Showing{" "}
+            <span className="font-semibold text-foreground">
+              {filteredExercises.length}
+            </span>{" "}
+            exercise
             {filteredExercises.length !== 1 ? "s" : ""}
           </p>
         </div>

@@ -34,6 +34,14 @@ export default function BreathingExercisesPage() {
         setLoading(true);
         setError(null);
 
+        console.log("Fetching breathing exercises from Supabase...");
+
+        const { data: allData, error: allError } = await supabase
+          .from("exercises")
+          .select("*");
+
+        console.log("All exercises (debug):", allData, "Error:", allError);
+
         const { data, error: fetchError } = await supabase
           .from("exercises")
           .select("*")
@@ -41,7 +49,15 @@ export default function BreathingExercisesPage() {
           .eq("is_active", true)
           .order("created_at", { ascending: false });
 
+        console.log(
+          "Filtered breathing exercises:",
+          data,
+          "Error:",
+          fetchError
+        );
+
         if (fetchError) {
+          console.error("Supabase error details:", fetchError);
           throw fetchError;
         }
 
@@ -58,10 +74,13 @@ export default function BreathingExercisesPage() {
           category: exercise.category,
         }));
 
+        console.log("Transformed breathing exercises:", transformedData);
         setExercises(transformedData);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error fetching exercises:", err);
-        setError("Failed to load exercises. Please try again later.");
+        const errorMessage =
+          err?.message || "Failed to load exercises. Please try again later.";
+        setError(`Failed to load breathing exercises: ${errorMessage}`);
       } finally {
         setLoading(false);
       }
@@ -71,7 +90,11 @@ export default function BreathingExercisesPage() {
   }, []);
 
   const filteredExercises = useMemo(() => {
-    return exercises.filter((exercise) => {
+    console.log("Filtering breathing exercises. Total:", exercises.length);
+    console.log("Search query:", searchQuery);
+    console.log("Selected difficulty:", selectedDifficulty);
+
+    const filtered = exercises.filter((exercise) => {
       const matchesSearch =
         exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         exercise.description
@@ -85,7 +108,10 @@ export default function BreathingExercisesPage() {
 
       return matchesSearch && matchesDifficulty;
     });
-  }, [searchQuery, selectedDifficulty]);
+
+    console.log("Filtered breathing exercises count:", filtered.length);
+    return filtered;
+  }, [exercises, searchQuery, selectedDifficulty]);
 
   const handleGoBack = () => {
     router.push("/dashboard");
