@@ -63,7 +63,7 @@ export default function Dashboard() {
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains("dark");
     setIsDark(isDarkMode);
-    
+
     // Fetch user's emergency contacts
     fetchEmergencyContacts();
   }, []);
@@ -84,8 +84,12 @@ export default function Dashboard() {
         .single();
 
       if (userData) {
-        const contacts: Array<{ number: string; displayNumber: string; label: string }> = [];
-        
+        const contacts: Array<{
+          number: string;
+          displayNumber: string;
+          label: string;
+        }> = [];
+
         if (userData.emergency_phone_1) {
           contacts.push({
             number: userData.emergency_phone_1,
@@ -93,7 +97,7 @@ export default function Dashboard() {
             label: "Emergency Contact 1",
           });
         }
-        
+
         if (userData.emergency_phone_2) {
           contacts.push({
             number: userData.emergency_phone_2,
@@ -101,13 +105,17 @@ export default function Dashboard() {
             label: "Emergency Contact 2",
           });
         }
-        
+
         setEmergencyContacts(contacts);
       } else {
         // Fallback: Try to get from user metadata
         const metadata = user.user_metadata;
-        const contacts: Array<{ number: string; displayNumber: string; label: string }> = [];
-        
+        const contacts: Array<{
+          number: string;
+          displayNumber: string;
+          label: string;
+        }> = [];
+
         if (metadata?.emergency_phone_1) {
           contacts.push({
             number: metadata.emergency_phone_1,
@@ -115,7 +123,7 @@ export default function Dashboard() {
             label: "Emergency Contact 1",
           });
         }
-        
+
         if (metadata?.emergency_phone_2) {
           contacts.push({
             number: metadata.emergency_phone_2,
@@ -123,7 +131,7 @@ export default function Dashboard() {
             label: "Emergency Contact 2",
           });
         }
-        
+
         setEmergencyContacts(contacts);
       }
     } catch (error) {
@@ -171,31 +179,32 @@ export default function Dashboard() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-background">
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-2xl border-b border-border/40">
-        <div className="flex items-center justify-between px-6 py-4">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-2xl border-b border-border/40">
+        <div className="flex items-center justify-between px-3 md:px-6 py-3 md:py-4">
           <button
             onClick={handleGoBack}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/50 active:scale-95"
+            className="flex items-center gap-1.5 md:gap-2 px-2 md:px-4 py-2 md:py-2.5 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/50 active:scale-95"
             aria-label="Go back"
           >
-            <ArrowLeft size={20} strokeWidth={2} />
-            <span className="font-medium">Back</span>
+            <ArrowLeft size={18} strokeWidth={2} className="md:w-5 md:h-5" />
+            <span className="font-medium text-sm md:text-base">Back</span>
           </button>
 
-          <h1 className="text-xl font-semibold text-foreground/90 tracking-tight">
+          <h1 className="text-base md:text-xl font-semibold text-foreground/90 tracking-tight hidden sm:block">
             Your Wellness Journey
           </h1>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             <CallNowButton
               emergencyContacts={emergencyContacts}
-              className="!px-4 !py-2.5 !bg-transparent !text-foreground/70 hover:!text-foreground hover:!bg-muted/50 !shadow-none hover:!shadow-none !rounded-xl"
-              showText={true}
+              className="!px-2 md:!px-4 !py-2 md:!py-2.5 !bg-transparent !text-foreground/70 hover:!text-foreground hover:!bg-muted/50 !shadow-none hover:!shadow-none !rounded-xl"
+              showText={false}
             />
 
+            {/* Upload button - hidden on mobile */}
             <button
               onClick={handleUpload}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/50 active:scale-95"
+              className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/50 active:scale-95"
               aria-label="Upload Exercise"
             >
               <Upload size={20} strokeWidth={2} />
@@ -204,26 +213,30 @@ export default function Dashboard() {
 
             <button
               onClick={handleProfile}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/50 active:scale-95"
+              className="flex items-center gap-1.5 md:gap-2 px-2 md:px-4 py-2 md:py-2.5 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/50 active:scale-95"
               aria-label="Profile"
             >
-              <User size={20} strokeWidth={2} />
-              <span className="font-medium hidden sm:inline">Profile</span>
+              <User size={18} strokeWidth={2} className="md:w-5 md:h-5" />
+              <span className="font-medium hidden sm:inline text-sm md:text-base">
+                Profile
+              </span>
             </button>
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 text-destructive/70 hover:text-destructive hover:bg-destructive/10 active:scale-95"
+              className="flex items-center gap-1.5 md:gap-2 px-2 md:px-4 py-2 md:py-2.5 rounded-xl transition-all duration-300 text-destructive/70 hover:text-destructive hover:bg-destructive/10 active:scale-95"
               aria-label="Logout"
             >
-              <LogOut size={20} strokeWidth={2} />
-              <span className="font-medium hidden sm:inline">Logout</span>
+              <LogOut size={18} strokeWidth={2} className="md:w-5 md:h-5" />
+              <span className="font-medium hidden sm:inline text-sm md:text-base">
+                Logout
+              </span>
             </button>
           </div>
         </div>
       </header>
 
-      <div className="h-full w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 pt-[73px]">
+      <div className="h-full w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 pt-[57px] md:pt-[73px]">
         {categories.map((category) => {
           return (
             <button
@@ -244,12 +257,15 @@ export default function Dashboard() {
                 className={`absolute inset-0 bg-gradient-to-t ${category.gradient} transition-opacity duration-700 opacity-60 group-hover:opacity-90`}
               />
 
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 transition-all duration-700">
-                <div className="text-center space-y-2 transform transition-all duration-700 group-hover:-translate-y-2">
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight opacity-0 group-hover:opacity-100 transition-all duration-700">
+              {/* Content - Always visible on mobile, hover effect on desktop */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 md:p-8 transition-all duration-700">
+                <div className="text-center space-y-2 transform transition-all duration-700 md:group-hover:-translate-y-2">
+                  {/* Section name - always visible on mobile, hover on desktop */}
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-2xl tracking-tight opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-700">
                     {category.name}
                   </h2>
-                  <p className="text-base sm:text-lg text-white/80 drop-shadow-xl font-light tracking-wide opacity-0 group-hover:opacity-100 transition-all duration-700 delay-75">
+                  {/* Description - always visible on mobile, hover on desktop */}
+                  <p className="text-sm sm:text-base md:text-lg text-white/90 md:text-white/80 drop-shadow-xl font-light tracking-wide opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-700 md:delay-75">
                     {category.description}
                   </p>
                 </div>
@@ -262,23 +278,23 @@ export default function Dashboard() {
       </div>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-4">
+      <div className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-40 flex flex-col gap-3 md:gap-4">
         {/* Map Button */}
         <button
           onClick={toggleMap}
-          className="w-16 h-16 bg-gradient-to-r from-chart-2 to-chart-4 text-white rounded-full shadow-2xl hover:shadow-chart-2/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-2 to-chart-4 text-white rounded-full shadow-2xl hover:shadow-chart-2/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
           aria-label="Open Hospital Map"
         >
-          <MapPin size={28} strokeWidth={2} />
+          <MapPin size={24} strokeWidth={2} className="md:w-7 md:h-7" />
         </button>
 
         {/* Chatbot Button */}
         <button
           onClick={toggleChatbot}
-          className="w-16 h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
           aria-label="Open Chatbot"
         >
-          <MessageCircle size={28} strokeWidth={2} />
+          <MessageCircle size={24} strokeWidth={2} className="md:w-7 md:h-7" />
         </button>
       </div>
 

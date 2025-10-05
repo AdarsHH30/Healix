@@ -66,18 +66,18 @@ export function Testimonials() {
   }, [testimonials.length]);
 
   return (
-    <section className="py-24 bg-gradient-to-b from-background to-primary/5 relative overflow-hidden">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-background to-primary/5 relative overflow-hidden">
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-primary blur-3xl" />
         <div className="absolute bottom-20 right-10 w-64 h-64 rounded-full bg-accent blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 md:mb-4">
             Real Results from Real People
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Join thousands who have transformed their health and wellness
             journey
           </p>
@@ -90,12 +90,12 @@ export function Testimonials() {
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
               {testimonials.map((testimonial, index) => (
-                <div key={index} className="w-full flex-shrink-0 px-4">
-                  <Card className="bg-white/90 backdrop-blur-sm border-border shadow-2xl p-8 md:p-12">
-                    <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+                <div key={index} className="w-full flex-shrink-0 px-2 md:px-4">
+                  <Card className="bg-white/90 backdrop-blur-sm border-border shadow-2xl p-6 md:p-8 lg:p-12">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start">
                       <div className="flex-shrink-0">
                         <div className="relative">
-                          <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-lg">
+                          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-lg">
                             <img
                               src={
                                 testimonial.image ||
@@ -106,33 +106,33 @@ export function Testimonials() {
                             />
                           </div>
                           {testimonial.verified && (
-                            <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary shadow-lg">
-                              <CheckCircle className="h-5 w-5 text-white" />
+                            <div className="absolute -bottom-2 -right-2 flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full bg-primary shadow-lg">
+                              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-white" />
                             </div>
                           )}
                         </div>
                       </div>
 
                       <div className="flex-1 text-center md:text-left">
-                        <div className="flex items-center justify-center md:justify-start gap-1 mb-4">
+                        <div className="flex items-center justify-center md:justify-start gap-1 mb-3 md:mb-4">
                           {[...Array(testimonial.rating)].map((_, i) => (
                             <Star
                               key={i}
-                              className="h-5 w-5 text-primary fill-primary"
+                              className="h-4 w-4 md:h-5 md:w-5 text-primary fill-primary"
                             />
                           ))}
                         </div>
 
-                        <blockquote className="text-xl md:text-2xl text-foreground font-medium mb-6 leading-relaxed">
+                        <blockquote className="text-lg md:text-xl lg:text-2xl text-foreground font-medium mb-4 md:mb-6 leading-relaxed">
                           &ldquo;{testimonial.quote}&rdquo;
                         </blockquote>
 
-                        <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
+                        <div className="flex flex-col md:flex-row items-center md:items-start gap-3 md:gap-4">
                           <div>
-                            <p className="font-semibold text-foreground">
+                            <p className="font-semibold text-sm md:text-base text-foreground">
                               {testimonial.name}, {testimonial.age}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-xs md:text-sm text-muted-foreground">
                               {testimonial.condition}
                             </p>
                           </div>
@@ -156,14 +156,14 @@ export function Testimonials() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-2 mt-8">
+          <div className="flex items-center justify-center gap-2 mt-6 md:mt-8">
             {testimonials.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 className={`h-2 rounded-full transition-all duration-300 ${
                   index === currentIndex
-                    ? "w-8 bg-primary"
+                    ? "w-6 md:w-8 bg-primary"
                     : "w-2 bg-muted-foreground/30"
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}

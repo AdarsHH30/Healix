@@ -82,7 +82,7 @@ export function HeroSection() {
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Header />
 
-        <div className="flex flex-col items-center justify-center py-20 md:py-32">
+        <div className="flex flex-col items-center justify-center py-16 sm:py-20 md:py-32">
           <div
             className={`transition-all duration-1000 ease-in-out ${
               isVisible
@@ -104,7 +104,7 @@ export function HeroSection() {
           </div>
 
           <div
-            className={`mt-32 grid grid-cols-1 md:grid-cols-3 gap-10 w-full max-w-6xl transition-all duration-1000 delay-300 ease-in-out ${
+            className={`mt-16 sm:mt-24 md:mt-32 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10 w-full max-w-6xl transition-all duration-1000 delay-300 ease-in-out ${
               isVisible
                 ? "translate-y-0 opacity-100"
                 : "translate-y-10 opacity-0"

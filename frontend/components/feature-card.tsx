@@ -80,44 +80,44 @@ export function FeatureCard({
         className={`absolute top-0 right-0 w-40 h-40 ${colors.bg} rounded-full blur-3xl opacity-30 group-hover:scale-150 group-hover:opacity-50 transition-all duration-700`}
       />
 
-      <div className="relative p-8">
-        <div className="flex items-center justify-between mb-4">
+      <div className="relative p-5 sm:p-6 md:p-8">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
           <span
-            className={`text-xs font-medium ${colors.text} px-3 py-1 rounded-full ${colors.bg}`}
+            className={`text-xs font-medium ${colors.text} px-2.5 md:px-3 py-1 rounded-full ${colors.bg}`}
           >
             {category}
           </span>
           <div
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${colors.bg} group-hover:scale-110 transition-all duration-500`}
+            className={`inline-flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl md:rounded-2xl ${colors.bg} group-hover:scale-110 transition-all duration-500`}
           >
-            <Icon className={`h-6 w-6 ${colors.text}`} />
+            <Icon className={`h-5 w-5 md:h-6 md:w-6 ${colors.text}`} />
           </div>
         </div>
 
         <h3
-          className={`mb-3 text-3xl font-semibold text-foreground group-hover:${colors.text} transition-colors duration-500`}
+          className={`mb-2 md:mb-3 text-2xl md:text-3xl font-semibold text-foreground group-hover:${colors.text} transition-colors duration-500`}
         >
           {title}
         </h3>
 
-        <p className="text-muted-foreground leading-relaxed mb-6 text-base">
+        <p className="text-muted-foreground leading-relaxed mb-4 md:mb-6 text-sm md:text-base">
           {description}
         </p>
 
-        <div className="flex items-center gap-4 mb-6 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 text-xs md:text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <Clock className="h-4 w-4" />
+            <Clock className="h-3.5 w-3.5 md:h-4 md:w-4" />
             <span>{duration}</span>
           </div>
           <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
           <div className="flex items-center gap-1.5">
-            <TrendingUp className="h-4 w-4" />
+            <TrendingUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
             <span>{level}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-border">
+        <div className="flex items-center gap-2.5 md:gap-3 mb-4 md:mb-6">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden border-2 border-border">
             <img
               src={
                 instructorImage ||
@@ -129,23 +129,23 @@ export function FeatureCard({
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Led by</p>
-            <p className="text-sm font-medium text-foreground">
+            <p className="text-xs md:text-sm font-medium text-foreground">
               {instructorName}
             </p>
           </div>
         </div>
 
         <div
-          className={`transition-all duration-500 ${
+          className={`transition-all duration-500 md:${
             isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
           <Button
-            className={`w-full rounded-full ${colors.bg} ${colors.text} hover:scale-105 transition-all duration-300 group/btn`}
+            className={`w-full rounded-full text-sm md:text-base ${colors.bg} ${colors.text} hover:scale-105 transition-all duration-300 group/btn`}
             variant="ghost"
           >
             Start Program
-            <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+            <ArrowRight className="ml-2 h-3.5 w-3.5 md:h-4 md:w-4 group-hover/btn:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
@@ -201,7 +201,7 @@ export function WellnessPillarCard({
       className={`group relative overflow-hidden bg-white/90 backdrop-blur-sm border-border hover:shadow-2xl ${colors.border} ${colors.shadow} transition-all duration-700 hover:-translate-y-2 cursor-pointer`}
       style={{
         animationDelay: `${delay}ms`,
-        borderRadius: "24px", // Softer rounded corners (16px -> 24px)
+        borderRadius: "24px",
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -211,47 +211,47 @@ export function WellnessPillarCard({
       />
 
       <div
-        className={`absolute top-0 right-0 w-40 h-40 ${colors.bg} rounded-full blur-3xl opacity-30 group-hover:scale-150 group-hover:opacity-50 transition-all duration-700`}
+        className={`absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 ${colors.bg} rounded-full blur-3xl opacity-30 group-hover:scale-150 group-hover:opacity-50 transition-all duration-700`}
       />
 
-      <div className="relative p-8">
-        <div className="flex items-center justify-between mb-4">
+      <div className="relative p-5 sm:p-6 md:p-8">
+        <div className="flex items-center justify-between mb-3 md:mb-4">
           <span
-            className={`text-xs font-medium ${colors.text} px-3 py-1 rounded-full ${colors.bg}`}
+            className={`text-xs font-medium ${colors.text} px-2.5 md:px-3 py-1 rounded-full ${colors.bg}`}
           >
             {category}
           </span>
           <div
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${colors.bg} group-hover:scale-110 transition-all duration-500`}
+            className={`inline-flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl md:rounded-2xl ${colors.bg} group-hover:scale-110 transition-all duration-500`}
           >
-            <Icon className={`h-6 w-6 ${colors.text}`} />
+            <Icon className={`h-5 w-5 md:h-6 md:w-6 ${colors.text}`} />
           </div>
         </div>
 
         <h3
-          className={`mb-3 text-3xl font-semibold text-foreground group-hover:${colors.text} transition-colors duration-500`}
+          className={`mb-2 md:mb-3 text-2xl md:text-3xl font-semibold text-foreground group-hover:${colors.text} transition-colors duration-500`}
         >
           {title}
         </h3>
 
-        <p className="text-muted-foreground leading-relaxed mb-6 text-base">
+        <p className="text-muted-foreground leading-relaxed mb-4 md:mb-6 text-sm md:text-base">
           {description}
         </p>
 
-        <div className="flex items-center gap-4 mb-6 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6 text-xs md:text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <Clock className="h-4 w-4" />
+            <Clock className="h-3.5 w-3.5 md:h-4 md:w-4" />
             <span>{duration}</span>
           </div>
           <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
           <div className="flex items-center gap-1.5">
-            <TrendingUp className="h-4 w-4" />
+            <TrendingUp className="h-3.5 w-3.5 md:h-4 md:w-4" />
             <span>{level}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-border">
+        <div className="flex items-center gap-2.5 md:gap-3 mb-4 md:mb-6">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden border-2 border-border">
             <img
               src={
                 instructorImage ||
@@ -263,23 +263,23 @@ export function WellnessPillarCard({
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Led by</p>
-            <p className="text-sm font-medium text-foreground">
+            <p className="text-xs md:text-sm font-medium text-foreground">
               {instructorName}
             </p>
           </div>
         </div>
 
         <div
-          className={`transition-all duration-500 ${
+          className={`transition-all duration-500 md:${
             isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
           <Button
-            className={`w-full rounded-full ${colors.bg} ${colors.text} hover:scale-105 transition-all duration-300 group/btn`}
+            className={`w-full rounded-full text-sm md:text-base ${colors.bg} ${colors.text} hover:scale-105 transition-all duration-300 group/btn`}
             variant="ghost"
           >
             Start Program
-            <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+            <ArrowRight className="ml-2 h-3.5 w-3.5 md:h-4 md:w-4 group-hover/btn:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>

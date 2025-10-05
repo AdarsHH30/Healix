@@ -482,41 +482,44 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-6xl h-[90vh] bg-background rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4">
+      <div className="relative w-full max-w-6xl h-[95vh] md:h-[90vh] bg-background rounded-xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-background/95 backdrop-blur-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-chart-1 to-chart-2 flex items-center justify-center">
-              <MapPin className="text-white" size={20} />
+        <div className="flex items-center justify-between px-3 md:px-6 py-3 md:py-4 border-b border-border/40 bg-background/95 backdrop-blur-sm">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-chart-1 to-chart-2 flex items-center justify-center">
+              <MapPin
+                className="text-white w-4 h-4 md:w-5 md:h-5"
+                strokeWidth={2}
+              />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-foreground">
+              <h2 className="text-base md:text-xl font-semibold text-foreground">
                 Nearby Medical Facilities
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
                 Searching within 15km • Powered by OpenStreetMap
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-muted/50 hover:bg-muted transition-colors flex items-center justify-center"
+            className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-muted/50 hover:bg-muted transition-colors flex items-center justify-center"
             aria-label="Close map"
           >
-            <X size={20} />
+            <X size={18} className="md:w-5 md:h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Map */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative min-h-[50%] md:min-h-full">
             {loading && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/95 z-10">
-                <div className="text-center space-y-4">
-                  <div className="w-12 h-12 border-4 border-chart-1 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                  <p className="text-muted-foreground">
+                <div className="text-center space-y-3 md:space-y-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 border-4 border-chart-1 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  <p className="text-sm md:text-base text-muted-foreground px-4">
                     Getting your location...
                   </p>
                 </div>
@@ -524,11 +527,16 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
             )}
             {error && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/95 z-10">
-                <div className="text-center space-y-4 p-6">
-                  <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
-                    <MapPin className="text-destructive" size={32} />
+                <div className="text-center space-y-3 md:space-y-4 p-4 md:p-6">
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+                    <MapPin
+                      className="text-destructive w-6 h-6 md:w-8 md:h-8"
+                      strokeWidth={2}
+                    />
                   </div>
-                  <p className="text-destructive font-medium">{error}</p>
+                  <p className="text-sm md:text-base text-destructive font-medium">
+                    {error}
+                  </p>
                 </div>
               </div>
             )}
@@ -595,27 +603,27 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
           </div>
 
           {/* Hospital List */}
-          <div className="w-80 border-l border-border/40 bg-muted/30 overflow-y-auto">
-            <div className="p-4 space-y-3">
+          <div className="w-full md:w-80 border-t md:border-t-0 md:border-l border-border/40 bg-muted/30 overflow-y-auto max-h-[45%] md:max-h-full">
+            <div className="p-3 md:p-4 space-y-2 md:space-y-3">
               {hospitals.length === 0 && !loading && !error && (
-                <p className="text-center text-muted-foreground py-8">
+                <p className="text-center text-sm md:text-base text-muted-foreground py-6 md:py-8">
                   No hospitals found nearby
                 </p>
               )}
               {hospitals.map((hospital) => (
                 <div
                   key={hospital.id}
-                  className="bg-background rounded-lg p-4 shadow-sm border border-border/40 hover:border-chart-1/50 transition-all cursor-pointer group"
+                  className="bg-background rounded-lg p-3 md:p-4 shadow-sm border border-border/40 hover:border-chart-1/50 transition-all cursor-pointer group"
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-2 md:gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground truncate group-hover:text-chart-1 transition-colors">
+                      <div className="flex items-center gap-1.5 md:gap-2 mb-1">
+                        <h3 className="text-sm md:text-base font-semibold text-foreground truncate group-hover:text-chart-1 transition-colors">
                           {hospital.name}
                         </h3>
                         {hospital.type && (
                           <span
-                            className={`text-xs px-2 py-0.5 rounded font-medium whitespace-nowrap ${
+                            className={`text-xs px-1.5 md:px-2 py-0.5 rounded font-medium whitespace-nowrap ${
                               hospital.type === "clinic" ||
                               hospital.type === "doctors"
                                 ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
@@ -628,21 +636,21 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                      <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2">
                         {hospital.address}
                       </p>
                       {hospital.distance && (
-                        <p className="text-xs text-chart-1 font-medium mt-2">
+                        <p className="text-xs text-chart-1 font-medium mt-1.5 md:mt-2">
                           {hospital.distance.toFixed(1)} km away
                         </p>
                       )}
                     </div>
                     <button
                       onClick={() => getDirections(hospital)}
-                      className="flex-shrink-0 w-9 h-9 rounded-full bg-chart-1/10 hover:bg-chart-1 hover:text-white transition-all flex items-center justify-center group/btn"
+                      className="flex-shrink-0 w-8 h-8 md:w-9 md:h-9 rounded-full bg-chart-1/10 hover:bg-chart-1 hover:text-white transition-all flex items-center justify-center group/btn"
                       aria-label="Get directions"
                     >
-                      <Navigation size={16} />
+                      <Navigation size={14} className="md:w-4 md:h-4" />
                     </button>
                   </div>
                 </div>

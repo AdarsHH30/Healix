@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Leaf, Heart, Users, BookOpen, LogOut } from "lucide-react";
+import { Leaf, Heart, Users, BookOpen, LogOut, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -12,6 +12,7 @@ import type { User } from "@supabase/supabase-js";
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -56,9 +57,22 @@ export function Header() {
           : "bg-transparent"
       }`}
     >
-      <nav className="container mx-auto flex items-center justify-between py-6 px-4">
-        {/* Left side navigation */}
-        <div className="flex items-center gap-8">
+      <nav className="container mx-auto flex items-center justify-between py-4 md:py-6 px-4">
+        {/* Mobile menu button */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="lg:hidden flex items-center justify-center h-10 w-10 rounded-lg hover:bg-primary/10 transition-colors"
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? (
+            <X className="h-6 w-6 text-foreground" />
+          ) : (
+            <Menu className="h-6 w-6 text-foreground" />
+          )}
+        </button>
+
+        {/* Left side navigation - Desktop only */}
+        <div className="hidden lg:flex items-center gap-8">
           <a
             href="#programs"
             className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
@@ -79,18 +93,18 @@ export function Header() {
         </div>
 
         {/* Center logo */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30">
-            <Leaf className="h-5 w-5 text-primary-foreground" />
+        <div className="flex items-center gap-2 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
+          <div className="relative flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30">
+            <Leaf className="h-4 w-4 md:h-5 md:w-5 text-primary-foreground" />
             <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
           </div>
-          <span className="text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <span className="text-lg md:text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Healix
           </span>
         </div>
 
-        {/* Right side navigation */}
-        <div className="flex items-center gap-8">
+        {/* Right side navigation - Desktop only */}
+        <div className="hidden lg:flex items-center gap-8">
           <a
             href="#community"
             className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
@@ -124,7 +138,77 @@ export function Header() {
             </Link>
           )}
         </div>
+
+        {/* Mobile right side - Theme toggle only */}
+        <div className="flex lg:hidden items-center gap-2">
+          <ThemeToggle />
+        </div>
       </nav>
+
+      {/* Mobile menu */}
+      <div
+        className={`lg:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border shadow-lg transition-all duration-300 ease-in-out ${
+          mobileMenuOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-4 pointer-events-none"
+        }`}
+      >
+        <div className="container mx-auto px-4 py-6 space-y-4">
+          <a
+            href="#programs"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 text-base font-medium text-muted-foreground hover:text-primary transition-colors py-3 px-4 rounded-lg hover:bg-primary/5"
+          >
+            <BookOpen className="h-5 w-5" />
+            <span>Programs</span>
+          </a>
+
+          <a
+            href="#instructors"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 text-base font-medium text-muted-foreground hover:text-primary transition-colors py-3 px-4 rounded-lg hover:bg-primary/5"
+          >
+            <Heart className="h-5 w-5" />
+            <span>Instructors</span>
+          </a>
+
+          <a
+            href="#community"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 text-base font-medium text-muted-foreground hover:text-primary transition-colors py-3 px-4 rounded-lg hover:bg-primary/5"
+          >
+            <Users className="h-5 w-5" />
+            <span>Community</span>
+          </a>
+
+          <div className="pt-4 border-t border-border">
+            {user ? (
+              <Button
+                variant="outline"
+                size="default"
+                onClick={() => {
+                  handleSignOut();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full rounded-full border-2 border-destructive/20 hover:border-destructive hover:bg-destructive/5 transition-all duration-300"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            ) : (
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button
+                  variant="outline"
+                  size="default"
+                  className="w-full rounded-full border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300"
+                >
+                  Sign In
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
     </header>
   );
 }
