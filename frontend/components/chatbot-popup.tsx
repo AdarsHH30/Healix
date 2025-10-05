@@ -1,13 +1,16 @@
 "use client";
 
-import { X, Send } from "lucide-react";
+import { X, Send, AlertCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { sendChatbotQuery } from "@/lib/chatbot-api";
 
 interface Message {
   id: string;
   text: string;
   sender: "user" | "bot";
   timestamp: Date;
+  sources?: string[];
+  error?: boolean;
 }
 
 interface ChatbotPopupProps {
@@ -47,20 +50,37 @@ export function ChatbotPopup({ isOpen, onClose }: ChatbotPopupProps) {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentQuery = inputMessage;
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      // Call the RAG backend API
+      const response = await sendChatbotQuery(currentQuery);
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "Thank you for your message. I'm here to help with your wellness journey!",
+        text: response.answer,
         sender: "bot",
         timestamp: new Date(),
+        sources: response.sources,
       };
       setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      // Handle errors gracefully
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: error instanceof Error 
+          ? `I'm sorry, I encountered an error: ${error.message}. Please make sure the chatbot backend is running.`
+          : "I'm sorry, I encountered an unexpected error. Please try again.",
+        sender: "bot",
+        timestamp: new Date(),
+        error: true,
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -115,14 +135,24 @@ export function ChatbotPopup({ isOpen, onClose }: ChatbotPopupProps) {
                 className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                   message.sender === "user"
                     ? "bg-chart-1 text-white rounded-br-sm"
+                    : message.error
+                    ? "bg-destructive/10 text-destructive border border-destructive/20 rounded-bl-sm"
                     : "bg-muted text-foreground rounded-bl-sm"
                 }`}
               >
-                <p className="text-sm leading-relaxed">{message.text}</p>
+                {message.error && (
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertCircle size={16} />
+                    <span className="text-xs font-semibold">Error</span>
+                  </div>
+                )}
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
                 <p
                   className={`text-xs mt-1 ${
                     message.sender === "user"
                       ? "text-white/60"
+                      : message.error
+                      ? "text-destructive/60"
                       : "text-muted-foreground"
                   }`}
                 >

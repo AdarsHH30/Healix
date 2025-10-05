@@ -26,6 +26,15 @@ const nextConfig = {
       },
     ],
   },
+  // Proxy API requests to chatbot backend to avoid CORS issues in development
+  async rewrites() {
+    return [
+      {
+        source: '/api/chatbot/:path*',
+        destination: process.env.NEXT_PUBLIC_CHATBOT_API_URL || 'http://localhost:5000/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
