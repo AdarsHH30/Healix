@@ -284,3 +284,117 @@ async function trackExercise(exerciseId: string, duration?: number) {
   return { data, error };
 }
 ```
+
+### Get Quote Favorites
+
+```typescript
+async function getFavoriteQuotes(userId: string) {
+  const { data, error } = await supabase
+    .from("quote_favorites")
+    .select("quote_id")
+    .eq("user_id", userId);
+
+  return { data, error };
+}
+```
+
+### Toggle Quote Favorite
+
+```typescript
+async function toggleQuoteFavorite(userId: string, quoteId: string) {
+  const { data: existing } = await supabase
+    .from("quote_favorites")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("quote_id", quoteId)
+    .single();
+
+  if (existing) {
+    // Remove favorite
+    const { error } = await supabase
+      .from("quote_favorites")
+      .delete()
+      .eq("user_id", userId)
+      .eq("quote_id", quoteId);
+    return { isFavorited: false, error };
+  } else {
+    // Add favorite
+    const { error } = await supabase
+      .from("quote_favorites")
+      .insert({ user_id: userId, quote_id: quoteId });
+    return { isFavorited: true, error };
+  }
+}
+```
+
+### Track Quote View
+
+```typescript
+async function trackQuoteView(quoteId: string, userId?: string) {
+  const { error } = await supabase.from("quote_views").insert({
+    quote_id: quoteId,
+    user_id: userId,
+  });
+
+  return { error };
+}
+```
+
+## Quote Tables Schema
+
+Add these tables for quote interaction tracking:
+
+```sql
+-- Create quote_favorites table
+CREATE TABLE IF NOT EXISTS public.quote_favorites (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  quote_id TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_user_quote_favorite UNIQUE (user_id, quote_id)
+);
+
+-- Create quote_views table
+CREATE TABLE IF NOT EXISTS public.quote_views (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  quote_id TEXT NOT NULL,
+  user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  viewed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes for quote tables
+CREATE INDEX IF NOT EXISTS idx_quote_favorites_user ON public.quote_favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_quote_favorites_quote ON public.quote_favorites(quote_id);
+CREATE INDEX IF NOT EXISTS idx_quote_views_quote ON public.quote_views(quote_id);
+CREATE INDEX IF NOT EXISTS idx_quote_views_viewed_at ON public.quote_views(viewed_at);
+
+-- Enable RLS for quote tables
+ALTER TABLE public.quote_favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.quote_views ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for quote_favorites
+CREATE POLICY "Users can view their own favorites"
+  ON public.quote_favorites FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own favorites"
+  ON public.quote_favorites FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own favorites"
+  ON public.quote_favorites FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- RLS Policies for quote_views (read-only for authenticated users)
+CREATE POLICY "Anyone can insert quote views"
+  ON public.quote_views FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Users can view all quote views"
+  ON public.quote_views FOR SELECT
+  USING (true);
+```
+
+````
+```
+````

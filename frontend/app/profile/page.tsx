@@ -10,6 +10,8 @@ import {
   Upload as UploadIcon,
   MessageCircle,
   MapPin,
+  Heart,
+  TrendingUp,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
@@ -25,16 +27,82 @@ interface UserProfile {
   created_at: string;
 }
 
+interface QuoteData {
+  id: string;
+  text: string;
+  author: string;
+  category: string;
+  color: string;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [favoriteQuotes, setFavoriteQuotes] = useState<Set<string>>(new Set());
+  const [quotes, setQuotes] = useState<QuoteData[]>([]);
 
   useEffect(() => {
     loadProfile();
+    loadFavorites();
+    loadQuotes();
   }, []);
+
+  const loadQuotes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("quotes")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      if (data) {
+        setQuotes(data);
+      }
+    } catch (error) {
+      console.error("Error loading quotes:", error);
+    }
+  };
+
+  const loadFavorites = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("quote_favorites")
+        .select("quote_id")
+        .eq("user_id", user.id);
+
+      if (data) {
+        setFavoriteQuotes(new Set(data.map((fav) => fav.quote_id)));
+      }
+    } catch (error) {
+      console.error("Error loading favorites:", error);
+    }
+  };
+
+  const handleRemoveFavorite = async (quoteId: string) => {
+    if (!profile?.id) return;
+
+    try {
+      await supabase
+        .from("quote_favorites")
+        .delete()
+        .eq("user_id", profile.id)
+        .eq("quote_id", quoteId);
+
+      const newFavorites = new Set(favoriteQuotes);
+      newFavorites.delete(quoteId);
+      setFavoriteQuotes(newFavorites);
+    } catch (error) {
+      console.error("Error removing favorite:", error);
+    }
+  };
 
   const loadProfile = async () => {
     try {
@@ -218,6 +286,79 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          {/* Favorited Quotes Section */}
+          {favoriteQuotes.size > 0 && (
+            <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Heart size={24} className="text-red-500" fill="currentColor" />
+                <h3 className="text-xl font-bold text-foreground">
+                  Your Favorite Quotes
+                </h3>
+                <span className="px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/30 text-sm font-medium text-red-600 dark:text-red-400">
+                  {favoriteQuotes.size}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {quotes
+                  .filter((quote) => favoriteQuotes.has(quote.id))
+                  .map((quote) => (
+                    <div
+                      key={quote.id}
+                      className="group relative bg-gradient-to-br from-red-50/50 to-pink-50/50 dark:from-red-950/20 dark:to-pink-950/20 rounded-xl border-2 border-red-200/50 dark:border-red-900/50 hover:border-red-300 dark:hover:border-red-800 transition-all duration-300 overflow-hidden"
+                    >
+                      {/* Color Accent Bar */}
+                      <div
+                        className="h-1.5 w-full"
+                        style={{ backgroundColor: quote.color }}
+                      />
+
+                      {/* Card Content */}
+                      <div className="p-5 space-y-4">
+                        {/* Header */}
+                        <div className="flex items-start justify-between gap-3">
+                          <div
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border"
+                            style={{
+                              backgroundColor: `${quote.color}15`,
+                              borderColor: `${quote.color}40`,
+                              color: quote.color,
+                            }}
+                          >
+                            <TrendingUp size={12} />
+                            {quote.category}
+                          </div>
+
+                          <button
+                            onClick={() => handleRemoveFavorite(quote.id)}
+                            className="p-2 rounded-full bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 transition-all duration-300"
+                            aria-label="Remove from favorites"
+                          >
+                            <Heart
+                              size={18}
+                              className="text-red-500"
+                              fill="currentColor"
+                              strokeWidth={2}
+                            />
+                          </button>
+                        </div>
+
+                        {/* Quote Text */}
+                        <blockquote className="text-sm text-foreground/90 leading-relaxed">
+                          "{quote.text}"
+                        </blockquote>
+
+                        {/* Author */}
+                        <p className="text-xs font-medium text-muted-foreground">
+                          — {quote.author}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
 
           {/* Info Section */}
           <div className="bg-muted/20 rounded-2xl border border-border p-8">

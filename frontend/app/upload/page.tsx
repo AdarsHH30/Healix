@@ -36,6 +36,7 @@ export default function UploadPage() {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -59,6 +60,12 @@ export default function UploadPage() {
     >
   ) => {
     const { name, value } = e.target;
+
+    // Clear image preview if URL is being set
+    if (name === "imageUrl" && value) {
+      setImagePreview(null);
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -81,6 +88,14 @@ export default function UploadPage() {
         });
         return;
       }
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
       setFormData((prev) => ({ ...prev, imageFile: file, imageUrl: "" }));
       setMessage(null);
     }
@@ -358,61 +373,149 @@ export default function UploadPage() {
             {/* Image Upload - File or URL */}
             <div className="space-y-4">
               <label className="block text-sm font-medium text-foreground">
-                Exercise Image *
+                Exercise Image *{" "}
+                <span className="text-xs text-muted-foreground font-normal">
+                  (Choose one option)
+                </span>
               </label>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* File Upload */}
-                <div>
+              {/* File Upload Option */}
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Option 1: Upload Image File
+                </p>
+
+                {/* Image Preview if file selected */}
+                {imagePreview && formData.imageFile && (
+                  <div className="relative w-full h-48 rounded-xl overflow-hidden border-2 border-green-500">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                      <Check size={14} />
+                      Uploaded
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({ ...prev, imageFile: null }));
+                        setImagePreview(null);
+                      }}
+                      className="absolute bottom-2 right-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                )}
+
+                {/* Upload Button */}
+                {!imagePreview && (
                   <label
                     htmlFor="imageFile"
-                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-chart-1 transition-colors bg-background/50"
+                    className={`flex flex-col items-center justify-center w-full h-36 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 ${
+                      formData.imageUrl
+                        ? "border-border/30 bg-background/30 cursor-not-allowed"
+                        : "border-border hover:border-chart-1 bg-background/50"
+                    }`}
                   >
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <ImagePlus className="w-8 h-8 mb-2 text-muted-foreground" />
-                      <p className="text-xs text-muted-foreground">
-                        <span className="font-semibold">Click to upload</span>{" "}
-                        or drag and drop
+                    <div className="flex flex-col items-center justify-center p-6">
+                      <ImagePlus className="w-10 h-10 mb-3 text-muted-foreground" />
+                      <p className="text-sm font-semibold text-foreground mb-1">
+                        Click to upload image
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        PNG, JPG, WebP (max 5MB)
+                        PNG, JPG, WebP, GIF (max 5MB)
                       </p>
+                      {formData.imageUrl && (
+                        <p className="text-xs text-yellow-500 mt-2">
+                          Image URL is set. Clear URL to upload file.
+                        </p>
+                      )}
                     </div>
                     <input
                       id="imageFile"
                       type="file"
                       accept="image/*"
                       onChange={handleImageFileChange}
+                      disabled={!!formData.imageUrl}
                       className="hidden"
                     />
                   </label>
-                  {formData.imageFile && (
-                    <p className="mt-2 text-sm text-green-500">
-                      ✓ {formData.imageFile.name}
-                    </p>
-                  )}
-                </div>
+                )}
+              </div>
 
-                {/* OR Separator */}
-                <div className="flex items-center justify-center md:col-span-1">
-                  <span className="text-sm text-muted-foreground font-medium">
+              {/* OR Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-background text-muted-foreground font-medium">
                     OR
                   </span>
                 </div>
               </div>
 
-              {/* URL Input */}
-              <input
-                type="url"
-                name="imageUrl"
-                value={formData.imageUrl}
-                onChange={handleInputChange}
-                disabled={!!formData.imageFile}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full px-4 py-3 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-chart-1 text-foreground placeholder:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-              />
+              {/* URL Input Option */}
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Option 2: Use Image URL
+                </p>
+                <input
+                  type="url"
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleInputChange}
+                  disabled={!!formData.imageFile}
+                  placeholder="https://images.unsplash.com/photo-example.jpg"
+                  className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-chart-1 text-foreground placeholder:text-muted-foreground transition-all ${
+                    formData.imageUrl && !formData.imageFile
+                      ? "bg-green-500/5 border-green-500"
+                      : formData.imageFile
+                      ? "bg-background/30 border-border/30 opacity-50 cursor-not-allowed"
+                      : "bg-background border-border"
+                  }`}
+                />
+                {formData.imageUrl && !formData.imageFile && (
+                  <div className="flex items-center gap-2 text-xs text-green-500">
+                    <Check size={14} />
+                    <span>URL set successfully</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => ({ ...prev, imageUrl: "" }))
+                      }
+                      className="ml-auto text-red-500 hover:text-red-400 underline"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Helper Text */}
               <p className="text-xs text-muted-foreground">
-                Provide either an image file or a URL
+                💡 <span className="font-medium">Tip:</span> Use high-quality
+                images from{" "}
+                <a
+                  href="https://unsplash.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-chart-1 hover:underline"
+                >
+                  Unsplash
+                </a>{" "}
+                or{" "}
+                <a
+                  href="https://pexels.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-chart-1 hover:underline"
+                >
+                  Pexels
+                </a>
               </p>
             </div>
 
