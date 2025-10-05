@@ -8,10 +8,14 @@ import {
   Calendar,
   LogOut,
   Upload as UploadIcon,
+  MessageCircle,
+  MapPin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
+import { ChatbotPopup } from "@/components/chatbot-popup";
+import { MapPopup } from "@/components/map-popup";
 
 interface UserProfile {
   id: string;
@@ -25,6 +29,8 @@ export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -236,6 +242,34 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-40 flex flex-col gap-3 md:gap-4">
+        {/* Map Button */}
+        <button
+          onClick={() => setIsMapOpen(true)}
+          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-2 to-chart-4 text-white rounded-full shadow-2xl hover:shadow-chart-2/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          aria-label="Open Hospital Map"
+        >
+          <MapPin size={24} strokeWidth={2} className="md:w-7 md:h-7" />
+        </button>
+
+        {/* Chatbot Button */}
+        <button
+          onClick={() => setIsChatbotOpen(true)}
+          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          aria-label="Open Chatbot"
+        >
+          <MessageCircle size={24} strokeWidth={2} className="md:w-7 md:h-7" />
+        </button>
+      </div>
+
+      {/* Chatbot & Map Popups */}
+      <ChatbotPopup
+        isOpen={isChatbotOpen}
+        onClose={() => setIsChatbotOpen(false)}
+      />
+      <MapPopup isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
     </div>
   );
 }

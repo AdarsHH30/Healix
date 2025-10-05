@@ -504,10 +504,14 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-muted/50 hover:bg-muted transition-colors flex items-center justify-center"
+            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-muted hover:bg-muted/80 transition-colors flex items-center justify-center active:scale-95 shadow-md"
             aria-label="Close map"
           >
-            <X size={18} className="md:w-5 md:h-5" />
+            <X
+              size={20}
+              className="md:w-5 md:h-5 text-foreground"
+              strokeWidth={2.5}
+            />
           </button>
         </div>
 

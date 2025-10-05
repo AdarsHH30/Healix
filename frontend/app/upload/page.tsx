@@ -2,8 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Upload, Check, AlertCircle, ImagePlus } from "lucide-react";
+import {
+  ArrowLeft,
+  Upload,
+  Check,
+  AlertCircle,
+  ImagePlus,
+  MessageCircle,
+  MapPin,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { ChatbotPopup } from "@/components/chatbot-popup";
+import { MapPopup } from "@/components/map-popup";
 
 type ExerciseType = "physical" | "mental" | "breathing" | "nutrition";
 type Difficulty = "Beginner" | "Intermediate" | "Advanced";
@@ -24,6 +34,8 @@ export default function UploadPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -465,6 +477,34 @@ export default function UploadPage() {
           </ul>
         </div>
       </main>
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-40 flex flex-col gap-3 md:gap-4">
+        {/* Map Button */}
+        <button
+          onClick={() => setIsMapOpen(true)}
+          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-2 to-chart-4 text-white rounded-full shadow-2xl hover:shadow-chart-2/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          aria-label="Open Hospital Map"
+        >
+          <MapPin size={24} strokeWidth={2} className="md:w-7 md:h-7" />
+        </button>
+
+        {/* Chatbot Button */}
+        <button
+          onClick={() => setIsChatbotOpen(true)}
+          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          aria-label="Open Chatbot"
+        >
+          <MessageCircle size={24} strokeWidth={2} className="md:w-7 md:h-7" />
+        </button>
+      </div>
+
+      {/* Chatbot & Map Popups */}
+      <ChatbotPopup
+        isOpen={isChatbotOpen}
+        onClose={() => setIsChatbotOpen(false)}
+      />
+      <MapPopup isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
     </div>
   );
 }
