@@ -2,12 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import twilio from 'twilio';
 import { createClient } from '@supabase/supabase-js';
 
-// Rate limiting map (in production, use Redis or similar)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-
-// Rate limit: 3 requests per 5 minutes per IP
 const RATE_LIMIT_MAX = 3;
-const RATE_LIMIT_WINDOW = 5 * 60 * 1000; // 5 minutes
+const RATE_LIMIT_WINDOW = 5 * 60 * 1000;
 
 function checkRateLimit(identifier: string): boolean {
   const now = Date.now();
@@ -28,7 +25,6 @@ function checkRateLimit(identifier: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    // Validate environment variables (only Twilio credentials needed)
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
@@ -55,7 +51,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get the authenticated user
     const authHeader = request.headers.get('authorization');
     if (!authHeader) {
       return NextResponse.json(
@@ -75,7 +70,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user's emergency contacts from database
     const { data: userData, error: dbError } = await supabase
       .from('users')
       .select('emergency_phone_1, emergency_phone_2')
@@ -86,7 +80,6 @@ export async function POST(request: NextRequest) {
     let emergencyNumber2: string | null = null;
 
     if (dbError || !userData) {
-      // Fallback to user metadata
       emergencyNumber1 = user.user_metadata?.emergency_phone_1 || null;
       emergencyNumber2 = user.user_metadata?.emergency_phone_2 || null;
     } else {
@@ -101,11 +94,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get client IP for rate limiting
     const forwardedFor = request.headers.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
 
-    // Check rate limit
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         { error: 'Too many emergency requests. Please wait before trying again.' },
@@ -113,11 +104,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse request body
     const body = await request.json();
     const { latitude, longitude, userMessage } = body;
 
-    // Validate input
     if (!latitude || !longitude) {
       return NextResponse.json(
         { error: 'Location data is required' },
@@ -125,7 +114,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate latitude and longitude ranges
     if (typeof latitude !== 'number' || typeof longitude !== 'number' ||
         latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
       return NextResponse.json(
@@ -134,70 +122,89 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize Twilio client
     const client = twilio(accountSid, authToken);
-
-    // Create location URL (Google Maps link)
     const locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-    // Create SMS message
-    const smsMessage = `🚨 EMERGENCY ALERT 🚨\n\n${userMessage || 'Emergency assistance needed!'}\n\nLocation: ${locationUrl}\n\nCoordinates: ${latitude}, ${longitude}\n\nTime: ${new Date().toLocaleString()}`;
+    const smsMessage = `🚨 EMERGENCY ALERT 🚨
 
-    // Filter out null contacts and send SMS to available emergency contacts
+Your contact has pressed the EMERGENCY button and needs immediate help!
+
+📍 Location: ${locationUrl}
+
+Coordinates: ${latitude}, ${longitude}
+
+⏰ Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+
+⚠️ Please go to their location immediately or call emergency services!`;
+
     const contactNumbers = [emergencyNumber1, emergencyNumber2].filter((num): num is string => num !== null);
+    
+    console.log('📞 Attempting to send emergency alerts to:', contactNumbers);
+    console.log('📱 Twilio Number:', twilioPhoneNumber);
     
     const smsPromises = contactNumbers.map(async (toNumber) => {
       try {
+        console.log(`📤 Sending SMS to ${toNumber}...`);
         const message = await client.messages.create({
           body: smsMessage,
           from: twilioPhoneNumber,
           to: toNumber,
         });
+        console.log(`✅ SMS sent successfully to ${toNumber}, SID: ${message.sid}`);
         return { success: true, to: toNumber, sid: message.sid };
       } catch (error: any) {
-        console.error(`Failed to send SMS to ${toNumber}:`, error);
+        console.error(`❌ Failed to send SMS to ${toNumber}:`, error.message);
+        console.error('Full error:', error);
         return { success: false, to: toNumber, error: error.message };
       }
     });
 
-    // Make calls to available emergency contacts simultaneously
     const callPromises = contactNumbers.map(async (toNumber) => {
       try {
+        console.log(`📞 Calling ${toNumber}...`);
         const call = await client.calls.create({
-          // TwiML to say an emergency message
           twiml: `<Response>
             <Say voice="alice" language="en-US">
-              Emergency Alert! This is an automated emergency call. 
-              The user has requested emergency assistance. 
-              Please check your text messages for the exact location details.
+              Emergency Alert! Emergency Alert! 
+              Your contact has pressed the emergency button and needs immediate help.
+              Please check your text messages right now for their exact location.
             </Say>
-            <Pause length="2"/>
+            <Pause length="1"/>
             <Say voice="alice" language="en-US">
-              Location coordinates have been sent via S M S. 
-              This call will now end. Please respond immediately.
+              I repeat: Your contact has pressed the emergency button.
+              Their location has been sent to you via S M S text message.
+              Please go to their location immediately or call emergency services.
+              This is an urgent emergency. Please respond now.
             </Say>
           </Response>`,
           from: twilioPhoneNumber,
           to: toNumber,
         });
+        console.log(`✅ Call initiated successfully to ${toNumber}, SID: ${call.sid}`);
         return { success: true, to: toNumber, sid: call.sid };
       } catch (error: any) {
-        console.error(`Failed to call ${toNumber}:`, error);
+        console.error(`❌ Failed to call ${toNumber}:`, error.message);
+        console.error('Full error:', error);
         return { success: false, to: toNumber, error: error.message };
       }
     });
 
-    // Wait for all operations to complete
     const [smsResults, callResults] = await Promise.all([
       Promise.all(smsPromises),
       Promise.all(callPromises),
     ]);
 
-    // Check if at least one SMS and one call succeeded
+    console.log('📊 Results Summary:');
+    console.log('SMS Results:', JSON.stringify(smsResults, null, 2));
+    console.log('Call Results:', JSON.stringify(callResults, null, 2));
+
     const smsSuccess = smsResults.some(result => result.success);
     const callSuccess = callResults.some(result => result.success);
 
+    console.log(`✅ SMS Success: ${smsSuccess}, Call Success: ${callSuccess}`);
+
     if (!smsSuccess && !callSuccess) {
+      console.error('❌ All emergency notifications failed!');
       return NextResponse.json(
         {
           error: 'Failed to send emergency notifications',
@@ -207,6 +214,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('🎉 Emergency alerts sent successfully!');
     return NextResponse.json({
       success: true,
       message: 'Emergency notifications sent',
@@ -223,7 +231,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Only allow POST requests
 export async function GET() {
   return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
 }
