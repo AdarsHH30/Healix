@@ -216,7 +216,13 @@ const Login03Page = () => {
             </p>
           </div>
         </div>
-        <div className="bg-muted hidden lg:block border-l " />
+        <div className="bg-muted hidden lg:block border-l relative overflow-hidden">
+          <img
+            src="https://qvkzwudrgnyfwvvpfqxb.supabase.co/storage/v1/object/public/exercises/exercise-images/supasupa.png"
+            alt="Healix"
+            className="w-full h-full object-cover"
+          />
+        </div>
       </div>
     </div>
   );

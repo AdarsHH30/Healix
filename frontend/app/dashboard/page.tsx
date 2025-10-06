@@ -13,8 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { ChatbotPopup } from "@/components/chatbot-popup";
 import { MapPopup } from "@/components/map-popup";
-import { supabase } from "@/lib/supabase";
-import CallNowButton from "@/components/call-now-button";
+import { createBrowserClient } from "@supabase/ssr";
 import { EmergencyButton } from "@/components/emergency-button";
 import { EmergencyPopup } from "@/components/emergency-popup";
 
@@ -59,88 +58,17 @@ export default function Dashboard() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
-  const [emergencyContacts, setEmergencyContacts] = useState<
-    Array<{ number: string; displayNumber: string; label: string }>
-  >([]);
+
+  // Create Supabase client with SSR support
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains("dark");
     setIsDark(isDarkMode);
-
-    // Fetch user's emergency contacts
-    fetchEmergencyContacts();
   }, []);
-
-  const fetchEmergencyContacts = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) return;
-
-      // Try to get emergency contacts from users table
-      const { data: userData, error } = await supabase
-        .from("users")
-        .select("emergency_phone_1, emergency_phone_2")
-        .eq("id", user.id)
-        .single();
-
-      if (userData) {
-        const contacts: Array<{
-          number: string;
-          displayNumber: string;
-          label: string;
-        }> = [];
-
-        if (userData.emergency_phone_1) {
-          contacts.push({
-            number: userData.emergency_phone_1,
-            displayNumber: userData.emergency_phone_1,
-            label: "Emergency Contact 1",
-          });
-        }
-
-        if (userData.emergency_phone_2) {
-          contacts.push({
-            number: userData.emergency_phone_2,
-            displayNumber: userData.emergency_phone_2,
-            label: "Emergency Contact 2",
-          });
-        }
-
-        setEmergencyContacts(contacts);
-      } else {
-        // Fallback: Try to get from user metadata
-        const metadata = user.user_metadata;
-        const contacts: Array<{
-          number: string;
-          displayNumber: string;
-          label: string;
-        }> = [];
-
-        if (metadata?.emergency_phone_1) {
-          contacts.push({
-            number: metadata.emergency_phone_1,
-            displayNumber: metadata.emergency_phone_1,
-            label: "Emergency Contact 1",
-          });
-        }
-
-        if (metadata?.emergency_phone_2) {
-          contacts.push({
-            number: metadata.emergency_phone_2,
-            displayNumber: metadata.emergency_phone_2,
-            label: "Emergency Contact 2",
-          });
-        }
-
-        setEmergencyContacts(contacts);
-      }
-    } catch (error) {
-      console.error("Error fetching emergency contacts:", error);
-    }
-  };
 
   const handleCategoryClick = (categoryId: string) => {
     router.push(`/dashboard/${categoryId}`);
@@ -160,10 +88,15 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     try {
+      // Sign out with SSR client to properly clear cookies
       await supabase.auth.signOut();
-      router.push("/");
+
+      // Force a hard redirect to clear any cached state
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error signing out:", error);
+      // Even if there's an error, redirect to login
+      window.location.href = "/login";
     }
   };
 
@@ -202,12 +135,6 @@ export default function Dashboard() {
           </h1>
 
           <div className="flex items-center gap-1 md:gap-2">
-            <CallNowButton
-              emergencyContacts={emergencyContacts}
-              className="!px-2 md:!px-4 !py-2 md:!py-2.5 !bg-transparent !text-foreground/70 hover:!text-foreground hover:!bg-muted/50 !shadow-none hover:!shadow-none !rounded-xl"
-              showText={false}
-            />
-
             {/* Upload button - hidden on mobile */}
             <button
               onClick={handleUpload}
