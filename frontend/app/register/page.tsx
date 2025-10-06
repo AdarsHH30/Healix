@@ -16,11 +16,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { supabase } from "@/lib/supabase";
+import { createBrowserClient } from "@supabase/ssr";
 import { useState } from "react";
 import { ChatbotPopup } from "@/components/chatbot-popup";
 import { MapPopup } from "@/components/map-popup";
-import { MessageCircle, MapPin } from "lucide-react";
+import { MessageCircle, MapPin, CheckCircle2 } from "lucide-react";
 
 const formSchema = z
   .object({
@@ -68,12 +68,18 @@ const RegisterPage = () => {
     setSuccess(null);
 
     try {
+      // Create SSR-compatible Supabase client for proper cookie handling
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
       // Sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
           data: {
             emergency_phone_1: data.emergencyPhone1,
             emergency_phone_2: data.emergencyPhone2,
@@ -81,17 +87,35 @@ const RegisterPage = () => {
         },
       });
 
+      console.log("Sign up response:", { authData, authError });
+
       if (authError) {
         setError(authError.message);
         return;
       }
 
       if (authData.user) {
-        // Check if email confirmation is required
-        if (authData.session) {
-          // No email confirmation required - user is logged in
-          // Update user profile in the users table with emergency contacts
-          // Using upsert in case the trigger already created the profile
+        // Check if the user has an existing session or needs to confirm email
+        const identities = authData.user.identities;
+
+        console.log("User identities:", identities);
+        console.log("User confirmed at:", authData.user.confirmed_at);
+        console.log("Session exists:", !!authData.session);
+
+        if (identities && identities.length === 0) {
+          // User already exists but hasn't confirmed email
+          setError(
+            "This email is already registered. Please check your email for the confirmation link, or try logging in if you've already confirmed your account."
+          );
+          form.reset();
+          return;
+        }
+
+        if (authData.session && authData.user.confirmed_at) {
+          // Email confirmation is disabled in Supabase - user is already logged in
+          console.log("Auto-confirmed user, redirecting to dashboard");
+
+          // Create user profile
           const { error: profileError } = await supabase.from("users").upsert(
             {
               id: authData.user.id,
@@ -108,18 +132,28 @@ const RegisterPage = () => {
             console.error("Error creating user profile:", profileError);
           }
 
-          // Redirect to dashboard
-          router.push("/dashboard");
-        } else {
-          // Email confirmation required
           setSuccess(
-            "Registration successful! Please check your email to confirm your account before logging in."
+            "Account created successfully! Redirecting to dashboard..."
           );
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 1500);
+        } else {
+          // Email confirmation is required
+          console.log("Email confirmation required");
+          setSuccess(
+            "🎉 Registration successful! Please check your email inbox and click the confirmation link to verify your account. Don't forget to check your spam folder if you don't see it."
+          );
+
           // Clear the form
           form.reset();
+
+          // Sign out the user to ensure they must confirm email before logging in
+          await supabase.auth.signOut();
         }
       }
     } catch (err: unknown) {
+      console.error("Registration error:", err);
       setError(
         err instanceof Error
           ? err.message
@@ -152,136 +186,171 @@ const RegisterPage = () => {
           )}
 
           {success && (
-            <div className="mt-4 p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 text-sm">
-              {success}
+            <div className="mt-4 p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 text-sm space-y-2">
+              <p className="font-semibold">{success}</p>
+              <p className="text-xs">
+                After confirming your email, you can{" "}
+                <Link
+                  href="/login"
+                  className="underline font-medium hover:text-green-700 dark:hover:text-green-300"
+                >
+                  log in here
+                </Link>
+              </p>
             </div>
           )}
         </div>
 
         {/* Form Card */}
-        <div className="bg-card border rounded-lg shadow-sm p-8">
-          <Form {...form}>
-            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-              {/* Account Information */}
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Account Information</h2>
+        {!success && (
+          <div className="bg-card border rounded-lg shadow-sm p-8">
+            <Form {...form}>
+              <form
+                className="space-y-6"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                {/* Account Information */}
+                <div className="space-y-4">
+                  <h2 className="text-lg font-semibold">Account Information</h2>
 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="your.email@example.com"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="your.email@example.com"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Create a strong password"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Create a strong password"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Confirm your password"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Emergency Contacts */}
-              <div className="space-y-4 pt-6 border-t">
-                <div>
-                  <h2 className="text-lg font-semibold">Emergency Contacts</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Add phone numbers we can call in case of emergency
-                  </p>
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Confirm your password"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="emergencyPhone1"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Primary Emergency Contact</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="tel"
-                          placeholder="+1 (555) 123-4567"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Emergency Contacts */}
+                <div className="space-y-4 pt-6 border-t">
+                  <div>
+                    <h2 className="text-lg font-semibold">
+                      Emergency Contacts
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Add phone numbers we can call in case of emergency
+                    </p>
+                  </div>
 
-                <FormField
-                  control={form.control}
-                  name="emergencyPhone2"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Secondary Emergency Contact</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="tel"
-                          placeholder="+1 (555) 987-6543"
-                          className="h-11"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                  <FormField
+                    control={form.control}
+                    name="emergencyPhone1"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Primary Emergency Contact</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="+1 (555) 123-4567"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <Button
-                type="submit"
-                className="w-full h-11 text-base"
-                disabled={isLoading}
-              >
-                {isLoading ? "Creating Account..." : "Create Account"}
-              </Button>
-            </form>
-          </Form>
-        </div>
+                  <FormField
+                    control={form.control}
+                    name="emergencyPhone2"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Secondary Emergency Contact</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="tel"
+                            placeholder="+1 (555) 987-6543"
+                            className="h-11"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-11 text-base"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
+              </form>
+            </Form>
+          </div>
+        )}
+
+        {/* Success message with login link */}
+        {success && (
+          <div className="bg-card border rounded-lg shadow-sm p-8 text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-green-500" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold">Check Your Email!</h2>
+              <p className="text-sm text-muted-foreground">
+                We've sent a confirmation link to your email address. Please
+                click the link to verify your account.
+              </p>
+            </div>
+            <Button onClick={() => router.push("/login")} className="w-full">
+              Go to Login
+            </Button>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="text-center space-y-4">

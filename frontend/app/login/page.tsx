@@ -14,10 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { supabase } from "@/lib/supabase";
+import { createBrowserClient } from "@supabase/ssr";
 import { useState } from "react";
 
 const formSchema = z.object({
@@ -27,8 +27,12 @@ const formSchema = z.object({
 
 const Login03Page = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Get the redirect parameter from URL
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -43,6 +47,12 @@ const Login03Page = () => {
     setError(null);
 
     try {
+      // Create SSR-compatible Supabase client for proper cookie handling
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
       console.log("Attempting login with:", data.email);
 
       const { data: authData, error: authError } =
@@ -95,8 +105,8 @@ const Login03Page = () => {
         // Force a small delay to ensure session is set
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Redirect to dashboard
-        router.push("/dashboard");
+        // Redirect to the original page or dashboard
+        router.push(redirectTo);
         router.refresh();
       } else {
         setError("Login failed. Please try again.");
@@ -206,7 +216,7 @@ const Login03Page = () => {
             </p>
           </div>
         </div>
-        <div className="bg-muted hidden lg:block border-l" />
+        <div className="bg-muted hidden lg:block border-l " />
       </div>
     </div>
   );

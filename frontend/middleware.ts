@@ -61,33 +61,36 @@ export async function middleware(request: NextRequest) {
   // Refresh session if expired - required for Server Components
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Allow auth callback routes (for email confirmation)
-  if (request.nextUrl.pathname.startsWith('/auth/callback') || 
-      request.nextUrl.pathname.startsWith('/auth/confirm')) {
-    return response
+  const path = request.nextUrl.pathname
+
+  // Define public routes that don't require authentication
+  const publicRoutes = [
+    '/',
+    '/login',
+    '/register',
+    '/auth/callback',
+    '/auth/confirm',
+  ]
+
+  // Check if the current path is a public route
+  const isPublicRoute = publicRoutes.some(route => path === route || path.startsWith('/auth/'))
+
+  // If user is authenticated and trying to access login/register, redirect to dashboard
+  if (user && (path === '/login' || path === '/register')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // TEMPORARILY DISABLED - Allow access to dashboard without login for testing
-  // TODO: Re-enable authentication before production deployment
-  
-  // Protect dashboard routes - redirect to login if not authenticated
-  // if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-  //   return NextResponse.redirect(new URL('/login', request.url))
-  // }
+  // If route is protected and user is not authenticated, redirect to login
+  if (!isPublicRoute && !user) {
+    const redirectUrl = new URL('/login', request.url)
+    // Add the original URL as a redirect parameter so we can send them back after login
+    redirectUrl.searchParams.set('redirect', path)
+    return NextResponse.redirect(redirectUrl)
+  }
 
-  // Protect upload route - redirect to login if not authenticated
-  // if (request.nextUrl.pathname.startsWith('/upload') && !user) {
-  //   return NextResponse.redirect(new URL('/login', request.url))
-  // }
-
-  // Protect profile route - redirect to login if not authenticated
-  // if (request.nextUrl.pathname.startsWith('/profile') && !user) {
-  //   return NextResponse.redirect(new URL('/login', request.url))
-  // }
-
-  // Redirect to dashboard if already logged in and trying to access login/register
-  if ((request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register') && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  // Allow auth callback routes to proceed without additional checks
+  if (path.startsWith('/auth/callback') || path.startsWith('/auth/confirm')) {
+    return response
   }
 
   return response
