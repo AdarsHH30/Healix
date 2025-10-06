@@ -66,6 +66,43 @@ CREATE TABLE IF NOT EXISTS public.user_progress (
   CONSTRAINT unique_user_exercise_completion UNIQUE (user_id, exercise_id, completed_at)
 );
 
+-- Create quotes table
+CREATE TABLE IF NOT EXISTS public.quotes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  quote_text TEXT NOT NULL,
+  author TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('motivation', 'mindfulness', 'health', 'wellness', 'inspiration')),
+  tags TEXT[],
+  created_by UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  is_active BOOLEAN DEFAULT true
+);
+
+-- Create nutrition_plans table
+CREATE TABLE IF NOT EXISTS public.nutrition_plans (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  youtube_url TEXT,
+  calories TEXT NOT NULL,
+  protein TEXT NOT NULL,
+  carbs TEXT NOT NULL,
+  fats TEXT NOT NULL,
+  meal_type TEXT NOT NULL CHECK (meal_type IN ('breakfast', 'lunch', 'dinner', 'snack')),
+  category TEXT NOT NULL CHECK (category IN ('weight-loss', 'muscle-gain', 'balanced', 'vegan', 'keto', 'paleo', 'vegetarian', 'high-protein', 'low-carb')),
+  prep_time TEXT NOT NULL,
+  difficulty TEXT NOT NULL CHECK (difficulty IN ('Easy', 'Medium', 'Hard')),
+  ingredients TEXT[] NOT NULL,
+  instructions TEXT[] NOT NULL,
+  benefits TEXT[] NOT NULL,
+  created_by UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  is_active BOOLEAN DEFAULT true
+);
+
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_exercises_type ON public.exercises(exercise_type);
 CREATE INDEX IF NOT EXISTS idx_exercises_difficulty ON public.exercises(difficulty);
@@ -74,6 +111,13 @@ CREATE INDEX IF NOT EXISTS idx_exercises_active ON public.exercises(is_active);
 CREATE INDEX IF NOT EXISTS idx_user_progress_user_id ON public.user_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_exercise_id ON public.user_progress(exercise_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_completed_at ON public.user_progress(completed_at);
+CREATE INDEX IF NOT EXISTS idx_quotes_category ON public.quotes(category);
+CREATE INDEX IF NOT EXISTS idx_quotes_active ON public.quotes(is_active);
+CREATE INDEX IF NOT EXISTS idx_quotes_created_at ON public.quotes(created_at);
+CREATE INDEX IF NOT EXISTS idx_nutrition_meal_type ON public.nutrition_plans(meal_type);
+CREATE INDEX IF NOT EXISTS idx_nutrition_category ON public.nutrition_plans(category);
+CREATE INDEX IF NOT EXISTS idx_nutrition_difficulty ON public.nutrition_plans(difficulty);
+CREATE INDEX IF NOT EXISTS idx_nutrition_active ON public.nutrition_plans(is_active);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -95,10 +139,22 @@ CREATE TRIGGER update_exercises_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_quotes_updated_at
+  BEFORE UPDATE ON public.quotes
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_nutrition_plans_updated_at
+  BEFORE UPDATE ON public.nutrition_plans
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.quotes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.nutrition_plans ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for users table
 CREATE POLICY "Users can view their own profile"
@@ -146,6 +202,40 @@ CREATE POLICY "Users can update their own progress"
 CREATE POLICY "Users can delete their own progress"
   ON public.user_progress FOR DELETE
   USING (auth.uid() = user_id);
+
+-- RLS Policies for quotes table
+CREATE POLICY "Anyone can view active quotes"
+  ON public.quotes FOR SELECT
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can insert quotes"
+  ON public.quotes FOR INSERT
+  WITH CHECK (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Users can update their own quotes"
+  ON public.quotes FOR UPDATE
+  USING (auth.uid() = created_by);
+
+CREATE POLICY "Users can delete their own quotes"
+  ON public.quotes FOR DELETE
+  USING (auth.uid() = created_by);
+
+-- RLS Policies for nutrition_plans table
+CREATE POLICY "Anyone can view active nutrition plans"
+  ON public.nutrition_plans FOR SELECT
+  USING (is_active = true);
+
+CREATE POLICY "Authenticated users can insert nutrition plans"
+  ON public.nutrition_plans FOR INSERT
+  WITH CHECK (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Users can update their own nutrition plans"
+  ON public.nutrition_plans FOR UPDATE
+  USING (auth.uid() = created_by);
+
+CREATE POLICY "Users can delete their own nutrition plans"
+  ON public.nutrition_plans FOR DELETE
+  USING (auth.uid() = created_by);
 
 -- Create a function to automatically create user profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -221,12 +311,55 @@ Tracks user's exercise completion and progress.
 | duration_minutes | INTEGER     | Duration in minutes (optional)           |
 | notes            | TEXT        | User notes about the exercise (optional) |
 
+### `quotes`
+
+Stores inspirational and motivational quotes.
+
+| Column      | Type        | Description                                                       |
+| ----------- | ----------- | ----------------------------------------------------------------- |
+| id          | UUID        | Primary key                                                       |
+| quote_text  | TEXT        | The quote text                                                    |
+| author      | TEXT        | Quote author name                                                 |
+| category    | TEXT        | motivation, mindfulness, health, wellness, or inspiration         |
+| tags        | TEXT[]      | Array of tags for categorization                                  |
+| created_by  | UUID        | References users.id (who created it)                              |
+| created_at  | TIMESTAMPTZ | Creation timestamp                                                |
+| updated_at  | TIMESTAMPTZ | Last update timestamp                                             |
+| is_active   | BOOLEAN     | Whether quote is visible                                          |
+
+### `nutrition_plans`
+
+Stores meal plans and nutrition recipes.
+
+| Column       | Type        | Description                                                          |
+| ------------ | ----------- | -------------------------------------------------------------------- |
+| id           | UUID        | Primary key                                                          |
+| title        | TEXT        | Meal/food name                                                       |
+| description  | TEXT        | Meal description                                                     |
+| image_url    | TEXT        | Food image URL                                                       |
+| youtube_url  | TEXT        | YouTube recipe video link (optional)                                 |
+| calories     | TEXT        | Calorie information (e.g., "450 kcal")                               |
+| protein      | TEXT        | Protein content (e.g., "30g")                                        |
+| carbs        | TEXT        | Carbohydrate content (e.g., "45g")                                   |
+| fats         | TEXT        | Fat content (e.g., "15g")                                            |
+| meal_type    | TEXT        | breakfast, lunch, dinner, or snack                                   |
+| category     | TEXT        | weight-loss, muscle-gain, balanced, vegan, keto, paleo, etc.         |
+| prep_time    | TEXT        | Preparation time (e.g., "15 min")                                    |
+| difficulty   | TEXT        | Easy, Medium, or Hard                                                |
+| ingredients  | TEXT[]      | Array of ingredients                                                 |
+| instructions | TEXT[]      | Array of cooking steps                                               |
+| benefits     | TEXT[]      | Array of health benefits                                             |
+| created_by   | UUID        | References users.id (who created it)                                 |
+| created_at   | TIMESTAMPTZ | Creation timestamp                                                   |
+| updated_at   | TIMESTAMPTZ | Last update timestamp                                                |
+| is_active    | BOOLEAN     | Whether nutrition plan is visible                                    |
+
 ## Security
 
 - **Row Level Security (RLS)** is enabled on all tables
 - Users can only access their own data
-- Anyone can view active exercises
-- Users can only edit/delete exercises they created
+- Anyone can view active exercises, quotes, and nutrition plans
+- Users can only edit/delete content they created
 - Automatic profile creation on user signup
 - Secure authentication via Supabase Auth
 

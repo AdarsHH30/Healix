@@ -17,6 +17,7 @@ import {
   Zap,
   Flame,
   Loader2,
+  X,
 } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { ChatbotPopup } from "@/components/chatbot-popup";
@@ -329,11 +330,79 @@ export default function NutritionPage() {
               )}
             </div>
 
-            {/* Nutrition Plans Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {filteredPlans.map((plan) => (
-                <NutritionCard key={plan.id} plan={plan} />
-              ))}
+            {/* Meal Type Categories */}
+            <div className="space-y-8 sm:space-y-12">
+              {/* Breakfast Section */}
+              {filteredPlans.filter((p) => p.mealType === "breakfast").length >
+                0 && (
+                <section>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4 sm:mb-6 flex items-center gap-3">
+                    <Coffee className="w-8 h-8 text-orange-500" />
+                    Breakfast Ideas
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {filteredPlans
+                      .filter((p) => p.mealType === "breakfast")
+                      .map((plan) => (
+                        <NutritionCard key={plan.id} plan={plan} />
+                      ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Lunch Section */}
+              {filteredPlans.filter((p) => p.mealType === "lunch").length >
+                0 && (
+                <section>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4 sm:mb-6 flex items-center gap-3">
+                    <Salad className="w-8 h-8 text-blue-500" />
+                    Lunch Ideas
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {filteredPlans
+                      .filter((p) => p.mealType === "lunch")
+                      .map((plan) => (
+                        <NutritionCard key={plan.id} plan={plan} />
+                      ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Dinner Section */}
+              {filteredPlans.filter((p) => p.mealType === "dinner").length >
+                0 && (
+                <section>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4 sm:mb-6 flex items-center gap-3">
+                    <Pizza className="w-8 h-8 text-purple-500" />
+                    Dinner Recipes
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {filteredPlans
+                      .filter((p) => p.mealType === "dinner")
+                      .map((plan) => (
+                        <NutritionCard key={plan.id} plan={plan} />
+                      ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Snacks Section */}
+              {filteredPlans.filter((p) => p.mealType === "snack").length >
+                0 && (
+                <section>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4 sm:mb-6 flex items-center gap-3">
+                    <Apple className="w-8 h-8 text-green-500" />
+                    Healthy Snacks
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {filteredPlans
+                      .filter((p) => p.mealType === "snack")
+                      .map((plan) => (
+                        <NutritionCard key={plan.id} plan={plan} />
+                      ))}
+                  </div>
+                </section>
+              )}
             </div>
 
             {filteredPlans.length === 0 && (
@@ -391,165 +460,202 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
     snack: Apple,
   };
 
-  const categoryColors = {
-    "weight-loss": "from-red-500/20 to-orange-500/20 border-red-500/30",
-    "muscle-gain": "from-blue-500/20 to-purple-500/20 border-blue-500/30",
-    balanced: "from-green-500/20 to-emerald-500/20 border-green-500/30",
-    vegan: "from-lime-500/20 to-green-500/20 border-lime-500/30",
-    keto: "from-purple-500/20 to-pink-500/20 border-purple-500/30",
-  };
-
-  const difficultyColors = {
-    Easy: "bg-green-500/20 text-green-400 border-green-500/30",
-    Medium: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-    Hard: "bg-red-500/20 text-red-400 border-red-500/30",
-  };
-
   const MealIcon = mealTypeIcons[plan.mealType];
 
   return (
-    <div
-      className={`group bg-gradient-to-br ${
-        categoryColors[plan.category]
-      } backdrop-blur-sm rounded-2xl overflow-hidden border hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl`}
-    >
-      {/* Image */}
-      <div className="relative h-48 overflow-hidden">
+    <div className="group cursor-pointer">
+      {/* Card with Image Overlay - Food.com Style */}
+      <div
+        onClick={() => setShowDetails(!showDetails)}
+        className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+      >
+        {/* Background Image */}
         <img
           src={plan.imageUrl}
           alt={plan.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />
-        <div className="absolute top-3 left-3 flex gap-2">
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border ${
-              difficultyColors[plan.difficulty]
-            }`}
-          >
+
+        {/* Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+        {/* Collection Badge */}
+        <div className="absolute top-4 left-4">
+          <span className="px-3 py-1.5 rounded-md bg-white/95 backdrop-blur-sm text-xs font-bold text-gray-800 tracking-wider shadow-md">
+            COLLECTION
+          </span>
+        </div>
+
+        {/* Difficulty & Time Badges */}
+        <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black/60 text-white backdrop-blur-md border border-white/20">
             {plan.difficulty}
           </span>
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black/50 text-white backdrop-blur-md flex items-center gap-1">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black/60 text-white backdrop-blur-md flex items-center gap-1 border border-white/20">
             <Clock size={12} />
             {plan.prepTime}
           </span>
         </div>
-        <div className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-md">
-          <MealIcon size={20} className="text-foreground" />
+
+        {/* Meal Type Icon */}
+        <div className="absolute bottom-4 right-4 p-2.5 rounded-full bg-white/90 backdrop-blur-md shadow-lg">
+          <MealIcon size={20} className="text-gray-800" />
+        </div>
+
+        {/* Title & Description Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-5">
+          <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 drop-shadow-lg">
+            {plan.title}
+          </h3>
+          <p className="text-sm text-white/90 line-clamp-2 drop-shadow-md">
+            {plan.description}
+          </p>
+
+          {/* Macros Quick View */}
+          <div className="flex gap-4 mt-3">
+            <div className="flex items-center gap-1.5">
+              <Flame size={14} className="text-orange-400" />
+              <span className="text-xs font-semibold text-white">
+                {plan.calories} cal
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Zap size={14} className="text-blue-400" />
+              <span className="text-xs font-semibold text-white">
+                {plan.protein} protein
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-5">
-        <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-1">
-          {plan.title}
-        </h3>
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-          {plan.description}
-        </p>
+      {/* Expanded Details Modal */}
+      {showDetails && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Header with Image */}
+            <div className="relative h-64">
+              <img
+                src={plan.imageUrl}
+                alt={plan.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDetails(false);
+                }}
+                className="absolute top-4 right-4 p-2 rounded-full bg-white/90 hover:bg-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+              <div className="absolute bottom-4 left-4 right-4">
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  {plan.title}
+                </h2>
+                <p className="text-white/90">{plan.description}</p>
+              </div>
+            </div>
 
-        {/* Macros */}
-        <div className="grid grid-cols-4 gap-2 mb-4">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Flame size={14} className="text-orange-500" />
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Macros Grid */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center p-4 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                  <Flame size={20} className="text-orange-500 mx-auto mb-2" />
+                  <p className="text-lg font-bold text-foreground">
+                    {plan.calories}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Calories</p>
+                </div>
+                <div className="text-center p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                  <Zap size={20} className="text-blue-500 mx-auto mb-2" />
+                  <p className="text-lg font-bold text-foreground">
+                    {plan.protein}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Protein</p>
+                </div>
+                <div className="text-center p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                  <TrendingUp
+                    size={20}
+                    className="text-yellow-500 mx-auto mb-2"
+                  />
+                  <p className="text-lg font-bold text-foreground">
+                    {plan.carbs}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Carbs</p>
+                </div>
+                <div className="text-center p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <Heart size={20} className="text-red-500 mx-auto mb-2" />
+                  <p className="text-lg font-bold text-foreground">
+                    {plan.fats}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Fats</p>
+                </div>
+              </div>
+
+              {/* Ingredients */}
+              <div>
+                <h4 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                  <Utensils size={18} />
+                  Ingredients
+                </h4>
+                <ul className="space-y-2">
+                  {plan.ingredients.map((ingredient, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-muted-foreground flex items-start gap-2 pl-2"
+                    >
+                      <span className="text-green-500 mt-1">•</span>
+                      <span>{ingredient}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Instructions */}
+              <div>
+                <h4 className="text-lg font-bold text-foreground mb-3">
+                  Instructions
+                </h4>
+                <ol className="space-y-3">
+                  {plan.instructions.map((instruction, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-muted-foreground flex items-start gap-3 pl-2"
+                    >
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center text-xs font-bold">
+                        {index + 1}
+                      </span>
+                      <span>{instruction}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* Benefits */}
+              <div>
+                <h4 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                  <Heart size={18} className="text-red-500" />
+                  Health Benefits
+                </h4>
+                <ul className="space-y-2">
+                  {plan.benefits.map((benefit, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-muted-foreground flex items-start gap-2 pl-2"
+                    >
+                      <span className="text-red-500 mt-1">♥</span>
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <p className="text-xs font-bold text-foreground">{plan.calories}</p>
-            <p className="text-xs text-muted-foreground">Cal</p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Zap size={14} className="text-blue-500" />
-            </div>
-            <p className="text-xs font-bold text-foreground">{plan.protein}</p>
-            <p className="text-xs text-muted-foreground">Protein</p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <TrendingUp size={14} className="text-yellow-500" />
-            </div>
-            <p className="text-xs font-bold text-foreground">{plan.carbs}</p>
-            <p className="text-xs text-muted-foreground">Carbs</p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Heart size={14} className="text-red-500" />
-            </div>
-            <p className="text-xs font-bold text-foreground">{plan.fats}</p>
-            <p className="text-xs text-muted-foreground">Fats</p>
           </div>
         </div>
-
-        {/* View Details Button */}
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold hover:shadow-lg transition-all duration-300"
-        >
-          {showDetails ? "Hide Details" : "View Recipe"}
-        </button>
-
-        {/* Expanded Details */}
-        {showDetails && (
-          <div className="mt-4 pt-4 border-t border-border/50 space-y-4">
-            {/* Ingredients */}
-            <div>
-              <h4 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Utensils size={16} />
-                Ingredients
-              </h4>
-              <ul className="space-y-1">
-                {plan.ingredients.map((ingredient, index) => (
-                  <li
-                    key={index}
-                    className="text-xs text-muted-foreground flex items-start gap-2"
-                  >
-                    <span className="text-green-500 mt-0.5">•</span>
-                    <span>{ingredient}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Instructions */}
-            <div>
-              <h4 className="text-sm font-bold text-foreground mb-2">
-                Instructions
-              </h4>
-              <ol className="space-y-1">
-                {plan.instructions.map((instruction, index) => (
-                  <li
-                    key={index}
-                    className="text-xs text-muted-foreground flex items-start gap-2"
-                  >
-                    <span className="font-semibold text-green-500">
-                      {index + 1}.
-                    </span>
-                    <span>{instruction}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* Benefits */}
-            <div>
-              <h4 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Heart size={16} className="text-red-500" />
-                Health Benefits
-              </h4>
-              <ul className="space-y-1">
-                {plan.benefits.map((benefit, index) => (
-                  <li
-                    key={index}
-                    className="text-xs text-muted-foreground flex items-start gap-2"
-                  >
-                    <span className="text-red-500 mt-0.5">♥</span>
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
