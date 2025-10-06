@@ -80,10 +80,10 @@ export default function BreathingExercisesPage() {
 
         console.log("Transformed breathing exercises:", transformedData);
         setExercises(transformedData);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error fetching exercises:", err);
         const errorMessage =
-          err?.message || "Failed to load exercises. Please try again later.";
+          err instanceof Error ? err.message : "Failed to load exercises. Please try again later.";
         setError(`Failed to load breathing exercises: ${errorMessage}`);
       } finally {
         setLoading(false);

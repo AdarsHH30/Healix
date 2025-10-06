@@ -346,7 +346,7 @@ export default function ProfilePage() {
 
                         {/* Quote Text */}
                         <blockquote className="text-sm text-foreground/90 leading-relaxed">
-                          "{quote.text}"
+                          &quot;{quote.text}&quot;
                         </blockquote>
 
                         {/* Author */}

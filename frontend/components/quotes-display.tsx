@@ -175,7 +175,7 @@ export function QuotesDisplay() {
 
                 {/* Quote Text */}
                 <blockquote className="text-sm sm:text-base text-foreground/90 leading-relaxed line-clamp-4">
-                  "{quote.text}"
+                  &quot;{quote.text}&quot;
                 </blockquote>
 
                 {/* Author */}

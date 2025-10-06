@@ -87,10 +87,10 @@ export default function MentalHealthPage() {
 
         console.log("Transformed mental exercises:", transformedData);
         setExercises(transformedData);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error fetching exercises:", err);
         const errorMessage =
-          err?.message || "Failed to load exercises. Please try again later.";
+          err instanceof Error ? err.message : "Failed to load exercises. Please try again later.";
         setError(`Failed to load mental health exercises: ${errorMessage}`);
       } finally {
         setLoading(false);
@@ -317,8 +317,8 @@ export default function MentalHealthPage() {
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   Remember that taking care of your mental health is not
-                  selfish—it's essential. Be patient with yourself, celebrate
-                  small victories, and don't hesitate to seek support when
+                  selfish—it&apos;s essential. Be patient with yourself, celebrate
+                  small victories, and don&apos;t hesitate to seek support when
                   needed.
                 </p>
               </div>
