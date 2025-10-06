@@ -15,6 +15,8 @@ import { ChatbotPopup } from "@/components/chatbot-popup";
 import { MapPopup } from "@/components/map-popup";
 import { supabase } from "@/lib/supabase";
 import CallNowButton from "@/components/call-now-button";
+import { EmergencyButton } from "@/components/emergency-button";
+import { EmergencyPopup } from "@/components/emergency-popup";
 
 const categories = [
   {
@@ -56,6 +58,7 @@ export default function Dashboard() {
   const [isDark, setIsDark] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [emergencyContacts, setEmergencyContacts] = useState<
     Array<{ number: string; displayNumber: string; label: string }>
   >([]);
@@ -177,6 +180,10 @@ export default function Dashboard() {
     setIsMapOpen(!isMapOpen);
   };
 
+  const toggleEmergency = () => {
+    setIsEmergencyOpen(!isEmergencyOpen);
+  };
+
   return (
     <div className="h-screen w-screen overflow-hidden bg-background">
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-2xl border-b border-border/40">
@@ -279,6 +286,16 @@ export default function Dashboard() {
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-40 flex flex-col gap-3 md:gap-4">
+        {/* Emergency Button - Most Important, at the top */}
+        <button
+          onClick={toggleEmergency}
+          className="w-14 h-14 md:w-16 md:h-16 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-2xl hover:shadow-red-600/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center animate-pulse"
+          aria-label="Emergency Call and SMS"
+          title="Emergency - Call & SMS with Location"
+        >
+          <Phone size={24} strokeWidth={2.5} className="md:w-7 md:h-7" />
+        </button>
+
         {/* Map Button */}
         <button
           onClick={toggleMap}
@@ -306,6 +323,12 @@ export default function Dashboard() {
 
       {/* Map Popup */}
       <MapPopup isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
+
+      {/* Emergency Popup */}
+      <EmergencyPopup
+        isOpen={isEmergencyOpen}
+        onClose={() => setIsEmergencyOpen(false)}
+      />
     </div>
   );
 }

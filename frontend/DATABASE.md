@@ -315,44 +315,44 @@ Tracks user's exercise completion and progress.
 
 Stores inspirational and motivational quotes.
 
-| Column      | Type        | Description                                                       |
-| ----------- | ----------- | ----------------------------------------------------------------- |
-| id          | UUID        | Primary key                                                       |
-| quote_text  | TEXT        | The quote text                                                    |
-| author      | TEXT        | Quote author name                                                 |
-| category    | TEXT        | motivation, mindfulness, health, wellness, or inspiration         |
-| tags        | TEXT[]      | Array of tags for categorization                                  |
-| created_by  | UUID        | References users.id (who created it)                              |
-| created_at  | TIMESTAMPTZ | Creation timestamp                                                |
-| updated_at  | TIMESTAMPTZ | Last update timestamp                                             |
-| is_active   | BOOLEAN     | Whether quote is visible                                          |
+| Column     | Type        | Description                                               |
+| ---------- | ----------- | --------------------------------------------------------- |
+| id         | UUID        | Primary key                                               |
+| quote_text | TEXT        | The quote text                                            |
+| author     | TEXT        | Quote author name                                         |
+| category   | TEXT        | motivation, mindfulness, health, wellness, or inspiration |
+| tags       | TEXT[]      | Array of tags for categorization                          |
+| created_by | UUID        | References users.id (who created it)                      |
+| created_at | TIMESTAMPTZ | Creation timestamp                                        |
+| updated_at | TIMESTAMPTZ | Last update timestamp                                     |
+| is_active  | BOOLEAN     | Whether quote is visible                                  |
 
 ### `nutrition_plans`
 
 Stores meal plans and nutrition recipes.
 
-| Column       | Type        | Description                                                          |
-| ------------ | ----------- | -------------------------------------------------------------------- |
-| id           | UUID        | Primary key                                                          |
-| title        | TEXT        | Meal/food name                                                       |
-| description  | TEXT        | Meal description                                                     |
-| image_url    | TEXT        | Food image URL                                                       |
-| youtube_url  | TEXT        | YouTube recipe video link (optional)                                 |
-| calories     | TEXT        | Calorie information (e.g., "450 kcal")                               |
-| protein      | TEXT        | Protein content (e.g., "30g")                                        |
-| carbs        | TEXT        | Carbohydrate content (e.g., "45g")                                   |
-| fats         | TEXT        | Fat content (e.g., "15g")                                            |
-| meal_type    | TEXT        | breakfast, lunch, dinner, or snack                                   |
-| category     | TEXT        | weight-loss, muscle-gain, balanced, vegan, keto, paleo, etc.         |
-| prep_time    | TEXT        | Preparation time (e.g., "15 min")                                    |
-| difficulty   | TEXT        | Easy, Medium, or Hard                                                |
-| ingredients  | TEXT[]      | Array of ingredients                                                 |
-| instructions | TEXT[]      | Array of cooking steps                                               |
-| benefits     | TEXT[]      | Array of health benefits                                             |
-| created_by   | UUID        | References users.id (who created it)                                 |
-| created_at   | TIMESTAMPTZ | Creation timestamp                                                   |
-| updated_at   | TIMESTAMPTZ | Last update timestamp                                                |
-| is_active    | BOOLEAN     | Whether nutrition plan is visible                                    |
+| Column       | Type        | Description                                                  |
+| ------------ | ----------- | ------------------------------------------------------------ |
+| id           | UUID        | Primary key                                                  |
+| title        | TEXT        | Meal/food name                                               |
+| description  | TEXT        | Meal description                                             |
+| image_url    | TEXT        | Food image URL                                               |
+| youtube_url  | TEXT        | YouTube recipe video link (optional)                         |
+| calories     | TEXT        | Calorie information (e.g., "450 kcal")                       |
+| protein      | TEXT        | Protein content (e.g., "30g")                                |
+| carbs        | TEXT        | Carbohydrate content (e.g., "45g")                           |
+| fats         | TEXT        | Fat content (e.g., "15g")                                    |
+| meal_type    | TEXT        | breakfast, lunch, dinner, or snack                           |
+| category     | TEXT        | weight-loss, muscle-gain, balanced, vegan, keto, paleo, etc. |
+| prep_time    | TEXT        | Preparation time (e.g., "15 min")                            |
+| difficulty   | TEXT        | Easy, Medium, or Hard                                        |
+| ingredients  | TEXT[]      | Array of ingredients                                         |
+| instructions | TEXT[]      | Array of cooking steps                                       |
+| benefits     | TEXT[]      | Array of health benefits                                     |
+| created_by   | UUID        | References users.id (who created it)                         |
+| created_at   | TIMESTAMPTZ | Creation timestamp                                           |
+| updated_at   | TIMESTAMPTZ | Last update timestamp                                        |
+| is_active    | BOOLEAN     | Whether nutrition plan is visible                            |
 
 ## Security
 
