@@ -123,69 +123,73 @@ export function QuotesDisplay() {
             {quotes.map((quote) => {
               const isFavorited = favoriteQuotes.has(quote.id);
 
-          return (
-            <div
-              key={quote.id}
-              className="group relative bg-card rounded-xl border border-border/50 hover:border-border transition-all duration-300 overflow-hidden"
-              onMouseEnter={() => trackView(quote.id)}
-            >
-              {/* Color Accent Bar */}
-              <div
-                className="h-1 w-full transition-all duration-300 group-hover:h-1.5"
-                style={{ backgroundColor: quote.color }}
-              />
-
-              {/* Card Content */}
-              <div className="p-5 sm:p-6 space-y-4">
-                {/* Header */}
-                <div className="flex items-start justify-between gap-3">
+              return (
+                <div
+                  key={quote.id}
+                  className="group relative bg-card rounded-xl border border-border/50 hover:border-border transition-all duration-300 overflow-hidden"
+                  onMouseEnter={() => trackView(quote.id)}
+                >
+                  {/* Color Accent Bar */}
                   <div
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border"
-                    style={{
-                      backgroundColor: `${quote.color}15`,
-                      borderColor: `${quote.color}40`,
-                      color: quote.color,
-                    }}
-                  >
-                    <TrendingUp size={12} />
-                    {quote.category}
+                    className="h-1 w-full transition-all duration-300 group-hover:h-1.5"
+                    style={{ backgroundColor: quote.color }}
+                  />
+
+                  {/* Card Content */}
+                  <div className="p-5 sm:p-6 space-y-4">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border"
+                        style={{
+                          backgroundColor: `${quote.color}15`,
+                          borderColor: `${quote.color}40`,
+                          color: quote.color,
+                        }}
+                      >
+                        <TrendingUp size={12} />
+                        {quote.category}
+                      </div>
+
+                      <button
+                        onClick={() => handleFavorite(quote.id)}
+                        className={`p-2 rounded-full transition-all duration-300 ${
+                          isFavorited
+                            ? "bg-red-50 dark:bg-red-950/30 scale-110"
+                            : "hover:bg-accent"
+                        }`}
+                        aria-label={
+                          isFavorited
+                            ? "Remove from favorites"
+                            : "Add to favorites"
+                        }
+                      >
+                        <Heart
+                          size={18}
+                          className={`transition-all duration-300 ${
+                            isFavorited
+                              ? "text-red-500"
+                              : "text-muted-foreground"
+                          }`}
+                          fill={isFavorited ? "currentColor" : "none"}
+                          strokeWidth={2}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Quote Text */}
+                    <blockquote className="text-sm sm:text-base text-foreground/90 leading-relaxed line-clamp-4">
+                      &quot;{quote.text}&quot;
+                    </blockquote>
+
+                    {/* Author */}
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                      — {quote.author}
+                    </p>
                   </div>
-
-                  <button
-                    onClick={() => handleFavorite(quote.id)}
-                    className={`p-2 rounded-full transition-all duration-300 ${
-                      isFavorited
-                        ? "bg-red-50 dark:bg-red-950/30 scale-110"
-                        : "hover:bg-accent"
-                    }`}
-                    aria-label={
-                      isFavorited ? "Remove from favorites" : "Add to favorites"
-                    }
-                  >
-                    <Heart
-                      size={18}
-                      className={`transition-all duration-300 ${
-                        isFavorited ? "text-red-500" : "text-muted-foreground"
-                      }`}
-                      fill={isFavorited ? "currentColor" : "none"}
-                      strokeWidth={2}
-                    />
-                  </button>
                 </div>
-
-                {/* Quote Text */}
-                <blockquote className="text-sm sm:text-base text-foreground/90 leading-relaxed line-clamp-4">
-                  &quot;{quote.text}&quot;
-                </blockquote>
-
-                {/* Author */}
-                <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                  — {quote.author}
-                </p>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
           </div>
         </>
       )}

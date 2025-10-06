@@ -83,7 +83,9 @@ export default function BreathingExercisesPage() {
       } catch (err: unknown) {
         console.error("Error fetching exercises:", err);
         const errorMessage =
-          err instanceof Error ? err.message : "Failed to load exercises. Please try again later.";
+          err instanceof Error
+            ? err.message
+            : "Failed to load exercises. Please try again later.";
         setError(`Failed to load breathing exercises: ${errorMessage}`);
       } finally {
         setLoading(false);
