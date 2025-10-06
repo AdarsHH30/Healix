@@ -94,6 +94,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate phone numbers are in E.164 format (+[country code][number])
+    const validateE164 = (phone: string) => /^\+[1-9]\d{1,14}$/.test(phone);
+    
+    const validNumbers: string[] = [];
+    if (emergencyNumber1 && validateE164(emergencyNumber1)) {
+      validNumbers.push(emergencyNumber1);
+    } else if (emergencyNumber1) {
+      console.warn(`Invalid phone format for emergency number 1: ${emergencyNumber1}`);
+    }
+    
+    if (emergencyNumber2 && validateE164(emergencyNumber2)) {
+      validNumbers.push(emergencyNumber2);
+    } else if (emergencyNumber2) {
+      console.warn(`Invalid phone format for emergency number 2: ${emergencyNumber2}`);
+    }
+
+    if (validNumbers.length === 0) {
+      return NextResponse.json(
+        { error: 'No valid emergency contacts found. Phone numbers must be in E.164 format (e.g., +1234567890).' },
+        { status: 400 }
+      );
+    }
+
     const forwardedFor = request.headers.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
 
@@ -125,24 +148,16 @@ export async function POST(request: NextRequest) {
     const client = twilio(accountSid, authToken);
     const locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-    const smsMessage = `🚨 EMERGENCY ALERT 🚨
+    const smsMessage = `EMERGENCY ALERT!
+Your contact needs immediate help.
+Location: ${locationUrl}
+Time: ${new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}
+Call emergency services now!`;
 
-Your contact has pressed the EMERGENCY button and needs immediate help!
-
-📍 Location: ${locationUrl}
-
-Coordinates: ${latitude}, ${longitude}
-
-⏰ Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
-
-⚠️ Please go to their location immediately or call emergency services!`;
-
-    const contactNumbers = [emergencyNumber1, emergencyNumber2].filter((num): num is string => num !== null);
-    
-    console.log('📞 Attempting to send emergency alerts to:', contactNumbers);
+    console.log('📞 Attempting to send emergency alerts to:', validNumbers);
     console.log('📱 Twilio Number:', twilioPhoneNumber);
     
-    const smsPromises = contactNumbers.map(async (toNumber) => {
+    const smsPromises = validNumbers.map(async (toNumber) => {
       try {
         console.log(`📤 Sending SMS to ${toNumber}...`);
         const message = await client.messages.create({
@@ -159,7 +174,7 @@ Coordinates: ${latitude}, ${longitude}
       }
     });
 
-    const callPromises = contactNumbers.map(async (toNumber) => {
+    const callPromises = validNumbers.map(async (toNumber) => {
       try {
         console.log(`📞 Calling ${toNumber}...`);
         const call = await client.calls.create({

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, MapPin, Phone } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, MapPin, Phone } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 interface LocationData {
   latitude: number;
@@ -13,40 +13,44 @@ interface LocationData {
 export function EmergencyButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [location, setLocation] = useState<LocationData | null>(null);
-  const [locationError, setLocationError] = useState<string>('');
-  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [locationError, setLocationError] = useState<string>("");
+  const [statusMessage, setStatusMessage] = useState<string>("");
 
   // Request location permission on component mount
   useEffect(() => {
-    if ('geolocation' in navigator) {
+    if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           });
-          setLocationError('');
+          setLocationError("");
         },
         (error) => {
-          console.error('Location error:', error);
-          setLocationError('Location access denied. Please enable location services.');
+          console.error("Location error:", error);
+          setLocationError(
+            "Location access denied. Please enable location services."
+          );
         }
       );
     } else {
-      setLocationError('Geolocation is not supported by your browser.');
+      setLocationError("Geolocation is not supported by your browser.");
     }
   }, []);
 
   const handleEmergencyClick = async () => {
     setIsLoading(true);
-    setStatusMessage('');
+    setStatusMessage("");
 
     try {
       // Get authentication token
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session) {
-        setStatusMessage('❌ Please log in to use emergency feature.');
+        setStatusMessage("❌ Please log in to use emergency feature.");
         setIsLoading(false);
         return;
       }
@@ -57,66 +61,96 @@ export function EmergencyButton() {
       // If we don't have location yet, try to get it now
       if (!currentLocation) {
         try {
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              timeout: 10000,
-              enableHighAccuracy: true,
-            });
-          });
-          
+          const position = await new Promise<GeolocationPosition>(
+            (resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000,
+                enableHighAccuracy: true,
+              });
+            }
+          );
+
           currentLocation = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           };
           setLocation(currentLocation);
         } catch (error) {
-          setStatusMessage('⚠️ Could not get your location. Emergency call sent without location.');
+          setStatusMessage(
+            "⚠️ Could not get your location. Emergency call sent without location."
+          );
           // Continue anyway - the API will handle missing location
         }
       }
 
       // Call the emergency API with authentication
-      const response = await fetch('/api/emergency/call-and-sms', {
-        method: 'POST',
+      const response = await fetch("/api/emergency/call-and-sms", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           latitude: currentLocation?.latitude || 0,
           longitude: currentLocation?.longitude || 0,
-          userMessage: 'Emergency assistance needed! User has pressed the emergency button.',
+          userMessage:
+            "Emergency assistance needed! User has pressed the emergency button.",
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setStatusMessage('✅ Emergency alerts sent successfully! Help is on the way.');
-        
         // Count successful operations
-        const successfulSMS = data.sms?.filter((s: any) => s.success).length || 0;
-        const successfulCalls = data.calls?.filter((c: any) => c.success).length || 0;
-        
+        const successfulSMS =
+          data.sms?.filter((s: any) => s.success).length || 0;
+        const successfulCalls =
+          data.calls?.filter((c: any) => c.success).length || 0;
+
         if (successfulSMS > 0 || successfulCalls > 0) {
           setStatusMessage(
-            `✅ Emergency alerts sent! ${successfulCalls} call(s) and ${successfulSMS} SMS sent.`
+            `✅ Emergency alerts sent! ${successfulCalls} call(s) and ${successfulSMS} SMS sent successfully.`
+          );
+        } else {
+          setStatusMessage(
+            "⚠️ Emergency request processed but alerts may have failed. Check your emergency contacts."
           );
         }
       } else {
         if (response.status === 429) {
-          setStatusMessage('⚠️ Too many emergency requests. Please wait a few minutes.');
+          setStatusMessage(
+            "⚠️ Too many emergency requests. Please wait a few minutes."
+          );
         } else if (response.status === 401) {
-          setStatusMessage('❌ Authentication error. Please log in again.');
-        } else if (response.status === 400 && data.error?.includes('emergency contacts')) {
-          setStatusMessage('❌ No emergency contacts configured. Please add emergency contacts in your profile.');
+          setStatusMessage("❌ Authentication error. Please log in again.");
+        } else if (
+          response.status === 400 &&
+          data.error?.includes("emergency contacts")
+        ) {
+          setStatusMessage(
+            "❌ No emergency contacts configured. Please add emergency contacts in your profile."
+          );
+        } else if (
+          response.status === 400 &&
+          data.error?.includes("E.164 format")
+        ) {
+          setStatusMessage(
+            "❌ Emergency contacts must be in international format (e.g., +1234567890). Please update in your profile."
+          );
         } else {
-          setStatusMessage(`❌ ${data.error || 'Failed to send emergency alerts. Please call manually.'}`);
+          setStatusMessage(
+            `❌ ${
+              data.error ||
+              "Failed to send emergency alerts. Please call manually."
+            }`
+          );
         }
       }
     } catch (error) {
-      console.error('Emergency request failed:', error);
-      setStatusMessage('❌ Network error. Please call emergency services directly.');
+      console.error("Emergency request failed:", error);
+      setStatusMessage(
+        "❌ Network error. Please call emergency services directly."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -168,8 +202,8 @@ export function EmergencyButton() {
 
       {/* Important disclaimer */}
       <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-        This will call and SMS your emergency contacts with your location.
-        Use only in real emergencies.
+        This will call and SMS your emergency contacts with your location. Use
+        only in real emergencies.
       </p>
     </div>
   );
