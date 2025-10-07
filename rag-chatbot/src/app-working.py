@@ -173,7 +173,7 @@ def health():
         # Quick test call
         test_response = client.chat.completions.create(
             messages=[{"role": "user", "content": "Hello"}],
-            model="llama-3.1-70b-versatile",
+            model="llama-3.1-8b-instant",
             max_tokens=10
         )
         
@@ -226,7 +226,7 @@ RESPONSE:"""
             messages=[
                 {"role": "system", "content": system_prompt}
             ],
-            model="llama-3.1-70b-versatile",
+            model="llama-3.1-8b-instant",
             temperature=0.3,
             max_tokens=400
         )
