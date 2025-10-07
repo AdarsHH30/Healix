@@ -19,12 +19,14 @@ CORS(app)
 # Initialize Groq client
 groq_client = None
 
+
 def get_groq_client():
     """Initialize Groq client"""
     global groq_client
     if groq_client is None:
         try:
             from groq import Groq
+
             api_key = os.getenv("GROQ_API_KEY")
             if not api_key:
                 raise ValueError("GROQ_API_KEY not found")
@@ -33,6 +35,7 @@ def get_groq_client():
             logger.error(f"Failed to initialize Groq client: {e}")
             raise
     return groq_client
+
 
 # Simple knowledge base (no vector store needed for 512MB)
 FIRST_AID_KNOWLEDGE = """
@@ -70,19 +73,23 @@ First Aid Basics:
 - Emergency contact numbers
 """
 
+
 @app.route("/", methods=["GET"])
 def home():
     """Health check endpoint"""
-    return jsonify({
-        "status": "ok",
-        "message": "Ultra-Minimal RAG Chatbot API",
-        "mode": "groq_only",
-        "memory_optimized": True,
-        "endpoints": {
-            "/query": "POST - Query the chatbot",
-            "/health": "GET - Health check",
-        },
-    })
+    return jsonify(
+        {
+            "status": "ok",
+            "message": "Ultra-Minimal RAG Chatbot API",
+            "mode": "groq_only",
+            "memory_optimized": True,
+            "endpoints": {
+                "/query": "POST - Query the chatbot",
+                "/health": "GET - Health check",
+            },
+        }
+    )
+
 
 @app.route("/health", methods=["GET"])
 def health():
@@ -90,16 +97,16 @@ def health():
     try:
         # Test Groq connection
         client = get_groq_client()
-        return jsonify({
-            "status": "healthy",
-            "mode": "ultra_minimal",
-            "groq_connected": True,
-        })
+        return jsonify(
+            {
+                "status": "healthy",
+                "mode": "ultra_minimal",
+                "groq_connected": True,
+            }
+        )
     except Exception as e:
-        return jsonify({
-            "status": "unhealthy", 
-            "error": str(e)
-        }), 500
+        return jsonify({"status": "unhealthy", "error": str(e)}), 500
+
 
 @app.route("/query", methods=["POST"])
 def query():
@@ -131,38 +138,38 @@ User Question: {user_query}"""
         # Call Groq API
         client = get_groq_client()
         response = client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": system_prompt}
-            ],
+            messages=[{"role": "system", "content": system_prompt}],
             model="llama-3.1-70b-versatile",
             temperature=0.3,
-            max_tokens=300
+            max_tokens=300,
         )
 
         answer = response.choices[0].message.content
 
-        return jsonify({
-            "query": user_query,
-            "answer": answer,
-            "source": "built_in_knowledge",
-            "mode": "groq_direct"
-        })
+        return jsonify(
+            {
+                "query": user_query,
+                "answer": answer,
+                "source": "built_in_knowledge",
+                "mode": "groq_direct",
+            }
+        )
 
     except Exception as e:
         logger.error(f"Error processing query: {str(e)}")
-        return jsonify({
-            "error": "Internal server error", 
-            "details": str(e)
-        }), 500
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
 
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({"error": "Endpoint not found"}), 404
 
+
 @app.errorhandler(500)
 def internal_error(error):
     return jsonify({"error": "Internal server error"}), 500
 
+
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
