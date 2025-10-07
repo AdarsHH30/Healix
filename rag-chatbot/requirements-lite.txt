@@ -1,0 +1,29 @@
+# Lightweight Requirements for 512MB Render Free Tier
+
+# Core Flask and API
+flask==3.0.0
+flask-cors==4.0.0
+
+# Lightweight vector store and embeddings
+chromadb>=1.0.20
+
+# Use OpenAI embeddings API instead of local models (more memory efficient)
+openai==1.54.3
+
+# Minimal LangChain components
+langchain-core==0.3.15
+langchain-openai==0.2.8
+langchain-chroma==0.2.6
+
+# Document processing - minimal
+unstructured[md]==0.16.5
+
+# Environment and utilities
+python-dotenv==1.0.1
+groq==0.32.0
+
+# Production server
+gunicorn==21.2.0
+
+# Minimal utilities
+tqdm==4.66.5
