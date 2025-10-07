@@ -1,0 +1,8 @@
+# Ultra-minimal requirements for 512MB deployment
+gunicorn
+flask
+flask-cors
+python-dotenv
+groq
+openai
+requests

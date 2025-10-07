@@ -6,6 +6,13 @@ echo "🚀 Starting lightweight build for 512MB limit..."
 # Install minimal Python dependencies
 echo "📦 Installing minimal dependencies..."
 pip install --upgrade pip --no-cache-dir
+
+# Install gunicorn first to ensure it's available
+echo "📦 Installing gunicorn..."
+pip install gunicorn==23.0.0 --no-cache-dir
+
+# Install other requirements
+echo "📦 Installing other dependencies..."
 pip install -r requirements-lite.txt --no-cache-dir
 
 # Create necessary directories
