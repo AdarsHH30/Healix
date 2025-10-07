@@ -24,7 +24,7 @@ loglevel = "warning"  # Less verbose logging
 access_log_format = '%(h)s "%(r)s" %(s)s %(b)s %(D)s'
 
 # Process naming
-proc_name = 'rag-chatbot-lite'
+proc_name = "rag-chatbot-lite"
 
 # Server mechanics
 preload_app = True

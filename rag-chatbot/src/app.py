@@ -143,7 +143,7 @@ def query():
 def ingest_documents():
     """
     Ingest documents into the vector store
-    
+
     Expected JSON body:
     {
         "text": "Document content to ingest",
@@ -152,44 +152,46 @@ def ingest_documents():
     """
     try:
         data = request.get_json()
-        
+
         if not data or "text" not in data:
             return jsonify({"error": "Missing 'text' field in request body"}), 400
-            
+
         text_content = data.get("text", "").strip()
         metadata = data.get("metadata", {})
-        
+
         if not text_content:
             return jsonify({"error": "Text content cannot be empty"}), 400
-            
+
         logger.info(f"Ingesting document with {len(text_content)} characters...")
-        
+
         # Create document object
         from langchain.schema import Document
         from langchain.text_splitter import RecursiveCharacterTextSplitter
-        
+
         doc = Document(page_content=text_content, metadata=metadata)
-        
+
         # Split document into chunks
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=Config.CHUNK_SIZE,
             chunk_overlap=Config.CHUNK_OVERLAP,
             length_function=len,
         )
-        
+
         chunks = text_splitter.split_documents([doc])
-        
+
         # Add to vector store
         vector_store.add_documents(chunks)
-        
+
         new_count = vector_store.get_collection_count()
-        
-        return jsonify({
-            "message": "Document ingested successfully",
-            "chunks_created": len(chunks),
-            "total_documents": new_count
-        })
-        
+
+        return jsonify(
+            {
+                "message": "Document ingested successfully",
+                "chunks_created": len(chunks),
+                "total_documents": new_count,
+            }
+        )
+
     except Exception as e:
         logger.error(f"Error ingesting document: {str(e)}")
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
