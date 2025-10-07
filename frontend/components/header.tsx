@@ -5,14 +5,13 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Leaf, Heart, Users, BookOpen, LogOut, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
+import { useAuth } from "@/components/auth-provider";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -23,29 +22,8 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    // Check current auth state
-    const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-    };
-
-    checkUser();
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     router.push("/");
   };
 

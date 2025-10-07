@@ -2,35 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Video, ArrowRight, Heart, CheckCircle2, Shield } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
+import { useAuth } from "@/components/auth-provider";
 
 export function HeroContent() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    // Check current auth state
-    const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-    };
-
-    checkUser();
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
   return (
     <div className="text-center relative z-10 px-4">
       <div className="mb-6 md:mb-8 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-sm px-4 md:px-5 py-2 md:py-2.5 shadow-lg border border-primary/10 hover:shadow-xl hover:scale-105 transition-all duration-500">
@@ -60,7 +37,12 @@ export function HeroContent() {
       </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-6 md:mb-8 px-4">
-        {user ? (
+        {loading ? (
+          <div className="flex gap-3 md:gap-4">
+            <div className="w-full sm:w-48 h-12 md:h-14 bg-muted/50 rounded-full animate-pulse" />
+            <div className="w-full sm:w-36 h-12 md:h-14 bg-muted/30 rounded-full animate-pulse" />
+          </div>
+        ) : user ? (
           <>
             <Button
               size="lg"

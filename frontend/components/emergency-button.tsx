@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, MapPin, Phone } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/components/auth-provider";
 
 interface LocationData {
   latitude: number;
@@ -15,6 +15,7 @@ export function EmergencyButton() {
   const [location, setLocation] = useState<LocationData | null>(null);
   const [locationError, setLocationError] = useState<string>("");
   const [statusMessage, setStatusMessage] = useState<string>("");
+  const { session } = useAuth();
 
   // Request location permission on component mount
   useEffect(() => {
@@ -44,11 +45,7 @@ export function EmergencyButton() {
     setStatusMessage("");
 
     try {
-      // Get authentication token
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      // Check authentication
       if (!session) {
         setStatusMessage("❌ Please log in to use emergency feature.");
         setIsLoading(false);

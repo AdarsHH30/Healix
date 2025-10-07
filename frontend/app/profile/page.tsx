@@ -18,6 +18,7 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { ChatbotPopup } from "@/components/chatbot-popup";
 import { MapPopup } from "@/components/map-popup";
+import { useAuth } from "@/components/auth-provider";
 
 interface UserProfile {
   id: string;
@@ -37,6 +38,7 @@ interface QuoteData {
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -141,7 +143,7 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      await signOut();
       router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
