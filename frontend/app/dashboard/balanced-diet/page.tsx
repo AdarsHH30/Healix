@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ArrowLeft,
-  Filter,
   MessageCircle,
   MapPin,
   Utensils,
@@ -470,9 +470,11 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
         className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
       >
         {/* Background Image */}
-        <img
+        <Image
           src={plan.imageUrl}
           alt={plan.title}
+          width={500}
+          height={256}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />
 
@@ -535,9 +537,11 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
           <div className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             {/* Header with Image */}
             <div className="relative h-64">
-              <img
+              <Image
                 src={plan.imageUrl}
                 alt={plan.title}
+                width={500}
+                height={256}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

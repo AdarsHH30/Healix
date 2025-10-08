@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { latitude, longitude, userMessage } = body;
+    const { latitude, longitude } = body;
 
     if (!latitude || !longitude) {
       return NextResponse.json(
@@ -167,10 +167,11 @@ Call emergency services now!`;
         });
         console.log(`✅ SMS sent successfully to ${toNumber}, SID: ${message.sid}`);
         return { success: true, to: toNumber, sid: message.sid };
-      } catch (error: any) {
-        console.error(`❌ Failed to send SMS to ${toNumber}:`, error.message);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`❌ Failed to send SMS to ${toNumber}:`, errorMessage);
         console.error('Full error:', error);
-        return { success: false, to: toNumber, error: error.message };
+        return { success: false, to: toNumber, error: errorMessage };
       }
     });
 
@@ -197,10 +198,11 @@ Call emergency services now!`;
         });
         console.log(`✅ Call initiated successfully to ${toNumber}, SID: ${call.sid}`);
         return { success: true, to: toNumber, sid: call.sid };
-      } catch (error: any) {
-        console.error(`❌ Failed to call ${toNumber}:`, error.message);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`❌ Failed to call ${toNumber}:`, errorMessage);
         console.error('Full error:', error);
-        return { success: false, to: toNumber, error: error.message };
+        return { success: false, to: toNumber, error: errorMessage };
       }
     });
 
@@ -237,10 +239,11 @@ Call emergency services now!`;
       calls: callResults,
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Emergency API error:', error);
     return NextResponse.json(
-      { error: 'Failed to process emergency request', details: error.message },
+      { error: 'Failed to process emergency request', details: errorMessage },
       { status: 500 }
     );
   }

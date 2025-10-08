@@ -24,6 +24,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'qvkzwudrgnyfwvvpfqxb.supabase.co',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   // Proxy API requests to chatbot backend to avoid CORS issues in development

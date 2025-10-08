@@ -10,6 +10,19 @@ interface LocationData {
   longitude: number;
 }
 
+interface EmergencyResult {
+  success: boolean;
+  to: string;
+  sid?: string;
+  error?: string;
+}
+
+interface EmergencyResponse {
+  message: string;
+  sms?: EmergencyResult[];
+  calls?: EmergencyResult[];
+}
+
 export function EmergencyButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [location, setLocation] = useState<LocationData | null>(null);
@@ -72,7 +85,7 @@ export function EmergencyButton() {
             longitude: position.coords.longitude,
           };
           setLocation(currentLocation);
-        } catch (error) {
+        } catch (_error) {
           setStatusMessage(
             "⚠️ Could not get your location. Emergency call sent without location."
           );
@@ -98,11 +111,14 @@ export function EmergencyButton() {
       const data = await response.json();
 
       if (response.ok) {
+        const emergencyData = data as EmergencyResponse;
         // Count successful operations
         const successfulSMS =
-          data.sms?.filter((s: any) => s.success).length || 0;
+          emergencyData.sms?.filter((s: EmergencyResult) => s.success).length ||
+          0;
         const successfulCalls =
-          data.calls?.filter((c: any) => c.success).length || 0;
+          emergencyData.calls?.filter((c: EmergencyResult) => c.success)
+            .length || 0;
 
         if (successfulSMS > 0 || successfulCalls > 0) {
           setStatusMessage(

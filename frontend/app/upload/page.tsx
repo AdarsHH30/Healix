@@ -281,7 +281,7 @@ export default function UploadPage() {
       } = await supabase.auth.getUser();
 
       // Insert exercise into database
-      const { data, error } = await supabase.from("exercises").insert({
+      const { data: _data, error } = await supabase.from("exercises").insert({
         name: formData.name,
         description: formData.description,
         image_url: finalImageUrl,
@@ -452,25 +452,27 @@ export default function UploadPage() {
         .filter((item) => item.length > 0);
 
       // Insert nutrition plan into database
-      const { data, error } = await supabase.from("nutrition_plans").insert({
-        title: nutritionData.title,
-        description: nutritionData.description,
-        image_url: finalImageUrl,
-        youtube_url: nutritionData.youtubeUrl,
-        calories: nutritionData.calories,
-        protein: nutritionData.protein,
-        carbs: nutritionData.carbs,
-        fats: nutritionData.fats,
-        meal_type: nutritionData.mealType,
-        category: nutritionData.category,
-        prep_time: nutritionData.prepTime,
-        difficulty: nutritionData.difficulty,
-        ingredients: ingredientsArray,
-        instructions: instructionsArray,
-        benefits: benefitsArray,
-        created_by: user?.id || null,
-        is_active: true,
-      });
+      const { data: _data, error } = await supabase
+        .from("nutrition_plans")
+        .insert({
+          title: nutritionData.title,
+          description: nutritionData.description,
+          image_url: finalImageUrl,
+          youtube_url: nutritionData.youtubeUrl,
+          calories: nutritionData.calories,
+          protein: nutritionData.protein,
+          carbs: nutritionData.carbs,
+          fats: nutritionData.fats,
+          meal_type: nutritionData.mealType,
+          category: nutritionData.category,
+          prep_time: nutritionData.prepTime,
+          difficulty: nutritionData.difficulty,
+          ingredients: ingredientsArray,
+          instructions: instructionsArray,
+          benefits: benefitsArray,
+          created_by: user?.id || null,
+          is_active: true,
+        });
 
       if (error) throw error;
 

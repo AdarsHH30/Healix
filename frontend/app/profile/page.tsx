@@ -13,7 +13,7 @@ import {
   Heart,
   TrendingUp,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { ChatbotPopup } from "@/components/chatbot-popup";
@@ -45,12 +45,6 @@ export default function ProfilePage() {
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [favoriteQuotes, setFavoriteQuotes] = useState<Set<string>>(new Set());
   const [quotes, setQuotes] = useState<QuoteData[]>([]);
-
-  useEffect(() => {
-    loadProfile();
-    loadFavorites();
-    loadQuotes();
-  }, []);
 
   const loadQuotes = async () => {
     try {
@@ -106,7 +100,7 @@ export default function ProfilePage() {
     }
   };
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       const {
         data: { user },
@@ -118,7 +112,7 @@ export default function ProfilePage() {
       }
 
       // Try to get profile from users table
-      const { data: profileData, error } = await supabase
+      const { data: profileData, error: _error } = await supabase
         .from("users")
         .select("*")
         .eq("id", user.id)
@@ -139,7 +133,13 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    loadProfile();
+    loadFavorites();
+    loadQuotes();
+  }, [loadProfile]);
 
   const handleLogout = async () => {
     try {

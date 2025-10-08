@@ -5,77 +5,125 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated to wellness-themed color palette with sage greens, warm earth tones, and soft teals */
-  --background: oklch(0.98 0.01 120);
-  --foreground: oklch(0.25 0.02 140);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.02 140);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.02 140);
-  --primary: oklch(0.55 0.08 160);
-  --primary-foreground: oklch(0.99 0.01 120);
-  --secondary: oklch(0.72 0.06 85);
-  --secondary-foreground: oklch(0.25 0.02 140);
-  --muted: oklch(0.94 0.01 120);
-  --muted-foreground: oklch(0.5 0.02 140);
-  --accent: oklch(0.65 0.1 180);
-  --accent-foreground: oklch(0.99 0.01 120);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.99 0.01 120);
-  --border: oklch(0.9 0.01 120);
-  --input: oklch(0.9 0.01 120);
-  --ring: oklch(0.55 0.08 160);
-  --chart-1: oklch(0.55 0.08 160);
-  --chart-2: oklch(0.65 0.1 180);
-  --chart-3: oklch(0.72 0.06 85);
-  --chart-4: oklch(0.6 0.08 140);
-  --chart-5: oklch(0.68 0.09 170);
-  --radius: 1rem;
-  --sidebar: oklch(0.99 0.01 120);
-  --sidebar-foreground: oklch(0.25 0.02 140);
-  --sidebar-primary: oklch(0.55 0.08 160);
-  --sidebar-primary-foreground: oklch(0.99 0.01 120);
-  --sidebar-accent: oklch(0.94 0.01 120);
-  --sidebar-accent-foreground: oklch(0.25 0.02 140);
-  --sidebar-border: oklch(0.9 0.01 120);
-  --sidebar-ring: oklch(0.55 0.08 160);
+  /* Cool blue palette with glass morphism and watery effects */
+  
+  /* Base - soft periwinkle blue background like the image */
+  --background: oklch(0.93 0.025 260);
+  --foreground: oklch(0.18 0.030 250);
+  
+  /* Cards - frosted glass effect */
+  --card: oklch(0.98 0.008 260);
+  --card-foreground: oklch(0.18 0.030 250);
+  
+  /* Popover */
+  --popover: oklch(0.98 0.008 260);
+  --popover-foreground: oklch(0.18 0.030 250);
+  
+  /* Primary - electric bright blue like the CTA button */
+  --primary: oklch(0.60 0.22 250);
+  --primary-foreground: oklch(0.99 0.005 260);
+  
+  /* Secondary - aqua/cyan like the 3D element */
+  --secondary: oklch(0.75 0.15 210);
+  --secondary-foreground: oklch(0.18 0.030 250);
+  
+  /* Muted - soft lavender-blue */
+  --muted: oklch(0.90 0.020 265);
+  --muted-foreground: oklch(0.50 0.025 250);
+  
+  /* Accent - bright cyan/turquoise */
+  --accent: oklch(0.72 0.18 200);
+  --accent-foreground: oklch(0.18 0.030 250);
+  
+  /* Destructive */
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.99 0.005 260);
+  
+  /* Borders - subtle blue tint */
+  --border: oklch(0.88 0.015 260);
+  --input: oklch(0.96 0.012 260);
+  --ring: oklch(0.60 0.22 250);
+  
+  /* Charts - watery blue gradient */
+  --chart-1: oklch(0.60 0.22 250);
+  --chart-2: oklch(0.68 0.20 230);
+  --chart-3: oklch(0.72 0.18 200);
+  --chart-4: oklch(0.78 0.14 190);
+  --chart-5: oklch(0.65 0.19 215);
+  
+  /* Rounded modern feel */
+  --radius: 1.25rem;
+  
+  /* Sidebar */
+  --sidebar: oklch(0.98 0.008 260);
+  --sidebar-foreground: oklch(0.18 0.030 250);
+  --sidebar-primary: oklch(0.60 0.22 250);
+  --sidebar-primary-foreground: oklch(0.99 0.005 260);
+  --sidebar-accent: oklch(0.90 0.020 265);
+  --sidebar-accent-foreground: oklch(0.18 0.030 250);
+  --sidebar-border: oklch(0.88 0.015 260);
+  --sidebar-ring: oklch(0.60 0.22 250);
 }
 
 .dark {
-  --background: oklch(0.18 0.02 140);
-  --foreground: oklch(0.96 0.01 120);
-  --card: oklch(0.2 0.02 140);
-  --card-foreground: oklch(0.96 0.01 120);
-  --popover: oklch(0.2 0.02 140);
-  --popover-foreground: oklch(0.96 0.01 120);
-  --primary: oklch(0.65 0.1 160);
-  --primary-foreground: oklch(0.18 0.02 140);
-  --secondary: oklch(0.72 0.06 85);
-  --secondary-foreground: oklch(0.18 0.02 140);
-  --muted: oklch(0.25 0.02 140);
-  --muted-foreground: oklch(0.7 0.02 140);
-  --accent: oklch(0.65 0.1 180);
-  --accent-foreground: oklch(0.18 0.02 140);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.96 0.01 120);
-  --border: oklch(0.25 0.02 140);
-  --input: oklch(0.25 0.02 140);
-  --ring: oklch(0.65 0.1 160);
-  --chart-1: oklch(0.65 0.1 160);
-  --chart-2: oklch(0.7 0.12 180);
-  --chart-3: oklch(0.72 0.06 85);
-  --chart-4: oklch(0.68 0.09 140);
-  --chart-5: oklch(0.72 0.1 170);
-  --sidebar: oklch(0.2 0.02 140);
-  --sidebar-foreground: oklch(0.96 0.01 120);
-  --sidebar-primary: oklch(0.65 0.1 160);
-  --sidebar-primary-foreground: oklch(0.18 0.02 140);
-  --sidebar-accent: oklch(0.25 0.02 140);
-  --sidebar-accent-foreground: oklch(0.96 0.01 120);
-  --sidebar-border: oklch(0.25 0.02 140);
-  --sidebar-ring: oklch(0.65 0.1 160);
+  /* Dark mode - deep ocean blue with neon accents */
+  
+  /* Base - deep navy/midnight blue */
+  --background: oklch(0.14 0.035 250);
+  --foreground: oklch(0.96 0.008 240);
+  
+  /* Cards - slightly lighter with blue tint */
+  --card: oklch(0.18 0.038 250);
+  --card-foreground: oklch(0.96 0.008 240);
+  
+  /* Popover */
+  --popover: oklch(0.18 0.038 250);
+  --popover-foreground: oklch(0.96 0.008 240);
+  
+  /* Primary - neon electric blue */
+  --primary: oklch(0.68 0.24 250);
+  --primary-foreground: oklch(0.14 0.035 250);
+  
+  /* Secondary - glowing cyan */
+  --secondary: oklch(0.78 0.18 200);
+  --secondary-foreground: oklch(0.14 0.035 250);
+  
+  /* Muted - dark blue-gray */
+  --muted: oklch(0.22 0.035 255);
+  --muted-foreground: oklch(0.68 0.020 240);
+  
+  /* Accent - bright aqua glow */
+  --accent: oklch(0.75 0.20 205);
+  --accent-foreground: oklch(0.14 0.035 250);
+  
+  /* Destructive */
+  --destructive: oklch(0.50 0.20 30);
+  --destructive-foreground: oklch(0.96 0.008 240);
+  
+  /* Borders - subtle glow */
+  --border: oklch(0.26 0.038 250);
+  --input: oklch(0.22 0.035 255);
+  --ring: oklch(0.68 0.24 250);
+  
+  /* Charts - neon spectrum */
+  --chart-1: oklch(0.68 0.24 250);
+  --chart-2: oklch(0.72 0.22 230);
+  --chart-3: oklch(0.75 0.20 205);
+  --chart-4: oklch(0.80 0.16 190);
+  --chart-5: oklch(0.70 0.21 220);
+  
+  /* Sidebar */
+  --sidebar: oklch(0.18 0.038 250);
+  --sidebar-foreground: oklch(0.96 0.008 240);
+  --sidebar-primary: oklch(0.68 0.24 250);
+  --sidebar-primary-foreground: oklch(0.14 0.035 250);
+  --sidebar-accent: oklch(0.22 0.035 255);
+  --sidebar-accent-foreground: oklch(0.96 0.008 240);
+  --sidebar-border: oklch(0.26 0.038 250);
+  --sidebar-ring: oklch(0.68 0.24 250);
 }
 
+/* Theme configuration */
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -103,10 +151,10 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 0.5rem);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -117,6 +165,51 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Glass morphism and watery effect utilities */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+.watery-gradient {
+  background: linear-gradient(135deg, 
+    oklch(0.70 0.20 210) 0%, 
+    oklch(0.65 0.22 240) 50%, 
+    oklch(0.75 0.18 200) 100%);
+}
+
+.liquid-shadow {
+  box-shadow: 
+    0 10px 40px rgba(59, 130, 246, 0.3),
+    0 4px 20px rgba(96, 165, 250, 0.2),
+    inset 0 -2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.neon-glow {
+  box-shadow: 
+    0 0 20px rgba(59, 130, 246, 0.4),
+    0 0 40px rgba(96, 165, 250, 0.2),
+    0 0 60px rgba(59, 130, 246, 0.1);
+}
+
+.frosted {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.dark .glass-effect {
+  background: rgba(20, 25, 50, 0.6);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.2);
+}
+
+.dark .frosted {
+  background: rgba(20, 25, 50, 0.7);
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;

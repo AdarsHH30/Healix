@@ -342,8 +342,8 @@ const RegisterPage = () => {
             <div className="space-y-2">
               <h2 className="text-xl font-semibold">Check Your Email!</h2>
               <p className="text-sm text-muted-foreground">
-                We've sent a confirmation link to your email address. Please
-                click the link to verify your account.
+                We&apos;ve sent a confirmation link to your email address.
+                Please click the link to verify your account.
               </p>
             </div>
             <Button onClick={() => router.push("/login")} className="w-full">

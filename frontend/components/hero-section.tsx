@@ -38,7 +38,7 @@ export function HeroSection() {
       if (!gl) {
         setShow3D(false);
       }
-    } catch (e) {
+    } catch (_e) {
       setShow3D(false);
     }
   }, []);

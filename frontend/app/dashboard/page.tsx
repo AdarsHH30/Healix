@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ArrowLeft,
   User,
@@ -10,11 +11,10 @@ import {
   Upload,
   MapPin,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChatbotPopup } from "@/components/chatbot-popup";
 import { MapPopup } from "@/components/map-popup";
 import { createBrowserClient } from "@supabase/ssr";
-import { EmergencyButton } from "@/components/emergency-button";
 import { EmergencyPopup } from "@/components/emergency-popup";
 
 const categories = [
@@ -54,7 +54,6 @@ const categories = [
 
 export default function Dashboard() {
   const router = useRouter();
-  const [isDark, setIsDark] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
@@ -64,11 +63,6 @@ export default function Dashboard() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-
-  useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains("dark");
-    setIsDark(isDarkMode);
-  }, []);
 
   const handleCategoryClick = (categoryId: string) => {
     router.push(`/dashboard/${categoryId}`);
@@ -98,11 +92,6 @@ export default function Dashboard() {
       // Even if there's an error, redirect to login
       window.location.href = "/login";
     }
-  };
-
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle("dark");
   };
 
   const toggleChatbot = () => {
@@ -181,10 +170,11 @@ export default function Dashboard() {
             >
               <div className="absolute inset-0 bg-gradient-to-b from-black/5 to-black/30" />
 
-              <img
+              <Image
                 src={category.image}
                 alt={category.name}
-                className="absolute inset-0 h-full w-full object-cover transition-all duration-[800ms] ease-out group-hover:scale-105"
+                fill
+                className="object-cover transition-all duration-[800ms] ease-out group-hover:scale-105"
               />
 
               <div

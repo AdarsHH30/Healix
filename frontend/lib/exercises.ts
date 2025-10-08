@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import type { Database } from './supabase'
 
-type Exercise = Database['public']['Tables']['exercises']['Row']
+export type Exercise = Database['public']['Tables']['exercises']['Row']
 type ExerciseInsert = Database['public']['Tables']['exercises']['Insert']
 type ExerciseUpdate = Database['public']['Tables']['exercises']['Update']
 

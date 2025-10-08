@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,14 +19,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { createBrowserClient } from "@supabase/ssr";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
-const Login03Page = () => {
+const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -217,14 +218,29 @@ const Login03Page = () => {
           </div>
         </div>
         <div className="bg-muted hidden lg:block border-l relative overflow-hidden">
-          <img
+          <Image
             src="https://qvkzwudrgnyfwvvpfqxb.supabase.co/storage/v1/object/public/exercises/exercise-images/supasupa.png"
             alt="Healix"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         </div>
       </div>
     </div>
+  );
+};
+
+const Login03Page = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 };
 
