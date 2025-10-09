@@ -4,34 +4,37 @@ import { Button } from "@/components/ui/button";
 import { Video, ArrowRight, Heart, CheckCircle2, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
+import ShinyText from "@/components/shiny-text";
 
 export function HeroContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   return (
     <div className="text-center relative z-10 px-4">
-      <div className="mb-6 md:mb-8 inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-sm px-4 md:px-5 py-2 md:py-2.5 shadow-lg border border-primary/10 hover:shadow-xl hover:scale-105 transition-all duration-500">
+      <div className="mb-6 md:mb-8 inline-flex items-center gap-2 clean-card px-4 md:px-5 py-2 md:py-2.5 clean-hover">
         <Heart
-          className="h-3.5 w-3.5 md:h-4 md:w-4 text-primary animate-pulse"
+          className="h-3.5 w-3.5 md:h-4 md:w-4 text-accent"
           fill="currentColor"
         />
-        <span className="text-xs md:text-sm font-medium text-foreground">
+        <span className="text-xs md:text-sm font-medium text-muted-foreground">
           Join 10,000+ Active Members on Their Wellness Journey
         </span>
       </div>
 
-      {/* Main headline - kept as requested */}
+      {/* Main headline with shining text */}
       <h1 className="mb-4 md:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-balance leading-tight">
         <span className="text-foreground">Transform Your Life Through</span>
         <br />
-        <span className="inline-block bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
-          Healix
-        </span>
+        <ShinyText 
+          text="Healix" 
+          speed={3} 
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-accent"
+        />
       </h1>
 
-      {/* Subheadline with better line height */}
+      {/* Subheadline with shining keywords */}
       <p className="mx-auto mb-6 md:mb-10 max-w-2xl text-base md:text-lg lg:text-xl text-muted-foreground text-balance leading-relaxed px-4">
-        Discover balance and vitality through our comprehensive approach to
+        Discover <ShinyText text="balance and vitality" speed={4} className="text-base md:text-lg lg:text-xl text-accent font-medium" /> through our comprehensive approach to
         wellness. Expert-led tutorials in yoga, mental health, and physical
         fitness—all in one place.
       </p>

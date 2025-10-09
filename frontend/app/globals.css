@@ -5,54 +5,54 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Cool blue palette with glass morphism and watery effects */
+  /* Clean, minimal design system - inspired by the reference image */
   
-  /* Base - soft periwinkle blue background like the image */
-  --background: oklch(0.93 0.025 260);
-  --foreground: oklch(0.18 0.030 250);
+  /* Base - pure whites and light grays */
+  --background: #ffffff;
+  --foreground: #1f2937;
   
-  /* Cards - frosted glass effect */
-  --card: oklch(0.98 0.008 260);
-  --card-foreground: oklch(0.18 0.030 250);
+  /* Cards - clean white with subtle shadows */
+  --card: #ffffff;
+  --card-foreground: #1f2937;
   
   /* Popover */
-  --popover: oklch(0.98 0.008 260);
-  --popover-foreground: oklch(0.18 0.030 250);
+  --popover: #ffffff;
+  --popover-foreground: #1f2937;
   
-  /* Primary - electric bright blue like the CTA button */
-  --primary: oklch(0.60 0.22 250);
-  --primary-foreground: oklch(0.99 0.005 260);
+  /* Primary - clean dark accent like in the reference */
+  --primary: #1f2937;
+  --primary-foreground: #ffffff;
   
-  /* Secondary - aqua/cyan like the 3D element */
-  --secondary: oklch(0.75 0.15 210);
-  --secondary-foreground: oklch(0.18 0.030 250);
+  /* Secondary - very light gray for subtle elements */
+  --secondary: #f8fafc;
+  --secondary-foreground: #475569;
   
-  /* Muted - soft lavender-blue */
-  --muted: oklch(0.90 0.020 265);
-  --muted-foreground: oklch(0.50 0.025 250);
+  /* Muted - light gray backgrounds */
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
   
-  /* Accent - bright cyan/turquoise */
-  --accent: oklch(0.72 0.18 200);
-  --accent-foreground: oklch(0.18 0.030 250);
+  /* Accent - minimal purple accent like in the reference */
+  --accent: #6366f1;
+  --accent-foreground: #ffffff;
   
   /* Destructive */
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.99 0.005 260);
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
   
-  /* Borders - subtle blue tint */
-  --border: oklch(0.88 0.015 260);
-  --input: oklch(0.96 0.012 260);
-  --ring: oklch(0.60 0.22 250);
+  /* Borders - very subtle gray */
+  --border: #e2e8f0;
+  --input: #f8fafc;
+  --ring: #6366f1;
   
-  /* Charts - watery blue gradient */
-  --chart-1: oklch(0.60 0.22 250);
-  --chart-2: oklch(0.68 0.20 230);
-  --chart-3: oklch(0.72 0.18 200);
-  --chart-4: oklch(0.78 0.14 190);
-  --chart-5: oklch(0.65 0.19 215);
+  /* Charts - clean color palette */
+  --chart-1: #6366f1;
+  --chart-2: #8b5cf6;
+  --chart-3: #06b6d4;
+  --chart-4: #10b981;
+  --chart-5: #f59e0b;
   
-  /* Rounded modern feel */
-  --radius: 1.25rem;
+  /* Subtle rounded corners */
+  --radius: 0.75rem;
   
   /* Sidebar */
   --sidebar: oklch(0.98 0.008 260);
@@ -66,51 +66,51 @@
 }
 
 .dark {
-  /* Dark mode - deep ocean blue with neon accents */
+  /* Clean dark mode - maintaining the minimal aesthetic */
   
-  /* Base - deep navy/midnight blue */
-  --background: oklch(0.14 0.035 250);
-  --foreground: oklch(0.96 0.008 240);
+  /* Base - clean dark gray */
+  --background: #0f172a;
+  --foreground: #f8fafc;
   
-  /* Cards - slightly lighter with blue tint */
-  --card: oklch(0.18 0.038 250);
-  --card-foreground: oklch(0.96 0.008 240);
+  /* Cards - slightly lighter dark gray */
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
   
   /* Popover */
-  --popover: oklch(0.18 0.038 250);
-  --popover-foreground: oklch(0.96 0.008 240);
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
   
-  /* Primary - neon electric blue */
-  --primary: oklch(0.68 0.24 250);
-  --primary-foreground: oklch(0.14 0.035 250);
+  /* Primary - clean light accent */
+  --primary: #f8fafc;
+  --primary-foreground: #0f172a;
   
-  /* Secondary - glowing cyan */
-  --secondary: oklch(0.78 0.18 200);
-  --secondary-foreground: oklch(0.14 0.035 250);
+  /* Secondary - dark gray */
+  --secondary: #334155;
+  --secondary-foreground: #cbd5e1;
   
-  /* Muted - dark blue-gray */
-  --muted: oklch(0.22 0.035 255);
-  --muted-foreground: oklch(0.68 0.020 240);
+  /* Muted - medium dark gray */
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
   
-  /* Accent - bright aqua glow */
-  --accent: oklch(0.75 0.20 205);
-  --accent-foreground: oklch(0.14 0.035 250);
+  /* Accent - same purple accent */
+  --accent: #6366f1;
+  --accent-foreground: #ffffff;
   
   /* Destructive */
-  --destructive: oklch(0.50 0.20 30);
-  --destructive-foreground: oklch(0.96 0.008 240);
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
   
-  /* Borders - subtle glow */
-  --border: oklch(0.26 0.038 250);
-  --input: oklch(0.22 0.035 255);
-  --ring: oklch(0.68 0.24 250);
+  /* Borders - subtle dark border */
+  --border: #334155;
+  --input: #1e293b;
+  --ring: #6366f1;
   
-  /* Charts - neon spectrum */
-  --chart-1: oklch(0.68 0.24 250);
-  --chart-2: oklch(0.72 0.22 230);
-  --chart-3: oklch(0.75 0.20 205);
-  --chart-4: oklch(0.80 0.16 190);
-  --chart-5: oklch(0.70 0.21 220);
+  /* Charts - same clean colors */
+  --chart-1: #6366f1;
+  --chart-2: #8b5cf6;
+  --chart-3: #06b6d4;
+  --chart-4: #10b981;
+  --chart-5: #f59e0b;
   
   /* Sidebar */
   --sidebar: oklch(0.18 0.038 250);
@@ -165,50 +165,49 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Glass morphism and watery effect utilities */
-.glass-effect {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+/* Clean design utilities - minimal shadows and effects */
+.clean-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius);
 }
 
-.watery-gradient {
-  background: linear-gradient(135deg, 
-    oklch(0.70 0.20 210) 0%, 
-    oklch(0.65 0.22 240) 50%, 
-    oklch(0.75 0.18 200) 100%);
+.clean-shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
 }
 
-.liquid-shadow {
-  box-shadow: 
-    0 10px 40px rgba(59, 130, 246, 0.3),
-    0 4px 20px rgba(96, 165, 250, 0.2),
-    inset 0 -2px 8px rgba(59, 130, 246, 0.1);
+.clean-shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
-.neon-glow {
-  box-shadow: 
-    0 0 20px rgba(59, 130, 246, 0.4),
-    0 0 40px rgba(96, 165, 250, 0.2),
-    0 0 60px rgba(59, 130, 246, 0.1);
+.minimal-border {
+  border: 1px solid var(--border);
 }
 
-.frosted {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+.clean-hover {
+  transition: all 0.2s ease-in-out;
 }
 
-.dark .glass-effect {
-  background: rgba(20, 25, 50, 0.6);
-  border: 1px solid rgba(96, 165, 250, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.2);
+.clean-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.15);
 }
 
-.dark .frosted {
-  background: rgba(20, 25, 50, 0.7);
+/* Clean button styles */
+.btn-clean {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-clean:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.2);
 }
 @layer base {
   * {
@@ -219,50 +218,65 @@
   }
 }
 
-/* Improved animation smoothness with cubic-bezier easing */
-@keyframes spin-slow {
+/* Clean, subtle animations */
+@keyframes fade-in {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.animate-spin-slow {
-  animation: spin-slow 30s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
 }
 
-/* Smoother gradient animation with ease-in-out */
-@keyframes gradient {
-  0%,
-  100% {
-    background-position: 0% 50%;
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  50% {
-    background-position: 100% 50%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.animate-gradient {
-  animation: gradient 8s ease-in-out infinite;
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
 }
 
-/* Slower, smoother breathing animation */
-@keyframes breathe {
-  0%,
-  100% {
+/* Subtle scale animation for hover effects */
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
     transform: scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.8;
+    opacity: 1;
   }
 }
 
-.animate-breathe {
-  animation: breathe 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+/* Shine animation for text effects */
+@keyframes shine {
+  0% {
+    background-position: 100%;
+  }
+  100% {
+    background-position: -100%;
+  }
+}
+
+.animate-shine {
+  animation: shine 5s linear infinite;
 }
 
 /* Loading progress bar animation */
@@ -275,14 +289,18 @@
   }
 }
 
-/* Leaflet map customization */
+/* Leaflet map customization - clean styling */
 .leaflet-container {
   font-family: inherit;
+  border-radius: var(--radius);
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
 }
 
 .leaflet-popup-content {
@@ -291,27 +309,11 @@
 }
 
 .leaflet-popup-tip {
-  background: white;
+  background: var(--card);
 }
 
 /* Fix for marker icons in production builds */
 .leaflet-default-icon-path {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
-}
-
-/* Fade-in animation for CallNowButton popup */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.2s ease-out;
 }
 

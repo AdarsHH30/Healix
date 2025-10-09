@@ -4,6 +4,7 @@ import type React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Logo } from "@/components/logo";
 import {
   Leaf,
   Facebook,
@@ -27,18 +28,13 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-gradient-to-b from-muted/30 to-muted/50 border-t border-border">
+    <footer className="bg-muted/20 border-t border-border">
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 md:gap-12 mb-12">
           {/* About Column */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-lg">
-                <Leaf className="h-4 w-4 md:h-5 md:w-5 text-white" />
-              </div>
-              <span className="text-lg md:text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Healix
-              </span>
+            <div className="mb-4">
+              <Logo size="md" showText={true} />
             </div>
             <p className="text-xs md:text-sm text-muted-foreground leading-relaxed mb-6 max-w-md">
               Empowering your journey to complete wellness through expert-guided

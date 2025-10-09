@@ -66,13 +66,8 @@ export function Testimonials() {
   }, [testimonials.length]);
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-background to-primary/5 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-primary blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-64 h-64 rounded-full bg-accent blur-3xl" />
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
+    <section className="py-16 md:py-24 bg-background">
+      <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 md:mb-4">
             Real Results from Real People
@@ -91,7 +86,7 @@ export function Testimonials() {
             >
               {testimonials.map((testimonial, index) => (
                 <div key={index} className="w-full flex-shrink-0 px-2 md:px-4">
-                  <Card className="bg-white/90 backdrop-blur-sm border-border shadow-2xl p-6 md:p-8 lg:p-12">
+                  <Card className="clean-card p-6 md:p-8 lg:p-12">
                     <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start">
                       <div className="flex-shrink-0">
                         <div className="relative">

@@ -55,8 +55,9 @@ export function HeroSection() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-muted/30 to-accent/10">
-      {show3D && <Background3DScene mousePosition={mousePosition} />}
+    <div className="relative min-h-screen bg-background">
+      {/* Clean background with subtle pattern */}
+      <div className="absolute inset-0 bg-gradient-to-b from-muted/20 to-transparent" />
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
 import { Leaf, Heart, Users, BookOpen, LogOut, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -29,9 +30,9 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-out ${
         isScrolled
-          ? "bg-background/80 backdrop-blur-xl shadow-lg shadow-primary/5 dark:bg-background/90"
+          ? "bg-background/95 backdrop-blur-sm clean-shadow border-b border-border"
           : "bg-transparent"
       }`}
     >
@@ -70,15 +71,9 @@ export function Header() {
           </a>
         </div>
 
-        {/* Center logo */}
-        <div className="flex items-center gap-2 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
-          <div className="relative flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30">
-            <Leaf className="h-4 w-4 md:h-5 md:w-5 text-primary-foreground" />
-            <div className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
-          </div>
-          <span className="text-lg md:text-xl font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            Healix
-          </span>
+        {/* Center logo - health-focused design */}
+        <div className="lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2">
+          <Logo size="md" showText={true} />
         </div>
 
         {/* Right side navigation - Desktop only */}

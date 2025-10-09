@@ -173,51 +173,52 @@ export function EmergencyButton() {
     <div className="flex flex-col gap-2">
       <Button
         onClick={handleEmergencyClick}
-        disabled={isLoading}
-        className="bg-red-600 hover:bg-red-700 text-white font-bold py-6 px-8 rounded-lg shadow-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
-        size="lg"
+        disabled={isLoading || !session}
+        className="w-full bg-destructive hover:bg-destructive/90 disabled:bg-muted text-white font-bold py-6 px-8 text-lg rounded-xl clean-shadow-lg transition-all duration-200 hover:-translate-y-1 active:translate-y-0 disabled:translate-y-0"
       >
         {isLoading ? (
-          <>
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+          <div className="flex items-center gap-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-3 border-white/30 border-t-white"></div>
             <span>Sending Emergency Alert...</span>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="flex items-center justify-center gap-3">
             <AlertCircle className="h-6 w-6" />
             <Phone className="h-6 w-6" />
             <span>EMERGENCY - CALL & SMS</span>
-          </>
+          </div>
         )}
       </Button>
 
-      {/* Location status indicator */}
+      {/* Clean location status indicator */}
       {location && (
-        <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-          <MapPin className="h-4 w-4" />
-          <span>Location enabled</span>
+        <div className="flex items-center gap-2 mt-3 p-3 bg-green-50 dark:bg-green-950/50 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+            <MapPin className="h-3 w-3 text-white" />
+          </div>
+          <span className="text-sm font-medium text-green-700 dark:text-green-300">
+            Location enabled
+          </span>
         </div>
       )}
 
       {locationError && (
-        <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-          <AlertCircle className="h-4 w-4" />
-          <span>{locationError}</span>
+        <div className="flex items-center gap-2 mt-3 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-lg border border-amber-200 dark:border-amber-800">
+          <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+            <AlertCircle className="h-3 w-3 text-white" />
+          </div>
+          <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            {locationError}
+          </span>
         </div>
       )}
 
-      {/* Status message */}
+      {/* Clean status message */}
       {statusMessage && (
-        <div className="mt-2 p-3 rounded-md bg-gray-100 dark:bg-gray-800 text-sm">
-          {statusMessage}
+        <div className="mt-4 p-4 rounded-lg bg-muted border border-border">
+          <p className="text-sm font-medium text-foreground">{statusMessage}</p>
         </div>
       )}
-
-      {/* Important disclaimer */}
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-        This will call and SMS your emergency contacts with your location. Use
-        only in real emergencies.
-      </p>
     </div>
   );
 }
