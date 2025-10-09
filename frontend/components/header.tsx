@@ -94,7 +94,7 @@ export function Header() {
               variant="outline"
               size="sm"
               onClick={handleSignOut}
-              className="rounded-full border-2 border-destructive/20 hover:border-destructive hover:bg-destructive/5 transition-all duration-300 bg-transparent"
+              className="rounded-full border-2 border-destructive/20  transition-all duration-300 bg-transparent"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
@@ -104,7 +104,7 @@ export function Header() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 bg-transparent"
+                className="rounded-full border-2 border-primary/20 hover:border-primary transition-all duration-300  hover:transform hover:scale-105"
               >
                 Sign In
               </Button>

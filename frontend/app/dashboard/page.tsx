@@ -157,16 +157,16 @@ export default function Dashboard() {
 
       {/* Clean grid layout with larger cards */}
       <div className="container mx-auto px-4 pb-8 h-[calc(100vh-120px)]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 h-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 h-full">
           {categories.map((category, index) => (
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
-              className="clean-card clean-hover p-8 text-left group animate-slide-up flex flex-col h-full min-h-[400px]"
+              className="clean-card clean-hover p-8 text-left group animate-slide-up flex flex-col h-full min-h-[500px]"
               style={{ animationDelay: `${index * 0.1}s` }}
               aria-label={`Navigate to ${category.name}`}
             >
-              <div className="relative w-full flex-1 mb-6 rounded-lg overflow-hidden">
+              <div className="relative w-full flex-3 mb-6 rounded-lg overflow-hidden">
                 <Image
                   src={category.image}
                   alt={category.name}

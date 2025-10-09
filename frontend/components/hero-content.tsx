@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Video, ArrowRight, Heart, CheckCircle2, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
-import ShinyText from "@/components/shiny-text";
 
 export function HeroContent() {
   const { user, loading } = useAuth();
@@ -21,22 +20,23 @@ export function HeroContent() {
         </span>
       </div>
 
-      {/* Main headline with shining text */}
+      {/* Main headline */}
       <h1 className="mb-4 md:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-balance leading-tight">
         <span className="text-foreground">Transform Your Life Through</span>
         <br />
-        <ShinyText 
-          text="Healix" 
-          speed={3} 
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-accent"
-        />
+        <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-accent">
+          Healix
+        </span>
       </h1>
 
-      {/* Subheadline with shining keywords */}
+      {/* Subheadline */}
       <p className="mx-auto mb-6 md:mb-10 max-w-2xl text-base md:text-lg lg:text-xl text-muted-foreground text-balance leading-relaxed px-4">
-        Discover <ShinyText text="balance and vitality" speed={4} className="text-base md:text-lg lg:text-xl text-accent font-medium" /> through our comprehensive approach to
-        wellness. Expert-led tutorials in yoga, mental health, and physical
-        fitness—all in one place.
+        Discover{" "}
+        <span className="text-base md:text-lg lg:text-xl text-accent font-medium">
+          balance and vitality
+        </span>{" "}
+        through our comprehensive approach to wellness. Expert-led tutorials in
+        yoga, mental health, and physical fitness—all in one place.
       </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-6 md:mb-8 px-4">
@@ -89,7 +89,7 @@ export function HeroContent() {
             <Button
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto text-sm md:text-base px-6 md:px-8 h-12 md:h-14 rounded-full border-2 border-primary/30 bg-white/50 backdrop-blur-sm hover:bg-white hover:border-primary hover:scale-105 transition-all duration-500"
+              className="w-full sm:w-auto text-sm md:text-base px-6 md:px-8 h-12 md:h-14 rounded-full border-2 border-primary/30 backdrop-blur-sm hover:border-primary hover:text-primary hover:scale-105 transition-all duration-500"
             >
               Explore Tutorials
             </Button>
