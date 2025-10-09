@@ -280,7 +280,7 @@ export function WellnessPillarCard({
             className={`w-full rounded-full text-sm md:text-base ${colors.bg} ${colors.text} hover:scale-105 transition-all duration-300 group/btn`}
             variant="ghost"
           >
-            Learn More
+            Start Program
             <ArrowRight className="ml-2 h-3.5 w-3.5 md:h-4 md:w-4 group-hover/btn:translate-x-1 transition-transform" />
           </Button>
         </div>

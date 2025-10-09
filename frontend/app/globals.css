@@ -289,6 +289,46 @@
   }
 }
 
+/* Classic gradient animation */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background: linear-gradient(-45deg, #6366f1, #8b5cf6, #a855f7, #c084fc);
+  background-size: 400% 400%;
+  animation: gradient 4s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.animate-gradient-slow {
+  background: linear-gradient(-45deg, #6366f1, #8b5cf6, #a855f7, #c084fc);
+  background-size: 400% 400%;
+  animation: gradient 6s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.animate-gradient-fast {
+  background: linear-gradient(-45deg, #6366f1, #8b5cf6, #a855f7, #c084fc);
+  background-size: 400% 400%;
+  animation: gradient 2s ease infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 /* Leaflet map customization - clean styling */
 .leaflet-container {
   font-family: inherit;

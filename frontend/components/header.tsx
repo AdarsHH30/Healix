@@ -53,20 +53,20 @@ export function Header() {
         {/* Left side navigation - Desktop only */}
         <div className="hidden lg:flex items-center gap-8">
           <a
-            href="#programs"
+            href="/dashboard"
             className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
           >
             <BookOpen className="h-4 w-4 opacity-60 group-hover:opacity-100 transition-opacity" />
-            <span>Programs</span>
+            <span>Dashboard</span>
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
           </a>
 
           <a
-            href="#instructors"
+            href="/dashboard/mental-health"
             className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
           >
             <Heart className="h-4 w-4 opacity-60 group-hover:opacity-100 transition-opacity" />
-            <span>Instructors</span>
+            <span>Quotes</span>
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
           </a>
         </div>
@@ -79,11 +79,11 @@ export function Header() {
         {/* Right side navigation - Desktop only */}
         <div className="hidden lg:flex items-center gap-8">
           <a
-            href="#community"
+            href="/profile"
             className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
           >
             <Users className="h-4 w-4 opacity-60 group-hover:opacity-100 transition-opacity" />
-            <span>Community</span>
+            <span>Profile</span>
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300 rounded-full" />
           </a>
 

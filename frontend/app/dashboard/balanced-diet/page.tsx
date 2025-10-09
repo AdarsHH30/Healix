@@ -740,4 +740,3 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
     </>
   );
 }
-  

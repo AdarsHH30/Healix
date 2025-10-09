@@ -4,18 +4,6 @@ import { useEffect, useState } from "react";
 import { Activity, Brain, Heart } from "lucide-react";
 import dynamic from "next/dynamic";
 
-const Background3DScene = dynamic(
-  () =>
-    import("./background-3d-scene").then((mod) => ({
-      default: mod.Background3DScene,
-    })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
-    ),
-  }
-);
 import { Header } from "./header";
 import { HeroContent } from "./hero-content";
 import { FeatureCard } from "./feature-card";
@@ -24,61 +12,15 @@ import { VisualHero } from "./visual-hero";
 
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [show3D, setShow3D] = useState(true);
 
   useEffect(() => {
     setIsVisible(true);
-
-    // Check if running in a browser that supports WebGL
-    try {
-      const canvas = document.createElement("canvas");
-      const gl =
-        canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-      if (!gl) {
-        setShow3D(false);
-      }
-    } catch (_e) {
-      setShow3D(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 2,
-        y: (e.clientY / window.innerHeight - 0.5) * 2,
-      });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   return (
     <div className="relative min-h-screen bg-background">
       {/* Clean background with subtle pattern */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/20 to-transparent" />
-
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl animate-float will-change-transform"
-          style={{
-            transform: `translate(${mousePosition.x * 20}px, ${
-              mousePosition.y * 20
-            }px)`,
-            transition: "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-          }}
-        />
-        <div
-          className="absolute bottom-20 -left-20 h-72 w-72 rounded-full bg-accent/10 blur-3xl animate-float-delayed will-change-transform"
-          style={{
-            transform: `translate(${mousePosition.x * -15}px, ${
-              mousePosition.y * -15
-            }px)`,
-            transition: "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
-          }}
-        />
-      </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Header />
@@ -112,37 +54,37 @@ export function HeroSection() {
             }`}
           >
             <FeatureCard
-              icon={Activity}
-              title="Yoga"
-              description="Build strength, flexibility, and inner peace through guided yoga practices for all levels."
+              icon={Heart}
+              title="Emergency Services"
+              description="Instant access to emergency contacts and automated calling/SMS system for urgent situations."
               color="primary"
-              duration="30 min"
-              level="Beginner Friendly"
-              instructorName="Sarah Chen"
-              instructorImage="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face"
-              category="Mind & Body"
+              duration="24/7"
+              level="Always Available"
+              instructorName=""
+              instructorImage=""
+              category="Emergency"
             />
             <FeatureCard
               icon={Brain}
-              title="Mental Health"
-              description="Cultivate mindfulness, reduce stress, and enhance emotional well-being with expert guidance."
+              title="First Aid Guidance"
+              description="AI-powered chatbot providing step-by-step first aid instructions for various emergency scenarios."
               color="accent"
-              duration="25 min"
-              level="All Levels"
-              instructorName="Dr. James Wilson"
-              instructorImage="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face"
-              category="Mindfulness"
+              duration="Instant"
+              level="All Situations"
+              instructorName=""
+              instructorImage=""
+              category="First Aid"
             />
             <FeatureCard
-              icon={Heart}
-              title="Physical Fitness"
-              description="Achieve your fitness goals with personalized workouts designed for sustainable results."
+              icon={Activity}
+              title="Hospital Locator"
+              description="Instantly find nearby hospitals and medical facilities with integrated map and location services."
               color="secondary"
-              duration="45 min"
-              level="Intermediate"
-              instructorName="Maya Rodriguez"
-              instructorImage="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face"
-              category="Strength"
+              duration="Real-time"
+              level="Location-based"
+              instructorName=""
+              instructorImage=""
+              category="Medical"
             />
           </div>
 
@@ -157,33 +99,6 @@ export function HeroSection() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
-        @keyframes float-delayed {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-30px);
-          }
-        }
-        .animate-float {
-          animation: float 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-        .animate-float-delayed {
-          animation: float-delayed 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
-      `}</style>
     </div>
   );
 }
