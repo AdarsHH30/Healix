@@ -7,10 +7,19 @@ import {
   Mail,
   Calendar,
   LogOut,
-  Upload as UploadIcon,
   MessageCircle,
   MapPin,
   Heart,
+  Upload as UploadIcon,
+  Star,
+  Phone,
+  Edit,
+  Settings,
+  Activity,
+  Dumbbell,
+  Brain,
+  Wind,
+  Apple,
   TrendingUp,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
@@ -23,50 +32,133 @@ import { useAuth } from "@/components/auth-provider";
 interface UserProfile {
   id: string;
   email: string;
+  first_name?: string;
+  last_name?: string;
   full_name?: string;
   avatar_url?: string;
+  emergency_phone_1?: string;
+  emergency_phone_2?: string;
   created_at: string;
 }
 
 interface QuoteData {
   id: string;
-  text: string;
+  quote_text: string;
   author: string;
   category: string;
-  color: string;
+  text?: string;
+  color?: string;
+}
+
+interface ExerciseData {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  difficulty: string;
+  exercise_type: string;
+  category: string;
+  created_at: string;
 }
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { signOut } = useAuth();
+  const { user, session, loading: authLoading, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [favoriteQuotes, setFavoriteQuotes] = useState<Set<string>>(new Set());
   const [quotes, setQuotes] = useState<QuoteData[]>([]);
+  const [uploadedExercises, setUploadedExercises] = useState<ExerciseData[]>(
+    []
+  );
+  const [stats, setStats] = useState({
+    totalUploads: 0,
+    favoriteQuotesCount: 0,
+    memberSince: "",
+  });
 
-  const loadQuotes = async () => {
+  console.log("🎯 ProfilePage render:", {
+    authLoading,
+    hasUser: !!user,
+    hasSession: !!session,
+    profileLoading: loading,
+  });
+
+  const loadQuotes = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("quotes")
         .select("*")
-        .order("created_at", { ascending: true });
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       if (data) {
-        setQuotes(data);
+        // Map quotes and add color based on category
+        const quotesWithColors = data.map((quote) => {
+          let color = "#6366f1"; // default chart-1 color
+          const category = quote.category.toLowerCase();
+
+          if (
+            category.includes("motivation") ||
+            category.includes("physical")
+          ) {
+            color = "#6366f1"; // chart-1
+          } else if (
+            category.includes("mental") ||
+            category.includes("mindfulness")
+          ) {
+            color = "#8b5cf6"; // chart-2
+          } else if (
+            category.includes("wellness") ||
+            category.includes("breathing")
+          ) {
+            color = "#06b6d4"; // chart-3
+          } else if (
+            category.includes("nutrition") ||
+            category.includes("health")
+          ) {
+            color = "#10b981"; // chart-4
+          }
+
+          return {
+            ...quote,
+            text: quote.quote_text,
+            color: color,
+          };
+        });
+
+        setQuotes(quotesWithColors);
       }
     } catch (error) {
       console.error("Error loading quotes:", error);
     }
-  };
+  }, []);
 
-  const loadFavorites = async () => {
+  const loadUploadedExercises = useCallback(async () => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("created_by", user.id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      if (data) {
+        setUploadedExercises(data);
+      }
+    } catch (error) {
+      console.error("Error loading uploaded exercises:", error);
+    }
+  }, [user]);
+
+  const loadFavorites = useCallback(async () => {
+    try {
       if (!user) return;
 
       const { data } = await supabase
@@ -80,7 +172,7 @@ export default function ProfilePage() {
     } catch (error) {
       console.error("Error loading favorites:", error);
     }
-  };
+  }, [user]);
 
   const handleRemoveFavorite = async (quoteId: string) => {
     if (!profile?.id) return;
@@ -102,44 +194,126 @@ export default function ProfilePage() {
 
   const loadProfile = useCallback(async () => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
+      // Don't try to load if we don't have a user yet
       if (!user) {
-        router.push("/login");
+        console.log("No user found, waiting for auth...");
         return;
       }
 
+      console.log("Loading profile for user:", user.id);
+
       // Try to get profile from users table
-      const { data: profileData, error: _error } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from("users")
         .select("*")
         .eq("id", user.id)
         .single();
 
+      console.log("Profile data:", profileData, "Error:", profileError);
+
       if (profileData) {
         setProfile(profileData);
+
+        // Update stats
+        const memberSinceDate = new Date(
+          profileData.created_at
+        ).toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        });
+
+        setStats((prev) => ({
+          ...prev,
+          memberSince: memberSinceDate,
+        }));
       } else {
-        // If no profile exists, create one
+        // If no profile exists, use basic info from auth
+        const firstName = user.user_metadata?.first_name || "";
+        const lastName = user.user_metadata?.last_name || "";
+        const fullName =
+          user.user_metadata?.full_name ||
+          `${firstName} ${lastName}`.trim() ||
+          "";
+
         setProfile({
           id: user.id,
           email: user.email || "",
+          full_name: fullName,
+          first_name: firstName,
+          last_name: lastName,
           created_at: user.created_at || new Date().toISOString(),
         });
+
+        // Update stats
+        const memberSinceDate = new Date(
+          user.created_at || Date.now()
+        ).toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        });
+
+        setStats((prev) => ({
+          ...prev,
+          memberSince: memberSinceDate,
+        }));
       }
     } catch (error) {
       console.error("Error loading profile:", error);
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [user]);
 
   useEffect(() => {
-    loadProfile();
-    loadFavorites();
-    loadQuotes();
-  }, [loadProfile]);
+    // Wait for auth to complete before checking
+    if (authLoading) {
+      console.log("🔄 Profile: Auth is still loading...");
+      return;
+    }
+
+    console.log("🔍 Profile useEffect:", {
+      authLoading,
+      hasUser: !!user,
+      hasSession: !!session,
+      userEmail: user?.email,
+    });
+
+    // If auth finished and there's no user, redirect to login
+    if (!authLoading && !user && !session) {
+      console.log("❌ Profile: No user or session, redirecting to login");
+      router.push("/login");
+      return;
+    }
+
+    // If we have a user, load their profile
+    if (user) {
+      console.log("✅ Profile: User found, loading profile data");
+      loadProfile();
+      loadFavorites();
+      loadQuotes();
+      loadUploadedExercises();
+    }
+  }, [
+    authLoading,
+    user,
+    session,
+    loadProfile,
+    loadFavorites,
+    loadQuotes,
+    loadUploadedExercises,
+    router,
+  ]);
+
+  // Update stats when quotes and exercises are loaded
+  useEffect(() => {
+    if (uploadedExercises.length > 0 || favoriteQuotes.size > 0) {
+      setStats((prev) => ({
+        ...prev,
+        totalUploads: uploadedExercises.length,
+        favoriteQuotesCount: favoriteQuotes.size,
+      }));
+    }
+  }, [uploadedExercises, favoriteQuotes]);
 
   const handleLogout = async () => {
     try {
@@ -158,10 +332,26 @@ export default function ProfilePage() {
     });
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-muted-foreground">
+            Loading your profile...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not loading and no user, the useEffect will redirect
+  if (!user || !profile) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-muted-foreground">Redirecting...</p>
+        </div>
       </div>
     );
   }
@@ -225,6 +415,14 @@ export default function ProfilePage() {
                       Member since {formatDate(profile?.created_at || "")}
                     </span>
                   </div>
+                  {profile?.first_name && profile?.last_name && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <User size={16} />
+                      <span>
+                        {profile.first_name} {profile.last_name}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -252,45 +450,99 @@ export default function ProfilePage() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-muted/20 rounded-xl border border-border p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-chart-1/20 rounded-lg">
-                  <User className="text-chart-1" size={24} />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Profile</p>
-                  <p className="text-xl font-bold text-foreground">Active</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-muted/20 rounded-xl border border-border p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-chart-2/20 rounded-lg">
-                  <Calendar className="text-chart-2" size={24} />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Dashboard</p>
-                  <p className="text-xl font-bold text-foreground">Access</p>
+            <div className="bg-gradient-to-br from-chart-1/10 to-chart-1/5 rounded-xl border border-chart-1/20 p-6 hover:shadow-lg hover:shadow-chart-1/10 transition-all duration-300">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-chart-1/20 rounded-lg">
+                    <UploadIcon className="text-chart-1" size={24} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-foreground">
+                      {stats.totalUploads}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Total Uploads
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-muted/20 rounded-xl border border-border p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-chart-4/20 rounded-lg">
-                  <UploadIcon className="text-chart-4" size={24} />
+            <div className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 rounded-xl border border-chart-2/20 p-6 hover:shadow-lg hover:shadow-chart-2/10 transition-all duration-300">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-chart-2/20 rounded-lg">
+                    <Heart className="text-chart-2" size={24} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-foreground">
+                      {stats.favoriteQuotesCount}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Favorite Quotes
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Contribute</p>
-                  <p className="text-xl font-bold text-foreground">Enabled</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 rounded-xl border border-chart-3/20 p-6 hover:shadow-lg hover:shadow-chart-3/10 transition-all duration-300">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-chart-3/20 rounded-lg">
+                    <Calendar className="text-chart-3" size={24} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-foreground">
+                      {stats.memberSince}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Member Since
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Emergency Contacts */}
+          {(profile?.emergency_phone_1 || profile?.emergency_phone_2) && (
+            <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Phone size={24} className="text-chart-4" />
+                <h3 className="text-xl font-bold text-foreground">
+                  Emergency Contacts
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {profile?.emergency_phone_1 && (
+                  <div className="flex items-center gap-3 p-4 bg-chart-4/5 rounded-lg border border-chart-4/20">
+                    <Phone size={18} className="text-chart-4" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Contact 1</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {profile.emergency_phone_1}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {profile?.emergency_phone_2 && (
+                  <div className="flex items-center gap-3 p-4 bg-chart-4/5 rounded-lg border border-chart-4/20">
+                    <Phone size={18} className="text-chart-4" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Contact 2</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {profile.emergency_phone_2}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Favorited Quotes Section */}
-          {favoriteQuotes.size > 0 && (
+          {favoriteQuotes.size > 0 ? (
             <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8">
               <div className="flex items-center gap-3 mb-6">
                 <Heart size={24} className="text-red-500" fill="currentColor" />
@@ -359,6 +611,152 @@ export default function ProfilePage() {
                     </div>
                   ))}
               </div>
+            </div>
+          ) : (
+            <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8 text-center">
+              <Heart
+                size={48}
+                className="text-muted-foreground/30 mx-auto mb-4"
+              />
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                No Favorite Quotes Yet
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Visit the Mental Health section on your dashboard to discover
+                and save inspirational quotes.
+              </p>
+              <Button
+                onClick={() => router.push("/dashboard/mental-health")}
+                variant="outline"
+                className="gap-2"
+              >
+                <Heart size={16} />
+                Explore Quotes
+              </Button>
+            </div>
+          )}
+
+          {/* Uploaded Exercises Section */}
+          {uploadedExercises.length > 0 ? (
+            <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <UploadIcon size={24} className="text-chart-4" />
+                <h3 className="text-xl font-bold text-foreground">
+                  Your Uploaded Exercises
+                </h3>
+                <span className="px-3 py-1 rounded-full bg-chart-4/20 text-sm font-medium text-chart-4">
+                  {uploadedExercises.length}
+                </span>
+              </div>
+
+              {/* Group exercises by type */}
+              {["physical", "mental", "breathing", "nutrition"].map((type) => {
+                const exercisesOfType = uploadedExercises.filter(
+                  (ex) =>
+                    ex.exercise_type.toLowerCase() === type.toLowerCase() ||
+                    ex.category.toLowerCase() === type.toLowerCase()
+                );
+
+                if (exercisesOfType.length === 0) return null;
+
+                const typeColors: Record<
+                  string,
+                  { bg: string; border: string; text: string }
+                > = {
+                  physical: {
+                    bg: "from-chart-1/10 to-chart-1/5",
+                    border: "border-chart-1/30",
+                    text: "text-chart-1",
+                  },
+                  mental: {
+                    bg: "from-chart-2/10 to-chart-2/5",
+                    border: "border-chart-2/30",
+                    text: "text-chart-2",
+                  },
+                  breathing: {
+                    bg: "from-chart-3/10 to-chart-3/5",
+                    border: "border-chart-3/30",
+                    text: "text-chart-3",
+                  },
+                  nutrition: {
+                    bg: "from-chart-4/10 to-chart-4/5",
+                    border: "border-chart-4/30",
+                    text: "text-chart-4",
+                  },
+                };
+
+                const colors = typeColors[type];
+
+                return (
+                  <div key={type} className="mb-6 last:mb-0">
+                    <h4 className="text-lg font-semibold text-foreground mb-3 capitalize">
+                      {type} Exercises ({exercisesOfType.length})
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {exercisesOfType.map((exercise) => (
+                        <div
+                          key={exercise.id}
+                          className={`group bg-gradient-to-br ${colors.bg} rounded-xl border ${colors.border} p-5 hover:shadow-lg transition-all duration-300`}
+                        >
+                          <div className="flex items-start justify-between gap-3 mb-3">
+                            <h5
+                              className={`font-semibold text-foreground group-hover:${colors.text} transition-colors`}
+                            >
+                              {exercise.name}
+                            </h5>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${colors.text} bg-background/50`}
+                            >
+                              {exercise.difficulty}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {exercise.description}
+                          </p>
+                          <div className="flex items-center gap-2 mt-3">
+                            <Calendar
+                              size={14}
+                              className="text-muted-foreground"
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(exercise.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8 text-center">
+              <UploadIcon
+                size={48}
+                className="text-muted-foreground/30 mx-auto mb-4"
+              />
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                No Uploaded Exercises Yet
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Share your knowledge with the community by uploading your own
+                exercises.
+              </p>
+              <Button
+                onClick={() => router.push("/upload")}
+                variant="outline"
+                className="gap-2"
+              >
+                <UploadIcon size={16} />
+                Upload Exercise
+              </Button>
             </div>
           )}
 

@@ -81,45 +81,51 @@ const RegisterPage = () => {
           return;
         }
 
-        // Create user profile in database
-        console.log("Creating user profile with data:", {
+        // IMPORTANT: Update user profile BEFORE signing out
+        // This must be done while the user is still authenticated for RLS policies
+        console.log("Updating user profile with data:", {
           id: authData.user.id,
           email: data.email,
           first_name: data.firstName,
           last_name: data.lastName,
+          full_name: `${data.firstName} ${data.lastName}`,
           emergency_phone_1: data.emergencyPhone1,
           emergency_phone_2: data.emergencyPhone2,
         });
 
+        // Wait a moment for the trigger to create the initial record
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // Now update it with the correct data
         const { data: profileData, error: profileError } = await supabase
           .from("users")
-          .upsert(
-            {
-              id: authData.user.id,
-              email: data.email,
-              first_name: data.firstName || null,
-              last_name: data.lastName || null,
-              emergency_phone_1: data.emergencyPhone1 || null,
-              emergency_phone_2: data.emergencyPhone2 || null,
-            },
-            {
-              onConflict: "id",
-            }
-          )
+          .update({
+            first_name: data.firstName,
+            last_name: data.lastName,
+            full_name: `${data.firstName} ${data.lastName}`,
+            emergency_phone_1: data.emergencyPhone1,
+            emergency_phone_2: data.emergencyPhone2,
+          })
+          .eq("id", authData.user.id)
           .select();
 
-        console.log("Profile creation result:", { profileData, profileError });
+        console.log("Profile update result:", { profileData, profileError });
 
         if (profileError) {
-          console.error("Error creating user profile:", profileError);
-          // Don't fail registration if profile creation fails
+          console.error("Error updating user profile:", profileError);
+          // Show error but don't fail registration
+          setError(
+            `Account created but profile update failed: ${profileError.message}. You can update your profile after logging in.`
+          );
         }
 
-        // Sign out the user immediately after registration
+        // NOW sign out the user
         await supabase.auth.signOut();
 
         // Show success message and redirect to login
-        setSuccess("Account created successfully! Redirecting to login...");
+        if (!profileError) {
+          setSuccess("Account created successfully! Redirecting to login...");
+        }
 
         // Clear the form
         form.reset();
