@@ -1,14 +1,5 @@
 "use client";
 
-import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -18,14 +9,7 @@ import { useState } from "react";
 import { ChatbotPopup } from "@/components/chatbot-popup";
 import { MapPopup } from "@/components/map-popup";
 import { SignupForm, formSchema, FormData } from "@/components/signup-form";
-import {
-  MessageCircle,
-  MapPin,
-  CheckCircle2,
-  Shield,
-  Phone,
-  Mail,
-} from "lucide-react";
+import { MessageCircle, MapPin } from "lucide-react";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -46,6 +30,8 @@ const RegisterPage = () => {
       emergencyPhone2: "",
     },
     resolver: zodResolver(formSchema),
+    mode: "onSubmit", // Validate only on submit
+    reValidateMode: "onChange", // Re-validate on change after first submit
   });
 
   const onSubmit = async (data: FormData) => {
@@ -60,17 +46,17 @@ const RegisterPage = () => {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
 
-      // Sign up the user
+      // Sign up the user (disable email confirmation by setting emailRedirectTo and autoConfirm)
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/login`,
           data: {
             first_name: data.firstName,
             last_name: data.lastName,
-            emergency_phone_1: data.emergencyPhone1,
-            emergency_phone_2: data.emergencyPhone2,
+            emergency_phone_1: data.emergencyPhone1 || null,
+            emergency_phone_2: data.emergencyPhone2 || null,
           },
         },
       });
@@ -83,28 +69,31 @@ const RegisterPage = () => {
       }
 
       if (authData.user) {
-        // Check if the user has an existing session or needs to confirm email
+        // Check if the user already exists
         const identities = authData.user.identities;
 
-        console.log("User identities:", identities);
-        console.log("User confirmed at:", authData.user.confirmed_at);
-        console.log("Session exists:", !!authData.session);
-
         if (identities && identities.length === 0) {
-          // User already exists but hasn't confirmed email
+          // User already exists
           setError(
-            "This email is already registered. Please check your email for the confirmation link, or try logging in if you've already confirmed your account."
+            "This email is already registered. Please try logging in instead."
           );
           form.reset();
           return;
         }
 
-        if (authData.session && authData.user.confirmed_at) {
-          // Email confirmation is disabled in Supabase - user is already logged in
-          console.log("Auto-confirmed user, redirecting to dashboard");
+        // Create user profile in database
+        console.log("Creating user profile with data:", {
+          id: authData.user.id,
+          email: data.email,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          emergency_phone_1: data.emergencyPhone1,
+          emergency_phone_2: data.emergencyPhone2,
+        });
 
-          // Create user profile
-          const { error: profileError } = await supabase.from("users").upsert(
+        const { data: profileData, error: profileError } = await supabase
+          .from("users")
+          .upsert(
             {
               id: authData.user.id,
               email: data.email,
@@ -116,31 +105,29 @@ const RegisterPage = () => {
             {
               onConflict: "id",
             }
-          );
+          )
+          .select();
 
-          if (profileError) {
-            console.error("Error creating user profile:", profileError);
-          }
+        console.log("Profile creation result:", { profileData, profileError });
 
-          setSuccess(
-            "Account created successfully! Redirecting to dashboard..."
-          );
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 1500);
-        } else {
-          // Email confirmation is required
-          console.log("Email confirmation required");
-          setSuccess(
-            "🎉 Registration successful! Please check your email inbox and click the confirmation link to verify your account. Don't forget to check your spam folder if you don't see it."
-          );
-
-          // Clear the form
-          form.reset();
-
-          // Sign out the user to ensure they must confirm email before logging in
-          await supabase.auth.signOut();
+        if (profileError) {
+          console.error("Error creating user profile:", profileError);
+          // Don't fail registration if profile creation fails
         }
+
+        // Sign out the user immediately after registration
+        await supabase.auth.signOut();
+
+        // Show success message and redirect to login
+        setSuccess("Account created successfully! Redirecting to login...");
+
+        // Clear the form
+        form.reset();
+
+        // Redirect to login page after a short delay
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
       }
     } catch (err: unknown) {
       console.error("Registration error:", err);
@@ -181,73 +168,14 @@ const RegisterPage = () => {
           )}
 
           {success && (
-            <div className="mt-4 p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 text-sm space-y-2">
+            <div className="mt-4 p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 text-sm text-center">
               <p className="font-semibold">{success}</p>
-              <p className="text-xs">
-                After confirming your email, you can{" "}
-                <Link
-                  href="/login"
-                  className="underline font-medium hover:text-green-700 dark:hover:text-green-300"
-                >
-                  log in here
-                </Link>
-              </p>
             </div>
           )}
         </div>
 
-        {/* Form Card */}
-        {!success && (
-          <SignupForm form={form} onSubmit={onSubmit} isLoading={isLoading} />
-        )}
-
-        {/* Success message with login link */}
-        {success && (
-          <Card className="w-full">
-            <CardContent className="text-center space-y-6 pt-8">
-              <div className="mx-auto w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center">
-                <CheckCircle2 className="w-12 h-12 text-green-500" />
-              </div>
-
-              <div className="space-y-3">
-                <CardTitle className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  Registration Successful!
-                </CardTitle>
-                <CardDescription className="text-base">
-                  We&apos;ve sent a confirmation link to your email address.
-                  Please click the link to verify your account and complete the
-                  setup.
-                </CardDescription>
-              </div>
-
-              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                <h4 className="font-semibold text-sm">What&apos;s Next?</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>✅ Check your email inbox</li>
-                  <li>✅ Click the verification link</li>
-                  <li>✅ Log in to access your dashboard</li>
-                </ul>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={() => router.push("/login")}
-                  className="flex-1 h-12"
-                  variant="outline"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Go to Login
-                </Button>
-                <Button
-                  onClick={() => window.location.reload()}
-                  className="flex-1 h-12"
-                >
-                  Register Another Account
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Form Card - Always show unless redirecting */}
+        <SignupForm form={form} onSubmit={onSubmit} isLoading={isLoading} />
 
         {/* Footer */}
         <div className="text-center space-y-6">

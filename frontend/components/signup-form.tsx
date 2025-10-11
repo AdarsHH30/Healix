@@ -16,21 +16,52 @@ import { z } from "zod";
 
 const formSchema = z
   .object({
-    firstName: z.string().min(2, "First name must be at least 2 characters"),
-    lastName: z.string().min(2, "Last name must be at least 2 characters"),
-    email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters long"),
+    firstName: z
+      .string()
+      .min(1, "First name is required")
+      .min(2, "First name must be at least 2 characters"),
+    lastName: z
+      .string()
+      .min(1, "Last name is required")
+      .min(2, "Last name must be at least 2 characters"),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Please enter a valid email address"),
+    password: z
+      .string()
+      .min(1, "Password is required")
+      .min(8, "Password must be at least 8 characters long"),
     confirmPassword: z
       .string()
+      .min(1, "Please confirm your password")
       .min(8, "Password must be at least 8 characters long"),
     emergencyPhone1: z
       .string()
-      .min(10, "Please enter a valid phone number")
-      .regex(/^[0-9+\-\s()]+$/, "Please enter a valid phone number"),
+      .min(1, "Primary emergency contact is required")
+      .refine(
+        (val) => {
+          if (!val || val.trim() === "") return false;
+          const digitsOnly = val.replace(/[\s\-\+\(\)]/g, "");
+          return digitsOnly.length >= 10 && /^[0-9]+$/.test(digitsOnly);
+        },
+        {
+          message: "Please enter a valid phone number (at least 10 digits)",
+        }
+      ),
     emergencyPhone2: z
       .string()
-      .min(10, "Please enter a valid phone number")
-      .regex(/^[0-9+\-\s()]+$/, "Please enter a valid phone number"),
+      .min(1, "Secondary emergency contact is required")
+      .refine(
+        (val) => {
+          if (!val || val.trim() === "") return false;
+          const digitsOnly = val.replace(/[\s\-\+\(\)]/g, "");
+          return digitsOnly.length >= 10 && /^[0-9]+$/.test(digitsOnly);
+        },
+        {
+          message: "Please enter a valid phone number (at least 10 digits)",
+        }
+      ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -48,7 +79,24 @@ interface SignupFormProps {
 export function SignupForm({ form, onSubmit, isLoading }: SignupFormProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    form.handleSubmit(onSubmit)(e);
+    console.log("=== FORM SUBMISSION DEBUG ===");
+    console.log("Form values:", form.getValues());
+    console.log("Form errors:", form.formState.errors);
+    console.log("Is form valid?", form.formState.isValid);
+    console.log("Is form dirty?", form.formState.isDirty);
+    console.log("Touch fields:", form.formState.touchedFields);
+    console.log("===========================");
+
+    // Manually trigger validation and submission
+    form.handleSubmit(
+      (data) => {
+        console.log("✅ Validation passed! Submitting data:", data);
+        onSubmit(data);
+      },
+      (errors) => {
+        console.log("❌ Validation failed! Errors:", errors);
+      }
+    )(e);
   };
 
   return (
@@ -168,7 +216,8 @@ export function SignupForm({ form, onSubmit, isLoading }: SignupFormProps) {
             Emergency Contacts
           </h3>
           <p className="text-xs text-muted-foreground mb-4">
-            Add trusted contacts we can reach in emergencies
+            Add trusted contacts we can reach in emergencies{" "}
+            <span className="text-red-500 font-semibold">(Required)</span>
           </p>
 
           <LabelInputContainer className="mb-4">
@@ -177,7 +226,8 @@ export function SignupForm({ form, onSubmit, isLoading }: SignupFormProps) {
               className="flex items-center gap-2"
             >
               <IconPhone className="w-4 h-4" />
-              Primary Emergency Contact
+              Primary Emergency Contact{" "}
+              <span className="text-xs text-red-500">*</span>
             </Label>
             <Input
               id="emergencyPhone1"
@@ -199,7 +249,8 @@ export function SignupForm({ form, onSubmit, isLoading }: SignupFormProps) {
               className="flex items-center gap-2"
             >
               <IconPhone className="w-4 h-4" />
-              Secondary Emergency Contact
+              Secondary Emergency Contact{" "}
+              <span className="text-xs text-red-500">*</span>
             </Label>
             <Input
               id="emergencyPhone2"
