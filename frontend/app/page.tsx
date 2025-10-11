@@ -8,8 +8,8 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <HeroSection />
-      <BenefitsSection />
-      <ProcessSection />
+      {/* <BenefitsSection /> */}
+      {/* <ProcessSection /> */}
       <CTASection />
       <Footer />
     </main>

@@ -79,7 +79,7 @@ export function HeroSection() {
               icon={Activity}
               title="Hospital Locator"
               description="Instantly find nearby hospitals and medical facilities with integrated map and location services."
-              color="secondary"
+              color="primary"
               duration="Real-time"
               level="Location-based"
               instructorName=""

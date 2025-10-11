@@ -20,6 +20,18 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'jehangirhospital.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.jehangirhospital.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'api.dicebear.com',
         port: '',
         pathname: '/**',
