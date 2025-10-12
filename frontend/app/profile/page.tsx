@@ -366,40 +366,48 @@ export default function ProfilePage() {
       <main className="container mx-auto px-6 py-12 max-w-4xl">
         <div className="space-y-6">
           {/* Profile Card */}
-          <div className="bg-muted/20 rounded-2xl border border-border p-8">
+          <div className="bg-gradient-to-br from-muted/30 via-muted/20 to-background rounded-2xl border border-border p-8 shadow-xl">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               {/* Avatar */}
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-chart-1 to-chart-2 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-br from-chart-1 via-chart-2 to-chart-3 rounded-full blur-md opacity-50 group-hover:opacity-75 transition-opacity" />
+                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-chart-1 to-chart-2 flex items-center justify-center text-white text-3xl font-bold shadow-lg ring-4 ring-background">
                   {profile?.full_name
                     ? profile.full_name.charAt(0).toUpperCase()
                     : profile?.email.charAt(0).toUpperCase()}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full border-4 border-background flex items-center justify-center">
+                  <Activity size={14} className="text-white" />
                 </div>
               </div>
 
               {/* User Info */}
               <div className="flex-1 space-y-3">
                 <div>
-                  <h2 className="text-2xl font-bold text-foreground">
+                  <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-chart-1 to-chart-2 bg-clip-text text-transparent">
                     {profile?.full_name || "User"}
                   </h2>
-                  <p className="text-muted-foreground">Welcome to Healix</p>
+                  <p className="text-muted-foreground flex items-center gap-2 mt-1">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    Active Member
+                  </p>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail size={16} />
-                    <span>{profile?.email}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/40 px-3 py-2 rounded-lg">
+                    <Mail size={16} className="text-chart-1 flex-shrink-0" />
+                    <span className="truncate">{profile?.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar size={16} />
-                    <span>
-                      Member since {formatDate(profile?.created_at || "")}
-                    </span>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/40 px-3 py-2 rounded-lg">
+                    <Calendar
+                      size={16}
+                      className="text-chart-2 flex-shrink-0"
+                    />
+                    <span>Since {formatDate(profile?.created_at || "")}</span>
                   </div>
                   {profile?.first_name && profile?.last_name && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <User size={16} />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/40 px-3 py-2 rounded-lg sm:col-span-2">
+                      <User size={16} className="text-chart-3 flex-shrink-0" />
                       <span>
                         {profile.first_name} {profile.last_name}
                       </span>
@@ -412,16 +420,15 @@ export default function ProfilePage() {
               <div className="flex flex-col gap-2 w-full md:w-auto">
                 <Button
                   onClick={() => router.push("/upload")}
-                  variant="outline"
-                  className="w-full md:w-auto gap-2"
+                  className="w-full md:w-auto gap-2 bg-gradient-to-r from-chart-1 to-chart-2 hover:from-chart-1/90 hover:to-chart-2/90 shadow-lg shadow-chart-1/20"
                 >
                   <UploadIcon size={16} />
                   Upload Exercise
                 </Button>
                 <Button
                   onClick={handleLogout}
-                  variant="destructive"
-                  className="w-full md:w-auto gap-2"
+                  variant="outline"
+                  className="w-full md:w-auto gap-2 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
                 >
                   <LogOut size={16} />
                   Logout
@@ -431,57 +438,64 @@ export default function ProfilePage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-chart-1/10 to-chart-1/5 rounded-xl border border-chart-1/20 p-6 hover:shadow-lg hover:shadow-chart-1/10 transition-all duration-300">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-chart-1/20 rounded-lg">
-                    <UploadIcon className="text-chart-1" size={24} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">
-                      {stats.totalUploads}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Total Uploads
-                    </p>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <div className="group relative bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-xl border-2 border-blue-200/50 dark:border-blue-900/50 p-6 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-105 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-colors" />
+              <div className="relative flex items-center gap-4">
+                <div className="p-3 bg-blue-500/10 rounded-xl ring-2 ring-blue-500/20 group-hover:ring-blue-500/40 transition-all">
+                  <UploadIcon
+                    className="text-blue-600 dark:text-blue-400"
+                    size={24}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-3xl font-bold text-foreground">
+                    {stats.totalUploads}
+                  </p>
+                  <p className="text-sm text-muted-foreground font-medium">
+                    Total Uploads
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 rounded-xl border border-chart-2/20 p-6 hover:shadow-lg hover:shadow-chart-2/10 transition-all duration-300">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-chart-2/20 rounded-lg">
-                    <Heart className="text-chart-2" size={24} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">
-                      {stats.favoriteQuotesCount}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Favorite Quotes
-                    </p>
-                  </div>
+            <div className="group relative bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20 rounded-xl border-2 border-red-200/50 dark:border-red-900/50 p-6 hover:shadow-xl hover:shadow-red-500/10 hover:scale-105 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl group-hover:bg-red-500/10 transition-colors" />
+              <div className="relative flex items-center gap-4">
+                <div className="p-3 bg-red-500/10 rounded-xl ring-2 ring-red-500/20 group-hover:ring-red-500/40 transition-all">
+                  <Heart
+                    className="text-red-600 dark:text-red-400"
+                    size={24}
+                    fill="currentColor"
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-3xl font-bold text-foreground">
+                    {stats.favoriteQuotesCount}
+                  </p>
+                  <p className="text-sm text-muted-foreground font-medium">
+                    Favorite Quotes
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 rounded-xl border border-chart-3/20 p-6 hover:shadow-lg hover:shadow-chart-3/10 transition-all duration-300">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-chart-3/20 rounded-lg">
-                    <Calendar className="text-chart-3" size={24} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">
-                      {stats.memberSince}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Member Since
-                    </p>
-                  </div>
+            <div className="group relative bg-gradient-to-br from-cyan-50 to-teal-50 dark:from-cyan-950/20 dark:to-teal-950/20 rounded-xl border-2 border-cyan-200/50 dark:border-cyan-900/50 p-6 hover:shadow-xl hover:shadow-cyan-500/10 hover:scale-105 transition-all duration-300 overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-2xl group-hover:bg-cyan-500/10 transition-colors" />
+              <div className="relative flex items-center gap-4">
+                <div className="p-3 bg-cyan-500/10 rounded-xl ring-2 ring-cyan-500/20 group-hover:ring-cyan-500/40 transition-all">
+                  <Calendar
+                    className="text-cyan-600 dark:text-cyan-400"
+                    size={24}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-2xl font-bold text-foreground">
+                    {stats.memberSince}
+                  </p>
+                  <p className="text-sm text-muted-foreground font-medium">
+                    Member Since
+                  </p>
                 </div>
               </div>
             </div>
@@ -489,31 +503,55 @@ export default function ProfilePage() {
 
           {/* Emergency Contacts */}
           {(profile?.emergency_phone_1 || profile?.emergency_phone_2) && (
-            <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8">
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 rounded-2xl border-2 border-orange-200/50 dark:border-orange-900/50 p-6 md:p-8 shadow-lg">
               <div className="flex items-center gap-3 mb-6">
-                <Phone size={24} className="text-chart-4" />
-                <h3 className="text-xl font-bold text-foreground">
-                  Emergency Contacts
-                </h3>
+                <div className="p-2 bg-orange-500/10 rounded-lg ring-2 ring-orange-500/20">
+                  <Phone
+                    size={24}
+                    className="text-orange-600 dark:text-orange-400"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-foreground">
+                    Emergency Contacts
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Your saved emergency numbers
+                  </p>
+                </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {profile?.emergency_phone_1 && (
-                  <div className="flex items-center gap-3 p-4 bg-chart-4/5 rounded-lg border border-chart-4/20">
-                    <Phone size={18} className="text-chart-4" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Contact 1</p>
-                      <p className="text-sm font-medium text-foreground">
+                  <div className="group flex items-center gap-3 p-4 bg-white/50 dark:bg-background/50 rounded-xl border-2 border-orange-200/50 dark:border-orange-900/30 hover:border-orange-300 dark:hover:border-orange-800 hover:shadow-md transition-all duration-300">
+                    <div className="p-2 bg-orange-500/10 rounded-lg group-hover:bg-orange-500/20 transition-colors">
+                      <Phone
+                        size={18}
+                        className="text-orange-600 dark:text-orange-400"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground font-medium mb-1">
+                        Primary Contact
+                      </p>
+                      <p className="text-sm font-bold text-foreground">
                         {profile.emergency_phone_1}
                       </p>
                     </div>
                   </div>
                 )}
                 {profile?.emergency_phone_2 && (
-                  <div className="flex items-center gap-3 p-4 bg-chart-4/5 rounded-lg border border-chart-4/20">
-                    <Phone size={18} className="text-chart-4" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Contact 2</p>
-                      <p className="text-sm font-medium text-foreground">
+                  <div className="group flex items-center gap-3 p-4 bg-white/50 dark:bg-background/50 rounded-xl border-2 border-orange-200/50 dark:border-orange-900/30 hover:border-orange-300 dark:hover:border-orange-800 hover:shadow-md transition-all duration-300">
+                    <div className="p-2 bg-orange-500/10 rounded-lg group-hover:bg-orange-500/20 transition-colors">
+                      <Phone
+                        size={18}
+                        className="text-orange-600 dark:text-orange-400"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground font-medium mb-1">
+                        Secondary Contact
+                      </p>
+                      <p className="text-sm font-bold text-foreground">
                         {profile.emergency_phone_2}
                       </p>
                     </div>
@@ -526,13 +564,26 @@ export default function ProfilePage() {
           {/* Favorited Quotes Section */}
           {favoriteQuotes.size > 0 ? (
             <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <Heart size={24} className="text-red-500" fill="currentColor" />
-                <h3 className="text-xl font-bold text-foreground">
-                  Your Favorite Quotes
-                </h3>
-                <span className="px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/30 text-sm font-medium text-red-600 dark:text-red-400">
-                  {favoriteQuotes.size}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-50 dark:bg-red-950/30 rounded-lg">
+                    <Heart
+                      size={24}
+                      className="text-red-500"
+                      fill="currentColor"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground">
+                      Your Favorite Quotes
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Quotes that inspire and motivate you
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/30 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900">
+                  {favoriteQuotes.size} saved
                 </span>
               </div>
 
@@ -542,11 +593,11 @@ export default function ProfilePage() {
                   .map((quote) => (
                     <div
                       key={quote.id}
-                      className="group relative bg-gradient-to-br from-red-50/50 to-pink-50/50 dark:from-red-950/20 dark:to-pink-950/20 rounded-xl border-2 border-red-200/50 dark:border-red-900/50 hover:border-red-300 dark:hover:border-red-800 transition-all duration-300 overflow-hidden"
+                      className="group relative bg-gradient-to-br from-red-50/50 to-pink-50/50 dark:from-red-950/20 dark:to-pink-950/20 rounded-xl border-2 border-red-200/50 dark:border-red-900/50 hover:border-red-300 dark:hover:border-red-800 hover:shadow-lg hover:shadow-red-500/10 transition-all duration-300 overflow-hidden"
                     >
                       {/* Color Accent Bar */}
                       <div
-                        className="h-1.5 w-full"
+                        className="h-1.5 w-full transition-all duration-300"
                         style={{ backgroundColor: quote.color }}
                       />
 
@@ -555,7 +606,7 @@ export default function ProfilePage() {
                         {/* Header */}
                         <div className="flex items-start justify-between gap-3">
                           <div
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-300"
                             style={{
                               backgroundColor: `${quote.color}15`,
                               borderColor: `${quote.color}40`,
@@ -568,12 +619,13 @@ export default function ProfilePage() {
 
                           <button
                             onClick={() => handleRemoveFavorite(quote.id)}
-                            className="p-2 rounded-full bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 transition-all duration-300"
+                            className="p-2 rounded-full bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 transition-all duration-300 group/button"
                             aria-label="Remove from favorites"
+                            title="Remove from favorites"
                           >
                             <Heart
                               size={18}
-                              className="text-red-500"
+                              className="text-red-500 group-hover/button:scale-110 transition-transform duration-300"
                               fill="currentColor"
                               strokeWidth={2}
                             />
@@ -581,53 +633,97 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Quote Text */}
-                        <blockquote className="text-sm text-foreground/90 leading-relaxed">
+                        <blockquote className="text-sm text-foreground/90 leading-relaxed font-medium">
                           &quot;{quote.text}&quot;
                         </blockquote>
 
                         {/* Author */}
-                        <p className="text-xs font-medium text-muted-foreground">
-                          — {quote.author}
-                        </p>
+                        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                          <p className="text-xs font-medium text-muted-foreground">
+                            — {quote.author}
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <Star
+                              size={12}
+                              className="text-yellow-500 fill-yellow-500"
+                            />
+                            <span className="text-xs text-muted-foreground">
+                              Favorite
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
               </div>
             </div>
           ) : (
-            <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8 text-center">
-              <Heart
-                size={48}
-                className="text-muted-foreground/30 mx-auto mb-4"
-              />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                No Favorite Quotes Yet
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Visit the Mental Health section on your dashboard to discover
-                and save inspirational quotes.
-              </p>
-              <Button
-                onClick={() => router.push("/dashboard/mental-health")}
-                variant="outline"
-                className="gap-2"
-              >
-                <Heart size={16} />
-                Explore Quotes
-              </Button>
+            <div className="bg-gradient-to-br from-red-50/30 to-pink-50/30 dark:from-red-950/10 dark:to-pink-950/10 rounded-2xl border-2 border-dashed border-red-200/50 dark:border-red-900/50 p-8 md:p-12 text-center">
+              <div className="max-w-md mx-auto space-y-4">
+                <div className="relative inline-block">
+                  <div className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full" />
+                  <div className="relative p-4 bg-background rounded-full">
+                    <Heart size={48} className="text-red-500 mx-auto" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">
+                    Discover Inspiring Quotes
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Start building your collection of motivational quotes.
+                    Explore the Mental Health section to find quotes that
+                    resonate with you and save them to your favorites.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <Button
+                    onClick={() => router.push("/dashboard/mental-health")}
+                    className="gap-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white"
+                  >
+                    <Heart size={16} />
+                    Explore Quotes
+                  </Button>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2 pt-4">
+                  {[
+                    "Motivation",
+                    "Mindfulness",
+                    "Wellness",
+                    "Empowerment",
+                    "Healing",
+                  ].map((category) => (
+                    <span
+                      key={category}
+                      className="px-3 py-1.5 bg-background/60 border border-border/50 rounded-full text-xs font-medium text-muted-foreground"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
           {/* Uploaded Exercises Section */}
           {uploadedExercises.length > 0 ? (
             <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <UploadIcon size={24} className="text-chart-4" />
-                <h3 className="text-xl font-bold text-foreground">
-                  Your Uploaded Exercises
-                </h3>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-chart-4/20 rounded-lg">
+                    <UploadIcon size={24} className="text-chart-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground">
+                      Your Uploaded Exercises
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Exercises you've shared with the community
+                    </p>
+                  </div>
+                </div>
                 <span className="px-3 py-1 rounded-full bg-chart-4/20 text-sm font-medium text-chart-4">
-                  {uploadedExercises.length}
+                  {uploadedExercises.length} total
                 </span>
               </div>
 
@@ -641,75 +737,141 @@ export default function ProfilePage() {
 
                 if (exercisesOfType.length === 0) return null;
 
-                const typeColors: Record<
+                const typeConfig: Record<
                   string,
-                  { bg: string; border: string; text: string }
+                  {
+                    bg: string;
+                    border: string;
+                    text: string;
+                    icon: any;
+                    iconColor: string;
+                  }
                 > = {
                   physical: {
-                    bg: "from-chart-1/10 to-chart-1/5",
-                    border: "border-chart-1/30",
-                    text: "text-chart-1",
+                    bg: "from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20",
+                    border:
+                      "border-blue-200/50 dark:border-blue-900/50 hover:border-blue-300 dark:hover:border-blue-800",
+                    text: "text-blue-600 dark:text-blue-400",
+                    icon: Dumbbell,
+                    iconColor: "#6366f1",
                   },
                   mental: {
-                    bg: "from-chart-2/10 to-chart-2/5",
-                    border: "border-chart-2/30",
-                    text: "text-chart-2",
+                    bg: "from-purple-50/50 to-violet-50/50 dark:from-purple-950/20 dark:to-violet-950/20",
+                    border:
+                      "border-purple-200/50 dark:border-purple-900/50 hover:border-purple-300 dark:hover:border-purple-800",
+                    text: "text-purple-600 dark:text-purple-400",
+                    icon: Brain,
+                    iconColor: "#8b5cf6",
                   },
                   breathing: {
-                    bg: "from-chart-3/10 to-chart-3/5",
-                    border: "border-chart-3/30",
-                    text: "text-chart-3",
+                    bg: "from-cyan-50/50 to-teal-50/50 dark:from-cyan-950/20 dark:to-teal-950/20",
+                    border:
+                      "border-cyan-200/50 dark:border-cyan-900/50 hover:border-cyan-300 dark:hover:border-cyan-800",
+                    text: "text-cyan-600 dark:text-cyan-400",
+                    icon: Wind,
+                    iconColor: "#06b6d4",
                   },
                   nutrition: {
-                    bg: "from-chart-4/10 to-chart-4/5",
-                    border: "border-chart-4/30",
-                    text: "text-chart-4",
+                    bg: "from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20",
+                    border:
+                      "border-green-200/50 dark:border-green-900/50 hover:border-green-300 dark:hover:border-green-800",
+                    text: "text-green-600 dark:text-green-400",
+                    icon: Apple,
+                    iconColor: "#10b981",
                   },
                 };
 
-                const colors = typeColors[type];
+                const config = typeConfig[type];
+                const IconComponent = config.icon;
 
                 return (
                   <div key={type} className="mb-6 last:mb-0">
-                    <h4 className="text-lg font-semibold text-foreground mb-3 capitalize">
-                      {type} Exercises ({exercisesOfType.length})
-                    </h4>
+                    <div className="flex items-center gap-2 mb-4">
+                      <IconComponent size={20} className={config.text} />
+                      <h4
+                        className={`text-lg font-semibold capitalize ${config.text}`}
+                      >
+                        {type} Exercises
+                      </h4>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${config.text} bg-background/50`}
+                      >
+                        {exercisesOfType.length}
+                      </span>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {exercisesOfType.map((exercise) => (
                         <div
                           key={exercise.id}
-                          className={`group bg-gradient-to-br ${colors.bg} rounded-xl border ${colors.border} p-5 hover:shadow-lg transition-all duration-300`}
+                          className={`group relative bg-gradient-to-br ${config.bg} rounded-xl border-2 ${config.border} hover:shadow-lg transition-all duration-300 overflow-hidden`}
                         >
-                          <div className="flex items-start justify-between gap-3 mb-3">
-                            <h5
-                              className={`font-semibold text-foreground group-hover:${colors.text} transition-colors`}
-                            >
-                              {exercise.name}
-                            </h5>
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${colors.text} bg-background/50`}
-                            >
-                              {exercise.difficulty}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {exercise.description}
-                          </p>
-                          <div className="flex items-center gap-2 mt-3">
-                            <Calendar
-                              size={14}
-                              className="text-muted-foreground"
-                            />
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(exercise.created_at).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                }
+                          {/* Color accent bar */}
+                          <div
+                            className="absolute top-0 left-0 w-1 h-full"
+                            style={{ backgroundColor: config.iconColor }}
+                          />
+
+                          {/* Exercise Image */}
+                          {exercise.image_url && (
+                            <div className="relative h-40 overflow-hidden">
+                              <img
+                                src={exercise.image_url}
+                                alt={exercise.name}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = "none";
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                              <div className="absolute bottom-2 right-2">
+                                <span
+                                  className={`px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${config.text} bg-background/90 backdrop-blur-sm border border-current/30 shadow-lg`}
+                                >
+                                  {exercise.difficulty}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          <div
+                            className={`p-5 ${
+                              exercise.image_url ? "" : "pl-7"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3 mb-3">
+                              <h5 className="font-semibold text-foreground text-base leading-tight">
+                                {exercise.name}
+                              </h5>
+                              {!exercise.image_url && (
+                                <span
+                                  className={`px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${config.text} bg-background/80 border border-current/20`}
+                                >
+                                  {exercise.difficulty}
+                                </span>
                               )}
-                            </span>
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                              {exercise.description}
+                            </p>
+                            <div className="flex items-center justify-between pt-2 border-t border-current/10">
+                              <div className="flex items-center gap-2">
+                                <Calendar
+                                  size={14}
+                                  className="text-muted-foreground"
+                                />
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(
+                                    exercise.created_at
+                                  ).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </span>
+                              </div>
+                              <Activity size={14} className={config.text} />
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -719,47 +881,138 @@ export default function ProfilePage() {
               })}
             </div>
           ) : (
-            <div className="bg-muted/20 rounded-2xl border border-border p-6 md:p-8 text-center">
-              <UploadIcon
-                size={48}
-                className="text-muted-foreground/30 mx-auto mb-4"
-              />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                No Uploaded Exercises Yet
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Share your knowledge with the community by uploading your own
-                exercises.
-              </p>
-              <Button
-                onClick={() => router.push("/upload")}
-                variant="outline"
-                className="gap-2"
-              >
-                <UploadIcon size={16} />
-                Upload Exercise
-              </Button>
+            <div className="bg-gradient-to-br from-muted/20 to-muted/10 rounded-2xl border-2 border-dashed border-border p-8 md:p-12 text-center">
+              <div className="max-w-md mx-auto space-y-4">
+                <div className="relative inline-block">
+                  <div className="absolute inset-0 bg-chart-4/20 blur-2xl rounded-full" />
+                  <div className="relative p-4 bg-background rounded-full">
+                    <UploadIcon size={48} className="text-chart-4 mx-auto" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">
+                    Share Your Knowledge
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    You haven't uploaded any exercises yet. Share your favorite
+                    workouts, meditation techniques, or wellness tips with the
+                    Healix community!
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <Button
+                    onClick={() => router.push("/upload")}
+                    className="gap-2 bg-gradient-to-r from-chart-4 to-chart-3 hover:from-chart-4/90 hover:to-chart-3/90"
+                  >
+                    <UploadIcon size={16} />
+                    Upload Your First Exercise
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-3 pt-4">
+                  <div className="p-3 bg-muted/30 rounded-lg text-left">
+                    <Dumbbell size={16} className="text-chart-1 mb-1" />
+                    <p className="text-xs font-medium text-foreground">
+                      Physical
+                    </p>
+                  </div>
+                  <div className="p-3 bg-muted/30 rounded-lg text-left">
+                    <Brain size={16} className="text-chart-2 mb-1" />
+                    <p className="text-xs font-medium text-foreground">
+                      Mental
+                    </p>
+                  </div>
+                  <div className="p-3 bg-muted/30 rounded-lg text-left">
+                    <Wind size={16} className="text-chart-3 mb-1" />
+                    <p className="text-xs font-medium text-foreground">
+                      Breathing
+                    </p>
+                  </div>
+                  <div className="p-3 bg-muted/30 rounded-lg text-left">
+                    <Apple size={16} className="text-chart-4 mb-1" />
+                    <p className="text-xs font-medium text-foreground">
+                      Nutrition
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Info Section */}
-          <div className="bg-muted/20 rounded-2xl border border-border p-8">
-            <h3 className="text-xl font-bold text-foreground mb-4">
-              About Your Account
-            </h3>
-            <div className="space-y-4 text-sm text-muted-foreground">
-              <p>
-                Your Healix account gives you access to a comprehensive
-                collection of health and wellness exercises.
-              </p>
-              <p>
-                You can browse exercises across different categories including
-                Physical Health, Mental Health, Breathing Exercises, and
-                Nutrition.
-              </p>
-              <p>
-                As a registered user, you can also contribute to the community
-                by uploading new exercises through the Upload page.
+          <div className="bg-gradient-to-br from-purple-50/50 to-blue-50/50 dark:from-purple-950/10 dark:to-blue-950/10 rounded-2xl border border-border p-8">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="p-3 bg-gradient-to-br from-chart-1 to-chart-2 rounded-xl">
+                <Settings size={24} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  Your Healix Journey
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Welcome to your personal wellness dashboard
+                </p>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4 mt-6">
+              <div className="flex gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
+                <Dumbbell
+                  size={20}
+                  className="text-chart-1 flex-shrink-0 mt-0.5"
+                />
+                <div>
+                  <p className="font-medium text-foreground text-sm mb-1">
+                    Physical Health
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Access exercises and workouts tailored to your fitness goals
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
+                <Brain
+                  size={20}
+                  className="text-chart-2 flex-shrink-0 mt-0.5"
+                />
+                <div>
+                  <p className="font-medium text-foreground text-sm mb-1">
+                    Mental Wellness
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Find inspirational quotes and mindfulness practices
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
+                <Wind size={20} className="text-chart-3 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-foreground text-sm mb-1">
+                    Breathing Exercises
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Practice breathing techniques for stress and relaxation
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 p-4 bg-background/50 rounded-xl border border-border/50">
+                <Apple
+                  size={20}
+                  className="text-chart-4 flex-shrink-0 mt-0.5"
+                />
+                <div>
+                  <p className="font-medium text-foreground text-sm mb-1">
+                    Nutrition Guide
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Discover healthy eating habits and balanced diet tips
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 p-4 bg-gradient-to-r from-chart-1/5 to-chart-2/5 rounded-xl border border-chart-1/20">
+              <p className="text-sm text-muted-foreground">
+                <span className="font-semibold text-foreground">Pro tip:</span>{" "}
+                Upload your own exercises to share with the community and help
+                others on their wellness journey!
               </p>
             </div>
           </div>
