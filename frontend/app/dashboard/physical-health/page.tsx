@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Filter, MessageCircle, MapPin } from "lucide-react";
+import { ArrowLeft, Filter } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { ExerciseCard } from "@/components/exercise-card";
 import { ExerciseSearch } from "@/components/exercise-search";
 import { supabase } from "@/lib/supabase";
-import { ChatbotPopup } from "@/components/chatbot-popup";
-import { MapPopup } from "@/components/map-popup";
+import { DashboardFloatingActions } from "@/components/dashboard-floating-actions";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface Exercise {
   id: string;
@@ -28,8 +28,6 @@ export default function PhysicalHealthPage() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const [isMapOpen, setIsMapOpen] = useState(false);
 
   // Fetch exercises from Supabase
   useEffect(() => {
@@ -136,8 +134,7 @@ export default function PhysicalHealthPage() {
             <h1 className="text-base sm:text-xl md:text-2xl font-bold text-foreground/90 tracking-tight">
               Physical Training
             </h1>
-            <div className="w-[60px] sm:w-[100px]" />{" "}
-            {/* Spacer for centering */}
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -247,32 +244,7 @@ export default function PhysicalHealthPage() {
       </main>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-40 flex flex-col gap-3 md:gap-4">
-        {/* Map Button */}
-        <button
-          onClick={() => setIsMapOpen(true)}
-          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-2 to-chart-4 text-white rounded-full shadow-2xl hover:shadow-chart-2/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
-          aria-label="Open Hospital Map"
-        >
-          <MapPin size={24} strokeWidth={2} className="md:w-7 md:h-7" />
-        </button>
-
-        {/* Chatbot Button */}
-        <button
-          onClick={() => setIsChatbotOpen(true)}
-          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
-          aria-label="Open Chatbot"
-        >
-          <MessageCircle size={24} strokeWidth={2} className="md:w-7 md:h-7" />
-        </button>
-      </div>
-
-      {/* Chatbot & Map Popups */}
-      <ChatbotPopup
-        isOpen={isChatbotOpen}
-        onClose={() => setIsChatbotOpen(false)}
-      />
-      <MapPopup isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
+      <DashboardFloatingActions />
     </div>
   );
 }

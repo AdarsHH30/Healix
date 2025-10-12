@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   ArrowLeft,
-  MessageCircle,
-  MapPin,
   Utensils,
   Apple,
   Coffee,
@@ -23,8 +21,8 @@ import {
   Star,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
-import { ChatbotPopup } from "@/components/chatbot-popup";
-import { MapPopup } from "@/components/map-popup";
+import { DashboardFloatingActions } from "@/components/dashboard-floating-actions";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { supabase } from "@/lib/supabase";
 
 interface NutritionPlan {
@@ -90,8 +88,6 @@ const difficultyColors = {
 export default function NutritionPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const [isMapOpen, setIsMapOpen] = useState(false);
   const [nutritionPlans, setNutritionPlans] = useState<NutritionPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -200,7 +196,7 @@ export default function NutritionPage() {
                 Nutrition Plans
               </h1>
             </div>
-            <div className="w-20"></div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -400,36 +396,7 @@ export default function NutritionPage() {
       </main>
 
       {/* Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-4">
-        <button
-          onClick={() => setIsMapOpen(true)}
-          className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
-          aria-label="Open Map"
-        >
-          <MapPin
-            size={24}
-            className="group-hover:scale-110 transition-transform"
-          />
-        </button>
-
-        <button
-          onClick={() => setIsChatbotOpen(true)}
-          className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-xl hover:shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
-          aria-label="Open Chatbot"
-        >
-          <MessageCircle
-            size={24}
-            className="group-hover:scale-110 transition-transform"
-          />
-        </button>
-      </div>
-
-      {/* Popups */}
-      <ChatbotPopup
-        isOpen={isChatbotOpen}
-        onClose={() => setIsChatbotOpen(false)}
-      />
-      <MapPopup isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
+      <DashboardFloatingActions />
     </div>
   );
 }

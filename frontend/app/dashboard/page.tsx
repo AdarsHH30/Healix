@@ -2,20 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import {
-  ArrowLeft,
-  User,
-  Phone,
-  MessageCircle,
-  LogOut,
-  Upload,
-  MapPin,
-} from "lucide-react";
-import { useState } from "react";
-import { ChatbotPopup } from "@/components/chatbot-popup";
-import { MapPopup } from "@/components/map-popup";
+import { ArrowLeft, User, Phone, LogOut, Upload } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
-import { EmergencyPopup } from "@/components/emergency-popup";
+import { DashboardFloatingActions } from "@/components/dashboard-floating-actions";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const categories = [
   {
@@ -54,9 +44,6 @@ const categories = [
 
 export default function Dashboard() {
   const router = useRouter();
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const [isMapOpen, setIsMapOpen] = useState(false);
-  const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
 
   // Create Supabase client with SSR support
   const supabase = createBrowserClient(
@@ -92,18 +79,6 @@ export default function Dashboard() {
       // Even if there's an error, redirect to login
       window.location.href = "/login";
     }
-  };
-
-  const toggleChatbot = () => {
-    setIsChatbotOpen(!isChatbotOpen);
-  };
-
-  const toggleMap = () => {
-    setIsMapOpen(!isMapOpen);
-  };
-
-  const toggleEmergency = () => {
-    setIsEmergencyOpen(!isEmergencyOpen);
   };
 
   return (
@@ -142,6 +117,8 @@ export default function Dashboard() {
               <User size={20} />
               <span className="font-medium hidden sm:inline">Profile</span>
             </button>
+
+            <ThemeToggle />
 
             <button
               onClick={handleLogout}
@@ -187,51 +164,8 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Clean Floating Action Buttons */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
-        {/* Emergency Button */}
-        <button
-          onClick={toggleEmergency}
-          className="w-14 h-14 bg-destructive hover:bg-destructive/90 text-white rounded-xl clean-shadow clean-hover flex items-center justify-center"
-          aria-label="Emergency Call and SMS"
-          title="Emergency - Call & SMS with Location"
-        >
-          <Phone size={20} strokeWidth={2.5} />
-        </button>
-
-        {/* Map Button */}
-        <button
-          onClick={toggleMap}
-          className="w-14 h-14 bg-accent hover:bg-accent/90 text-white rounded-xl clean-shadow clean-hover flex items-center justify-center"
-          aria-label="Open Hospital Map"
-        >
-          <MapPin size={20} strokeWidth={2} />
-        </button>
-
-        {/* Chatbot Button */}
-        <button
-          onClick={toggleChatbot}
-          className="w-14 h-14 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl clean-shadow clean-hover flex items-center justify-center"
-          aria-label="Open Chatbot"
-        >
-          <MessageCircle size={20} strokeWidth={2} />
-        </button>
-      </div>
-
-      {/* Chatbot Popup */}
-      <ChatbotPopup
-        isOpen={isChatbotOpen}
-        onClose={() => setIsChatbotOpen(false)}
-      />
-
-      {/* Map Popup */}
-      <MapPopup isOpen={isMapOpen} onClose={() => setIsMapOpen(false)} />
-
-      {/* Emergency Popup */}
-      <EmergencyPopup
-        isOpen={isEmergencyOpen}
-        onClose={() => setIsEmergencyOpen(false)}
-      />
+      {/* Floating Action Buttons */}
+      <DashboardFloatingActions />
     </div>
   );
 }
