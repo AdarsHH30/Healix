@@ -105,42 +105,45 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20">
-      <div className="w-full h-full grid lg:grid-cols-2">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 px-4 sm:px-6 lg:px-8">
+      <div className="w-full h-full grid lg:grid-cols-2 max-w-7xl">
         {/* --- Left Section --- */}
-        <div className="max-w-md mx-auto w-full flex flex-col justify-center px-6 py-12">
-          <div className="text-center mb-10">
-            <Logo className="h-12 w-12 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        <div className="max-w-md mx-auto w-full flex flex-col justify-center px-4 sm:px-6 py-8 sm:py-12">
+          <div className="text-center mb-6 sm:mb-10">
+            <Logo className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 sm:mb-6" />
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
               Welcome back
             </h1>
-            <p className="text-base text-muted-foreground mt-2 leading-relaxed">
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 leading-relaxed px-4">
               Sign in to access your personalized health dashboard
             </p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-xs sm:text-sm">
               {error}
             </div>
           )}
 
           {/* --- Login Form --- */}
           <Form {...form}>
-            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              className="space-y-4 sm:space-y-6"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-base font-medium">
+                    <FormLabel className="text-sm sm:text-base font-medium">
                       Email address
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="email"
                         placeholder="Enter your email"
-                        className="h-12 text-base px-4 rounded-lg border-2 transition-all duration-200 focus:border-primary"
+                        className="h-11 sm:h-12 text-sm sm:text-base px-3 sm:px-4 rounded-lg border-2 transition-all duration-200 focus:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -153,14 +156,14 @@ const LoginForm = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
-                    <FormLabel className="text-base font-medium">
+                    <FormLabel className="text-sm sm:text-base font-medium">
                       Password
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="password"
                         placeholder="Enter your password"
-                        className="h-12 text-base px-4 rounded-lg border-2 transition-all duration-200 focus:border-primary"
+                        className="h-11 sm:h-12 text-sm sm:text-base px-3 sm:px-4 rounded-lg border-2 transition-all duration-200 focus:border-primary"
                         {...field}
                       />
                     </FormControl>
@@ -172,7 +175,7 @@ const LoginForm = () => {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full h-12 text-base font-semibold rounded-lg mt-8 transition-all duration-200"
+                className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold rounded-lg mt-6 sm:mt-8 transition-all duration-200"
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Sign In"}
@@ -181,14 +184,14 @@ const LoginForm = () => {
           </Form>
 
           {/* --- Footer Links --- */}
-          <div className="mt-8 space-y-6 text-center">
+          <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-6 text-center">
             <Link
               href="/forgot-password"
-              className="text-base text-muted-foreground hover:text-primary transition-colors duration-200 hover:underline"
+              className="text-sm sm:text-base text-muted-foreground hover:text-primary transition-colors duration-200 hover:underline block"
             >
               Forgot your password?
             </Link>
-            <p className="text-base text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Don't have an account?{" "}
               <Link
                 href="/register"

@@ -22,12 +22,12 @@ export function HeroSection() {
       {/* Clean background with subtle pattern */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/20 to-transparent" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-3 sm:px-4 md:px-6 lg:px-8">
         <Header />
 
-        <div className="flex flex-col items-center justify-center py-16 sm:py-20 md:py-32">
+        <div className="flex flex-col items-center justify-center py-12 sm:py-16 md:py-20 lg:py-32 pt-20 sm:pt-24">
           <div
-            className={`transition-all duration-1000 ease-in-out ${
+            className={`transition-all duration-1000 ease-in-out w-full ${
               isVisible
                 ? "translate-y-0 opacity-100"
                 : "translate-y-10 opacity-0"
@@ -37,7 +37,7 @@ export function HeroSection() {
           </div>
 
           <div
-            className={`transition-all duration-1000 delay-200 ease-in-out ${
+            className={`transition-all duration-1000 delay-200 ease-in-out w-full ${
               isVisible
                 ? "translate-y-0 opacity-100"
                 : "translate-y-10 opacity-0"
@@ -47,7 +47,7 @@ export function HeroSection() {
           </div>
 
           <div
-            className={`mt-16 sm:mt-24 md:mt-32 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10 w-full max-w-6xl transition-all duration-1000 delay-300 ease-in-out ${
+            className={`mt-12 sm:mt-16 md:mt-24 lg:mt-32 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 lg:gap-10 w-full max-w-6xl transition-all duration-1000 delay-300 ease-in-out ${
               isVisible
                 ? "translate-y-0 opacity-100"
                 : "translate-y-10 opacity-0"
@@ -89,13 +89,13 @@ export function HeroSection() {
           </div>
 
           <div
-            className={`mt-24 transition-all duration-1000 delay-500 ease-in-out ${
+            className={`mt-16 sm:mt-20 md:mt-24 transition-all duration-1000 delay-500 ease-in-out w-full ${
               isVisible
                 ? "translate-y-0 opacity-100"
                 : "translate-y-10 opacity-0"
             }`}
           >
-            <StatsDisplay />
+            {/* <StatsDisplay /> */}
           </div>
         </div>
       </div>

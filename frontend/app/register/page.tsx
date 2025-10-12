@@ -148,10 +148,10 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center py-1 px-4">
-      <div className="max-w-2xl w-full space-y-0">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6">
+      <div className="max-w-2xl w-full space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="text-center space-y-0">
+        <div className="text-center space-y-3 sm:space-y-4">
           <div className="flex justify-center">
             {/* <div className="p-3 bg-primary/10 rounded-2xl">
               <Logo className="h-12 w-12" />
@@ -168,13 +168,13 @@ const RegisterPage = () => {
           </div> */}
 
           {error && (
-            <div className="mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+            <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-xs sm:text-sm">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mt-4 p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 text-sm text-center">
+            <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 dark:text-green-400 text-xs sm:text-sm text-center">
               <p className="font-semibold">{success}</p>
             </div>
           )}
@@ -184,9 +184,9 @@ const RegisterPage = () => {
         <SignupForm form={form} onSubmit={onSubmit} isLoading={isLoading} />
 
         {/* Footer */}
-        <div className="text-center space-y-6">
-          <div className="space-y-4">
-            <p className="text-xs text-muted-foreground">
+        <div className="text-center space-y-4 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-[10px] sm:text-xs text-muted-foreground px-4">
               By creating an account, you agree to our{" "}
               <Link
                 href="#"
@@ -203,7 +203,7 @@ const RegisterPage = () => {
               </Link>
             </p>
 
-            <div className="flex items-center justify-center gap-2 text-sm">
+            <div className="flex items-center justify-center gap-2 text-xs sm:text-sm">
               <span className="text-muted-foreground">
                 Already have an account?
               </span>
@@ -218,24 +218,32 @@ const RegisterPage = () => {
         </div>
       </div>
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-40 flex flex-col gap-3 md:gap-4">
+      {/* Floating Action Buttons - Responsive */}
+      <div className="fixed bottom-3 sm:bottom-4 md:bottom-6 right-3 sm:right-4 md:right-6 z-40 flex flex-col gap-2 sm:gap-3 md:gap-4">
         {/* Map Button */}
         <button
           onClick={() => setIsMapOpen(true)}
-          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-2 to-chart-4 text-white rounded-full shadow-2xl hover:shadow-chart-2/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-2 to-chart-4 text-white rounded-full shadow-2xl hover:shadow-chart-2/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
           aria-label="Open Hospital Map"
         >
-          <MapPin size={24} strokeWidth={2} className="md:w-7 md:h-7" />
+          <MapPin
+            size={20}
+            strokeWidth={2}
+            className="sm:w-6 sm:h-6 md:w-7 md:h-7"
+          />
         </button>
 
         {/* Chatbot Button */}
         <button
           onClick={() => setIsChatbotOpen(true)}
-          className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
+          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-full shadow-2xl hover:shadow-chart-1/50 transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
           aria-label="Open Chatbot"
         >
-          <MessageCircle size={24} strokeWidth={2} className="md:w-7 md:h-7" />
+          <MessageCircle
+            size={20}
+            strokeWidth={2}
+            className="sm:w-6 sm:h-6 md:w-7 md:h-7"
+          />
         </button>
       </div>
 

@@ -36,22 +36,22 @@ export function Header() {
           : "bg-transparent"
       }`}
     >
-      <nav className="container mx-auto flex items-center justify-between py-4 md:py-6 px-4">
+      <nav className="container mx-auto flex items-center justify-between py-3 sm:py-4 md:py-6 px-4">
         {/* Mobile menu button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="lg:hidden flex items-center justify-center h-10 w-10 rounded-lg hover:bg-primary/10 transition-colors"
+          className="lg:hidden flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg hover:bg-primary/10 transition-colors"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? (
-            <X className="h-6 w-6 text-foreground" />
+            <X className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
           ) : (
-            <Menu className="h-6 w-6 text-foreground" />
+            <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" />
           )}
         </button>
 
         {/* Left side navigation - Desktop only */}
-        <div className="hidden lg:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
           <a
             href="/dashboard"
             className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
@@ -77,7 +77,7 @@ export function Header() {
         </div>
 
         {/* Right side navigation - Desktop only */}
-        <div className="hidden lg:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
           <a
             href="/profile"
             className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-300 relative"
@@ -94,7 +94,7 @@ export function Header() {
               variant="outline"
               size="sm"
               onClick={handleSignOut}
-              className="rounded-full border-2 border-destructive/20  transition-all duration-300 bg-transparent"
+              className="rounded-full border-2 border-destructive/20 transition-all duration-300 bg-transparent"
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
@@ -104,7 +104,7 @@ export function Header() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full border-2 border-primary/20 hover:border-primary transition-all duration-300  hover:transform hover:scale-105"
+                className="rounded-full border-2 border-primary/20 hover:border-primary transition-all duration-300 hover:transform hover:scale-105"
               >
                 Sign In
               </Button>
@@ -118,43 +118,43 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu - Improved Responsive Design */}
       <div
-        className={`lg:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border shadow-lg transition-all duration-300 ease-in-out ${
+        className={`lg:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border shadow-lg transition-all duration-300 ease-in-out overflow-hidden ${
           mobileMenuOpen
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-4 pointer-events-none"
+            ? "max-h-[400px] opacity-100 translate-y-0"
+            : "max-h-0 opacity-0 -translate-y-4 pointer-events-none"
         }`}
       >
-        <div className="container mx-auto px-4 py-6 space-y-4">
+        <div className="container mx-auto px-4 py-4 sm:py-6 space-y-2 sm:space-y-4">
           <a
-            href="#programs"
+            href="/dashboard"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-3 text-base font-medium text-muted-foreground hover:text-primary transition-colors py-3 px-4 rounded-lg hover:bg-primary/5"
+            className="flex items-center gap-3 text-sm sm:text-base font-medium text-muted-foreground hover:text-primary transition-colors py-2 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-primary/5"
           >
-            <BookOpen className="h-5 w-5" />
-            <span>Programs</span>
+            <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span>Dashboard</span>
           </a>
 
           <a
-            href="#instructors"
+            href="/dashboard/mental-health"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-3 text-base font-medium text-muted-foreground hover:text-primary transition-colors py-3 px-4 rounded-lg hover:bg-primary/5"
+            className="flex items-center gap-3 text-sm sm:text-base font-medium text-muted-foreground hover:text-primary transition-colors py-2 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-primary/5"
           >
-            <Heart className="h-5 w-5" />
-            <span>Instructors</span>
+            <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span>Quotes</span>
           </a>
 
           <a
-            href="#community"
+            href="/profile"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-3 text-base font-medium text-muted-foreground hover:text-primary transition-colors py-3 px-4 rounded-lg hover:bg-primary/5"
+            className="flex items-center gap-3 text-sm sm:text-base font-medium text-muted-foreground hover:text-primary transition-colors py-2 sm:py-3 px-3 sm:px-4 rounded-lg hover:bg-primary/5"
           >
-            <Users className="h-5 w-5" />
-            <span>Community</span>
+            <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span>Profile</span>
           </a>
 
-          <div className="pt-4 border-t border-border">
+          <div className="pt-3 sm:pt-4 border-t border-border">
             {user ? (
               <Button
                 variant="outline"
@@ -163,7 +163,7 @@ export function Header() {
                   handleSignOut();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full rounded-full border-2 border-destructive/20 hover:border-destructive hover:bg-destructive/5 transition-all duration-300"
+                className="w-full rounded-full border-2 border-destructive/20 hover:border-destructive hover:bg-destructive/5 transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
@@ -173,7 +173,7 @@ export function Header() {
                 <Button
                   variant="outline"
                   size="default"
-                  className="w-full rounded-full border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300"
+                  className="w-full rounded-full border-2 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 text-sm sm:text-base h-10 sm:h-11"
                 >
                   Sign In
                 </Button>

@@ -313,9 +313,9 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-background">
       <ProfileHeader />
 
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8 max-w-5xl">
-        <div className="space-y-6">
+      {/* Main Content - Fully Responsive */}
+      <main className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 max-w-5xl">
+        <div className="space-y-4 sm:space-y-6">
           {/* Profile Card */}
           <ProfileCard profile={profile} onLogout={handleLogout} />
 

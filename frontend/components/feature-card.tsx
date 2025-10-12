@@ -100,58 +100,60 @@ export function FeatureCard({
           className={`absolute bottom-0 left-0 w-24 h-24 md:w-32 md:h-32 ${colors.bg} rounded-full blur-2xl opacity-15 group-hover:scale-125 group-hover:opacity-30 transition-all duration-1000 delay-200`}
         />
 
-        <div className="relative p-6 sm:p-7 md:p-9">
+        <div className="relative p-4 sm:p-6 md:p-7 lg:p-9">
           {/* Enhanced header */}
-          <div className="flex items-center justify-between mb-4 md:mb-5">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-5">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <span
-                className={`text-xs font-semibold ${colors.text} px-3 md:px-4 py-1.5 rounded-full ${colors.bg} border border-current/20 backdrop-blur-sm`}
+                className={`text-[10px] sm:text-xs font-semibold ${colors.text} px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 rounded-full ${colors.bg} border border-current/20 backdrop-blur-sm`}
               >
                 {category}
               </span>
               {isHovered && (
-                <Sparkles className={`w-4 h-4 ${colors.text} animate-pulse`} />
+                <Sparkles
+                  className={`w-3 h-3 sm:w-4 sm:h-4 ${colors.text} animate-pulse`}
+                />
               )}
             </div>
             <div
-              className={`inline-flex h-12 w-12 md:h-14 md:w-14 items-center justify-center rounded-2xl md:rounded-3xl ${colors.bg} group-hover:scale-110 transition-all duration-500 shadow-lg group-hover:shadow-xl backdrop-blur-sm border border-current/10`}
+              className={`inline-flex h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 items-center justify-center rounded-xl sm:rounded-2xl md:rounded-3xl ${colors.bg} group-hover:scale-110 transition-all duration-500 shadow-lg group-hover:shadow-xl backdrop-blur-sm border border-current/10`}
             >
               <Icon
-                className={`h-6 w-6 md:h-7 md:w-7 ${colors.text} group-hover:scale-110 transition-transform duration-300`}
+                className={`h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 ${colors.text} group-hover:scale-110 transition-transform duration-300`}
               />
             </div>
           </div>
 
           {/* Enhanced title */}
           <h3
-            className={`mb-3 md:mb-4 text-2xl md:text-3xl lg:text-4xl font-bold text-foreground dark:text-foreground group-hover:${colors.text} transition-colors duration-500 leading-tight`}
+            className={`mb-2 sm:mb-3 md:mb-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground dark:text-foreground group-hover:${colors.text} transition-colors duration-500 leading-tight`}
           >
             {title}
           </h3>
 
           {/* Enhanced description */}
-          <p className="text-muted-foreground dark:text-muted-foreground/80 leading-relaxed mb-5 md:mb-6 text-sm md:text-base lg:text-lg">
+          <p className="text-muted-foreground dark:text-muted-foreground/80 leading-relaxed mb-4 sm:mb-5 md:mb-6 text-xs sm:text-sm md:text-base lg:text-lg">
             {description}
           </p>
 
           {/* Enhanced metadata */}
-          <div className="flex items-center gap-4 md:gap-5 mb-5 md:mb-6 text-xs md:text-sm text-muted-foreground dark:text-muted-foreground/70">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/20 dark:bg-muted/10 backdrop-blur-sm">
-              <Clock className="h-4 w-4 md:h-4 md:w-4" />
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 md:gap-5 mb-4 sm:mb-5 md:mb-6 text-[10px] sm:text-xs md:text-sm text-muted-foreground dark:text-muted-foreground/70">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-muted/20 dark:bg-muted/10 backdrop-blur-sm">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="font-medium">{duration}</span>
             </div>
-            <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/20 dark:bg-muted/10 backdrop-blur-sm">
-              <TrendingUp className="h-4 w-4 md:h-4 md:w-4" />
+            <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-muted-foreground/40" />
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-muted/20 dark:bg-muted/10 backdrop-blur-sm">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="font-medium">{level}</span>
             </div>
           </div>
 
           {/* Enhanced instructor section */}
           {instructorName && instructorName.trim() !== "" && (
-            <div className="flex items-center gap-3 md:gap-4 mb-5 md:mb-6 p-3 rounded-2xl bg-muted/10 dark:bg-muted/5 backdrop-blur-sm border border-border/30">
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-5 md:mb-6 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-muted/10 dark:bg-muted/5 backdrop-blur-sm border border-border/30">
               <div className="relative">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-border shadow-lg">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-border shadow-lg">
                   <img
                     src={
                       instructorImage ||
@@ -162,14 +164,14 @@ export function FeatureCard({
                   />
                 </div>
                 <div
-                  className={`absolute -bottom-1 -right-1 w-4 h-4 bg-gradient-to-r ${colors.accent} rounded-full border-2 border-background shadow-sm`}
+                  className={`absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r ${colors.accent} rounded-full border-2 border-background shadow-sm`}
                 />
               </div>
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground dark:text-muted-foreground/60 mb-0.5">
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] sm:text-xs text-muted-foreground dark:text-muted-foreground/60 mb-0.5">
                   Led by
                 </p>
-                <p className="text-sm md:text-base font-semibold text-foreground dark:text-foreground">
+                <p className="text-xs sm:text-sm md:text-base font-semibold text-foreground dark:text-foreground truncate">
                   {instructorName}
                 </p>
               </div>
@@ -185,15 +187,15 @@ export function FeatureCard({
             }`}
           >
             <Button
-              className={`w-full h-12 md:h-14 rounded-2xl text-sm md:text-base font-semibold bg-gradient-to-r ${colors.accent} text-white hover:scale-105 hover:shadow-lg ${colors.glow} transition-all duration-300 group/btn border-0 relative overflow-hidden`}
+              className={`w-full h-10 sm:h-12 md:h-14 rounded-xl sm:rounded-2xl text-xs sm:text-sm md:text-base font-semibold bg-gradient-to-r ${colors.accent} text-white hover:scale-105 hover:shadow-lg ${colors.glow} transition-all duration-300 group/btn border-0 relative overflow-hidden`}
               variant="default"
             >
               {/* Button shine effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700" />
 
-              <span className="relative z-10 flex items-center justify-center gap-2">
+              <span className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2">
                 Learn More
-                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
               </span>
             </Button>
           </div>

@@ -2,7 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, User, Phone, LogOut, Upload } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import {
+  ArrowLeft,
+  User,
+  Phone,
+  LogOut,
+  Upload,
+  MoreHorizontal,
+} from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 import { DashboardFloatingActions } from "@/components/dashboard-floating-actions";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -44,12 +52,31 @@ const categories = [
 
 export default function Dashboard() {
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Create Supabase client with SSR support
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   const handleCategoryClick = (categoryId: string) => {
     router.push(`/dashboard/${categoryId}`);
@@ -83,67 +110,70 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-muted/20">
-      {/* Clean header */}
-      <header className="clean-card mx-4 mt-4 mb-8">
+      {/* Clean header with collapsible menu */}
+      <header className="bg-background/95 backdrop-blur-sm border-b mx-4 mt-4 mb-8 rounded-2xl shadow-sm relative">
         <div className="flex items-center justify-between px-6 py-4">
+          {/* Back button */}
           <button
             onClick={handleGoBack}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft size={20} />
-            <span className="font-medium">Back</span>
           </button>
 
-          <h1 className="text-xl font-bold text-foreground">
+          {/* Title */}
+          <h1 className="text-xl font-semibold text-foreground">
             Your Wellness Journey
           </h1>
 
+          {/* Simple profile button for mobile, full menu for desktop */}
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleUpload}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
-              aria-label="Upload Exercise"
-            >
-              <Upload size={20} />
-              <span className="font-medium hidden sm:inline">Upload</span>
-            </button>
+            {/* Desktop menu (hidden on mobile) */}
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={handleUpload}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+                aria-label="Upload Exercise"
+              >
+                <Upload size={20} />
+              </button>
 
+              <ThemeToggle />
+
+              <button
+                onClick={handleLogout}
+                className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+                aria-label="Logout"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+
+            {/* Mobile: Only profile button */}
             <button
               onClick={handleProfile}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors"
+              className="p-2 hover:bg-muted rounded-lg transition-colors"
               aria-label="Profile"
             >
               <User size={20} />
-              <span className="font-medium hidden sm:inline">Profile</span>
-            </button>
-
-            <ThemeToggle />
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
-              aria-label="Logout"
-            >
-              <LogOut size={20} />
-              <span className="font-medium hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Clean grid layout with larger cards */}
-      <div className="container mx-auto px-4 pb-8 h-[calc(100vh-120px)]">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 h-full">
+      {/* Clean grid layout - Fully Responsive */}
+      <div className="container mx-auto px-2 sm:px-4 pb-4 sm:pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {categories.map((category, index) => (
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
-              className="clean-card clean-hover p-8 text-left group animate-slide-up flex flex-col h-full min-h-[500px]"
+              className="clean-card clean-hover p-4 sm:p-6 lg:p-8 text-left group animate-slide-up flex flex-col min-h-[100px] sm:min-h-[200px] lg:min-h-[600px] xl:min-h-[800px]"
               style={{ animationDelay: `${index * 0.1}s` }}
               aria-label={`Navigate to ${category.name}`}
             >
-              <div className="relative w-full flex-3 mb-6 rounded-lg overflow-hidden">
+              <div className="relative w-full aspect-[3/4] mb-4 sm:mb-6 rounded-lg overflow-hidden flex-grow">
                 <Image
                   src={category.image}
                   alt={category.name}
@@ -152,10 +182,10 @@ export default function Dashboard() {
                 />
               </div>
               <div className="flex-shrink-0">
-                <h3 className="text-xl font-semibold text-foreground mb-3">
+                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">
                   {category.name}
                 </h3>
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   {category.description}
                 </p>
               </div>
