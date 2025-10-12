@@ -84,36 +84,40 @@ export default function ProfilePage() {
       const { data, error } = await supabase
         .from("quotes")
         .select("*")
-        .eq("is_active", true)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
       if (data) {
-        // Map quotes and add color based on category
+        // Map quotes and use color from database, or fallback to category-based color
         const quotesWithColors = data.map((quote) => {
-          let color = "#6366f1"; // default chart-1 color
-          const category = quote.category.toLowerCase();
+          // Use the color from database if it exists, otherwise determine by category
+          let color = quote.color || "#6366f1"; // default chart-1 color
 
-          if (
-            category.includes("motivation") ||
-            category.includes("physical")
-          ) {
-            color = "#6366f1"; // chart-1
-          } else if (
-            category.includes("mental") ||
-            category.includes("mindfulness")
-          ) {
-            color = "#8b5cf6"; // chart-2
-          } else if (
-            category.includes("wellness") ||
-            category.includes("breathing")
-          ) {
-            color = "#06b6d4"; // chart-3
-          } else if (
-            category.includes("nutrition") ||
-            category.includes("health")
-          ) {
-            color = "#10b981"; // chart-4
+          // If no color in database, determine by category
+          if (!quote.color) {
+            const category = quote.category?.toLowerCase() || "";
+
+            if (
+              category.includes("motivation") ||
+              category.includes("physical")
+            ) {
+              color = "#6366f1"; // chart-1
+            } else if (
+              category.includes("mental") ||
+              category.includes("mindfulness")
+            ) {
+              color = "#8b5cf6"; // chart-2
+            } else if (
+              category.includes("wellness") ||
+              category.includes("breathing")
+            ) {
+              color = "#06b6d4"; // chart-3
+            } else if (
+              category.includes("nutrition") ||
+              category.includes("health")
+            ) {
+              color = "#10b981"; // chart-4
+            }
           }
 
           return {

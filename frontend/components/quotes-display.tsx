@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Heart, TrendingUp } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/components/auth-provider";
 
 interface QuoteData {
   id: string;
@@ -13,21 +14,10 @@ interface QuoteData {
 }
 
 export function QuotesDisplay() {
-  const [userId, setUserId] = useState<string | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const [favoriteQuotes, setFavoriteQuotes] = useState<Set<string>>(new Set());
   const [quotes, setQuotes] = useState<QuoteData[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Get current user
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUserId(user?.id || null);
-    };
-    getUser();
-  }, []);
 
   // Load quotes from database
   useEffect(() => {
@@ -40,7 +30,48 @@ export function QuotesDisplay() {
 
         if (error) throw error;
         if (data) {
-          setQuotes(data);
+          // Map quotes and use color from database, or fallback to category-based color
+          const quotesWithColors = data.map((quote) => {
+            // Use the color from database if it exists, otherwise determine by category
+            let color = quote.color || "#6366f1"; // default chart-1 color
+
+            // If no color in database, determine by category
+            if (!quote.color) {
+              const category = quote.category?.toLowerCase() || "";
+
+              if (
+                category.includes("motivation") ||
+                category.includes("physical")
+              ) {
+                color = "#6366f1"; // chart-1
+              } else if (
+                category.includes("mental") ||
+                category.includes("mindfulness")
+              ) {
+                color = "#8b5cf6"; // chart-2
+              } else if (
+                category.includes("wellness") ||
+                category.includes("breathing")
+              ) {
+                color = "#06b6d4"; // chart-3
+              } else if (
+                category.includes("nutrition") ||
+                category.includes("health")
+              ) {
+                color = "#10b981"; // chart-4
+              }
+            }
+
+            return {
+              id: quote.id,
+              text: quote.quote_text || quote.text,
+              author: quote.author,
+              category: quote.category,
+              color: color,
+            };
+          });
+
+          setQuotes(quotesWithColors);
         }
       } catch (error) {
         console.error("Error loading quotes:", error);
@@ -54,22 +85,27 @@ export function QuotesDisplay() {
   // Load user's favorite quotes
   useEffect(() => {
     const loadFavorites = async () => {
-      if (!userId) return;
+      if (!user?.id) return;
 
       const { data } = await supabase
         .from("quote_favorites")
         .select("quote_id")
-        .eq("user_id", userId);
+        .eq("user_id", user.id);
 
       if (data) {
         setFavoriteQuotes(new Set(data.map((fav) => fav.quote_id)));
       }
     };
     loadFavorites();
-  }, [userId]);
+  }, [user]);
 
   const handleFavorite = async (quoteId: string) => {
-    if (!userId) {
+    // Wait for auth to load
+    if (authLoading) {
+      return;
+    }
+
+    if (!user?.id) {
       alert("Please sign in to favorite quotes");
       return;
     }
@@ -81,7 +117,7 @@ export function QuotesDisplay() {
       await supabase
         .from("quote_favorites")
         .delete()
-        .eq("user_id", userId)
+        .eq("user_id", user.id)
         .eq("quote_id", quoteId);
 
       const newFavorites = new Set(favoriteQuotes);
@@ -91,7 +127,7 @@ export function QuotesDisplay() {
       // Add favorite
       await supabase
         .from("quote_favorites")
-        .insert({ user_id: userId, quote_id: quoteId });
+        .insert({ user_id: user.id, quote_id: quoteId });
 
       const newFavorites = new Set(favoriteQuotes);
       newFavorites.add(quoteId);
@@ -102,7 +138,7 @@ export function QuotesDisplay() {
   const trackView = async (quoteId: string) => {
     await supabase.from("quote_views").insert({
       quote_id: quoteId,
-      user_id: userId,
+      user_id: user?.id,
     });
   };
 
