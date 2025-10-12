@@ -79,13 +79,6 @@ export default function ProfilePage() {
     memberSince: "",
   });
 
-  console.log("🎯 ProfilePage render:", {
-    authLoading,
-    hasUser: !!user,
-    hasSession: !!session,
-    profileLoading: loading,
-  });
-
   const loadQuotes = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -196,11 +189,8 @@ export default function ProfilePage() {
     try {
       // Don't try to load if we don't have a user yet
       if (!user) {
-        console.log("No user found, waiting for auth...");
         return;
       }
-
-      console.log("Loading profile for user:", user.id);
 
       // Try to get profile from users table
       const { data: profileData, error: profileError } = await supabase
@@ -208,8 +198,6 @@ export default function ProfilePage() {
         .select("*")
         .eq("id", user.id)
         .single();
-
-      console.log("Profile data:", profileData, "Error:", profileError);
 
       if (profileData) {
         setProfile(profileData);
@@ -267,27 +255,17 @@ export default function ProfilePage() {
   useEffect(() => {
     // Wait for auth to complete before checking
     if (authLoading) {
-      console.log("🔄 Profile: Auth is still loading...");
       return;
     }
 
-    console.log("🔍 Profile useEffect:", {
-      authLoading,
-      hasUser: !!user,
-      hasSession: !!session,
-      userEmail: user?.email,
-    });
-
     // If auth finished and there's no user, redirect to login
     if (!authLoading && !user && !session) {
-      console.log("❌ Profile: No user or session, redirecting to login");
       router.push("/login");
       return;
     }
 
     // If we have a user, load their profile
     if (user) {
-      console.log("✅ Profile: User found, loading profile data");
       loadProfile();
       loadFavorites();
       loadQuotes();

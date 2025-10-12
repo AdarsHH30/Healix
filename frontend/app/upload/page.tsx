@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -14,7 +14,7 @@ import {
   Quote,
   Utensils,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase-client";
 import { ChatbotPopup } from "@/components/chatbot-popup";
 import { MapPopup } from "@/components/map-popup";
 
@@ -129,10 +129,60 @@ export default function UploadPage() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
+
+  // Initialize Supabase client
+  const supabase = createClient();
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error("Error checking session:", error);
+          setIsAuthenticated(false);
+        } else {
+          setIsAuthenticated(!!session);
+          console.log(
+            "Auth status:",
+            !!session ? "Authenticated" : "Not authenticated"
+          );
+        }
+      } catch (error) {
+        console.error("Error in checkAuth:", error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+      console.log(
+        "Auth state changed:",
+        !!session ? "Authenticated" : "Not authenticated"
+      );
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const [formData, setFormData] = useState<ExerciseFormData>({
     name: "",
@@ -214,19 +264,34 @@ export default function UploadPage() {
       };
       reader.readAsDataURL(file);
 
-      setFormData((prev) => ({ ...prev, imageFile: file, imageUrl: "" }));
+      // Update the appropriate form data based on upload type
+      if (uploadType === "exercise") {
+        setFormData((prev) => ({ ...prev, imageFile: file, imageUrl: "" }));
+      } else if (uploadType === "nutrition") {
+        setNutritionData((prev) => ({
+          ...prev,
+          imageFile: file,
+          imageUrl: "",
+        }));
+      }
       setMessage(null);
     }
   };
 
-  const uploadImageToStorage = async (file: File): Promise<string | null> => {
+  const uploadImageToStorage = async (
+    file: File,
+    type: "exercise" | "nutrition" = "exercise"
+  ): Promise<string | null> => {
     try {
       setIsUploadingImage(true);
       const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random()
         .toString(36)
         .substring(2)}-${Date.now()}.${fileExt}`;
-      const filePath = `exercise-images/${fileName}`;
+      const filePath =
+        type === "exercise"
+          ? `exercise-images/${fileName}`
+          : `nutrition-images/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from("exercises")
@@ -259,11 +324,28 @@ export default function UploadPage() {
     setMessage(null);
 
     try {
+      // Validate inputs
+      if (!formData.name.trim()) {
+        throw new Error("Exercise name is required");
+      }
+      if (!formData.description.trim()) {
+        throw new Error("Description is required");
+      }
+      if (!formData.category.trim()) {
+        throw new Error("Please select a category");
+      }
+      if (!formData.youtubeUrl.trim()) {
+        throw new Error("YouTube URL is required");
+      }
+
       let finalImageUrl = formData.imageUrl;
 
       // If user uploaded a file, upload it to Supabase Storage
       if (formData.imageFile) {
-        const uploadedUrl = await uploadImageToStorage(formData.imageFile);
+        const uploadedUrl = await uploadImageToStorage(
+          formData.imageFile,
+          "exercise"
+        );
         if (uploadedUrl) {
           finalImageUrl = uploadedUrl;
         } else if (!formData.imageUrl) {
@@ -278,23 +360,55 @@ export default function UploadPage() {
       // Get current user (optional - can be null)
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
 
-      // Insert exercise into database
-      const { data: _data, error } = await supabase.from("exercises").insert({
-        name: formData.name,
-        description: formData.description,
+      if (userError) {
+        console.error("Error getting user:", userError);
+      }
+
+      console.log(
+        "Current user:",
+        user ? `${user.id} (${user.email})` : "No user found"
+      );
+
+      // Prepare exercise data
+      const exerciseData = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
         image_url: finalImageUrl,
         gif_url: null, // GIF is now optional and not exposed in UI
-        youtube_url: formData.youtubeUrl,
-        duration: formData.duration || null,
+        youtube_url: formData.youtubeUrl.trim(),
+        duration: formData.duration.trim() || null,
         difficulty: formData.difficulty,
-        category: formData.category,
+        category: formData.category.trim(),
         exercise_type: formData.exerciseType,
         created_by: user?.id || null,
-      });
+        is_active: true,
+      };
 
-      if (error) throw error;
+      console.log("Inserting exercise data:", exerciseData);
+
+      // Insert exercise into database
+      const { data: insertedData, error } = await supabase
+        .from("exercises")
+        .insert(exerciseData)
+        .select();
+
+      if (error) {
+        console.error("Supabase exercise upload error:", error);
+        console.error("Error details:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        });
+        throw new Error(
+          error.message || "Failed to upload exercise to database"
+        );
+      }
+
+      console.log("Successfully inserted exercise:", insertedData);
 
       setMessage({
         type: "success",
@@ -318,11 +432,14 @@ export default function UploadPage() {
       // Scroll to top to show message
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: unknown) {
+      console.error("Upload error:", error);
       setMessage({
         type: "error",
         text:
           error instanceof Error ? error.message : "Failed to upload exercise",
       });
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsSubmitting(false);
     }
@@ -348,39 +465,51 @@ export default function UploadPage() {
         throw new Error("Color is required");
       }
 
-      // Get the count of existing quotes to generate next ID
-      const { count, error: countError } = await supabase
-        .from("quotes")
-        .select("*", { count: "exact", head: true });
+      // Get current user (optional - can be null)
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-      if (countError) {
-        console.error("Error counting quotes:", countError);
-        throw new Error("Failed to generate quote ID");
+      if (userError) {
+        console.error("Error getting user:", userError);
       }
 
-      // Generate ID in format: quote-1, quote-2, etc.
-      const nextId = `quote-${(count || 0) + 1}`;
+      console.log(
+        "Current user:",
+        user ? `${user.id} (${user.email})` : "No user found"
+      );
 
-      // Insert quote into database (matching your current DB schema)
-      const { data, error } = await supabase
+      // Prepare quote data - match database schema
+      const quoteDataToInsert = {
+        quote_text: quoteData.text.trim(), // Changed from 'text' to 'quote_text'
+        author: quoteData.author.trim(),
+        category: quoteData.category,
+        color: quoteData.color,
+        created_by: user?.id || null,
+        is_active: true,
+      };
+
+      console.log("Inserting quote data:", quoteDataToInsert);
+
+      // Insert quote into database (ID will be auto-generated as UUID)
+      const { data: insertedData, error } = await supabase
         .from("quotes")
-        .insert([
-          {
-            id: nextId,
-            text: quoteData.text.trim(),
-            author: quoteData.author.trim(),
-            category: quoteData.category,
-            color: quoteData.color,
-          },
-        ])
+        .insert(quoteDataToInsert)
         .select();
 
       if (error) {
-        console.error("Supabase error:", error);
-        throw new Error(error.message || "Database error occurred");
+        console.error("Supabase quote upload error:", error);
+        console.error("Error details:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        });
+        throw new Error(error.message || "Failed to upload quote to database");
       }
 
-      console.log("Quote inserted successfully:", data);
+      console.log("Quote inserted successfully:", insertedData);
 
       setMessage({
         type: "success",
@@ -403,6 +532,8 @@ export default function UploadPage() {
         type: "error",
         text: error instanceof Error ? error.message : "Failed to upload quote",
       });
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsSubmitting(false);
     }
@@ -414,11 +545,31 @@ export default function UploadPage() {
     setMessage(null);
 
     try {
+      // Validate inputs
+      if (!nutritionData.title.trim()) {
+        throw new Error("Title is required");
+      }
+      if (!nutritionData.description.trim()) {
+        throw new Error("Description is required");
+      }
+      if (!nutritionData.ingredients.trim()) {
+        throw new Error("Ingredients are required");
+      }
+      if (!nutritionData.instructions.trim()) {
+        throw new Error("Instructions are required");
+      }
+      if (!nutritionData.benefits.trim()) {
+        throw new Error("Benefits are required");
+      }
+
       let finalImageUrl = nutritionData.imageUrl;
 
       // If user uploaded a file, upload it to Supabase Storage
       if (nutritionData.imageFile) {
-        const uploadedUrl = await uploadImageToStorage(nutritionData.imageFile);
+        const uploadedUrl = await uploadImageToStorage(
+          nutritionData.imageFile,
+          "nutrition"
+        );
         if (uploadedUrl) {
           finalImageUrl = uploadedUrl;
         } else if (!nutritionData.imageUrl) {
@@ -451,6 +602,25 @@ export default function UploadPage() {
         .map((item) => item.trim())
         .filter((item) => item.length > 0);
 
+      console.log("Nutrition data to upload:", {
+        title: nutritionData.title,
+        description: nutritionData.description,
+        image_url: finalImageUrl,
+        calories: nutritionData.calories,
+        protein: nutritionData.protein,
+        carbs: nutritionData.carbs,
+        fats: nutritionData.fats,
+        meal_type: nutritionData.mealType,
+        category: nutritionData.category,
+        prep_time: nutritionData.prepTime,
+        difficulty: nutritionData.difficulty,
+        ingredients: ingredientsArray,
+        instructions: instructionsArray,
+        benefits: benefitsArray,
+        created_by: user?.id || null,
+        is_active: true,
+      });
+
       // Insert nutrition plan into database
       const { data: _data, error } = await supabase
         .from("nutrition_plans")
@@ -458,7 +628,6 @@ export default function UploadPage() {
           title: nutritionData.title,
           description: nutritionData.description,
           image_url: finalImageUrl,
-          youtube_url: nutritionData.youtubeUrl,
           calories: nutritionData.calories,
           protein: nutritionData.protein,
           carbs: nutritionData.carbs,
@@ -474,7 +643,12 @@ export default function UploadPage() {
           is_active: true,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase nutrition upload error:", error);
+        throw new Error(
+          error.message || "Failed to upload nutrition plan to database"
+        );
+      }
 
       setMessage({
         type: "success",
@@ -505,6 +679,7 @@ export default function UploadPage() {
       // Scroll to top to show message
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: unknown) {
+      console.error("Nutrition upload error:", error);
       setMessage({
         type: "error",
         text:
@@ -512,10 +687,52 @@ export default function UploadPage() {
             ? error.message
             : "Failed to upload nutrition plan",
       });
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading state while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-chart-1/30 border-t-chart-1 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="max-w-md w-full mx-4">
+          <div className="bg-muted/20 rounded-2xl border border-border p-8 text-center">
+            <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle size={32} className="text-red-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              Authentication Required
+            </h2>
+            <p className="text-muted-foreground mb-6">
+              You must be logged in to upload content. Please log in to
+              continue.
+            </p>
+            <button
+              onClick={() => router.push("/login")}
+              className="w-full px-6 py-3 bg-gradient-to-r from-chart-1 to-chart-2 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-chart-1/50 transition-all duration-300"
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
