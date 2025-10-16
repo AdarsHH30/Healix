@@ -277,7 +277,7 @@ export default function NutritionPage() {
             {/* Search Bar */}
             <div className="mb-8">
               <div className="relative max-w-2xl mx-auto">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                {/* <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" /> */}
                 <input
                   type="text"
                   placeholder="Search by name, description, or category..."
@@ -372,7 +372,7 @@ export default function NutritionPage() {
             {filteredPlans.length === 0 && nutritionPlans.length > 0 && (
               <div className="text-center py-20">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/20 flex items-center justify-center mx-auto mb-6">
-                  <Search className="w-10 h-10 text-orange-500" />
+                  {/* <Search className="w-10 h-10 text-orange-500" /> */}
                 </div>
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   No plans match your search

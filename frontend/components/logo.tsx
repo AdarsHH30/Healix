@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Plus, Activity } from "lucide-react";
+import { Heart, Activity } from "lucide-react";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
@@ -8,55 +8,108 @@ interface LogoProps {
   className?: string;
 }
 
+// Main DNA Helix Logo
 export function Logo({
   size = "md",
   showText = true,
   className = "",
 }: LogoProps) {
   const sizeClasses = {
-    sm: "h-6 w-6",
-    md: "h-8 w-8 md:h-10 md:w-10",
-    lg: "h-12 w-12 md:h-16 md:w-16",
-  };
-
-  const iconSizes = {
-    sm: "h-3 w-3",
-    md: "h-4 w-4 md:h-5 md:w-5",
-    lg: "h-6 w-6 md:h-8 md:w-8",
+    sm: "h-7 w-7",
+    md: "h-9 w-9 md:h-11 md:w-11",
+    lg: "h-14 w-14 md:h-18 md:w-18",
   };
 
   const textSizes = {
-    sm: "text-base font-bold",
-    md: "text-lg md:text-xl font-bold",
-    lg: "text-2xl md:text-3xl font-bold",
+    sm: "text-base font-semibold",
+    md: "text-lg md:text-xl font-semibold",
+    lg: "text-2xl md:text-3xl font-semibold",
   };
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Health-focused logo design */}
-      <div
-        className={`relative flex items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent/80 clean-shadow ${sizeClasses[size]}`}
-      >
-        {/* Medical cross background */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Plus
-            className={`text-white/30 ${iconSizes[size]}`}
-            strokeWidth={3}
-          />
-        </div>
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <div className="relative group">
+        <div
+          className={`relative flex items-center justify-center rounded-2xl bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 shadow-lg shadow-slate-900/20 transition-transform duration-300 group-hover:scale-105 ${sizeClasses[size]}`}
+        >
+          {/* DNA Double Helix */}
+          <svg
+            viewBox="0 0 32 32"
+            className="w-full h-full p-1.5"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Left strand */}
+            <path
+              d="M10 6 Q8 12, 10 18 Q12 24, 10 30"
+              stroke="#e2e8f0"
+              strokeWidth="2"
+              strokeLinecap="round"
+              fill="none"
+            />
 
-        {/* Heart with pulse */}
-        <div className="relative flex items-center justify-center">
-          <Heart
-            className={`text-white ${iconSizes[size]} animate-pulse`}
-            fill="currentColor"
-            strokeWidth={1.5}
-          />
+            {/* Right strand */}
+            <path
+              d="M22 6 Q24 12, 22 18 Q20 24, 22 30"
+              stroke="#e2e8f0"
+              strokeWidth="2"
+              strokeLinecap="round"
+              fill="none"
+            />
 
-          {/* Pulse line */}
-          <div className="absolute -right-1 top-1/2 -translate-y-1/2">
-            <Activity className="h-2 w-2 text-white/80" strokeWidth={2} />
-          </div>
+            {/* Connecting base pairs */}
+            <line
+              x1="10"
+              y1="9"
+              x2="22"
+              y2="9"
+              stroke="#34d399"
+              strokeWidth="1.5"
+              opacity="0.8"
+            />
+            <line
+              x1="11"
+              y1="13"
+              x2="21"
+              y2="13"
+              stroke="#34d399"
+              strokeWidth="1.5"
+              opacity="0.6"
+            />
+            <line
+              x1="10"
+              y1="18"
+              x2="22"
+              y2="18"
+              stroke="#34d399"
+              strokeWidth="1.5"
+              opacity="0.9"
+            />
+            <line
+              x1="11"
+              y1="23"
+              x2="21"
+              y2="23"
+              stroke="#34d399"
+              strokeWidth="1.5"
+              opacity="0.6"
+            />
+            <line
+              x1="10"
+              y1="27"
+              x2="22"
+              y2="27"
+              stroke="#34d399"
+              strokeWidth="1.5"
+              opacity="0.8"
+            />
+
+            {/* Glowing dots on strands */}
+            <circle cx="10" cy="6" r="1.5" fill="#e2e8f0" />
+            <circle cx="22" cy="6" r="1.5" fill="#e2e8f0" />
+            <circle cx="10" cy="30" r="1.5" fill="#e2e8f0" />
+            <circle cx="22" cy="30" r="1.5" fill="#e2e8f0" />
+          </svg>
         </div>
       </div>
 
@@ -67,140 +120,389 @@ export function Logo({
   );
 }
 
-// Alternative minimalist health logo
+// Animated DNA Helix
+export function LogoAnimated({
+  size = "md",
+  showText = true,
+  className = "",
+}: LogoProps) {
+  const sizeClasses = {
+    sm: "h-7 w-7",
+    md: "h-9 w-9 md:h-11 md:w-11",
+    lg: "h-14 w-14 md:h-18 md:w-18",
+  };
+
+  const textSizes = {
+    sm: "text-base font-semibold",
+    md: "text-lg md:text-xl font-semibold",
+    lg: "text-2xl md:text-3xl font-semibold",
+  };
+
+  return (
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <div className="relative group">
+        <div
+          className={`relative flex items-center justify-center rounded-2xl bg-primary shadow-lg transition-transform duration-300 group-hover:scale-105 ${sizeClasses[size]}`}
+        >
+          <svg
+            viewBox="0 0 32 32"
+            className="w-full h-full p-1.5"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* DNA strands with rotation animation */}
+            <g>
+              <path
+                d="M10 6 Q8 12, 10 18 Q12 24, 10 30"
+                stroke="#e2e8f0"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M22 6 Q24 12, 22 18 Q20 24, 22 30"
+                stroke="#e2e8f0"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+
+              {/* Animated connecting pairs */}
+              <line
+                x1="10"
+                y1="10"
+                x2="22"
+                y2="10"
+                stroke="#34d399"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <animate
+                  attributeName="opacity"
+                  values="0.4;1;0.4"
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+              </line>
+              <line
+                x1="10"
+                y1="16"
+                x2="22"
+                y2="16"
+                stroke="#34d399"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <animate
+                  attributeName="opacity"
+                  values="1;0.4;1"
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+              </line>
+              <line
+                x1="10"
+                y1="22"
+                x2="22"
+                y2="22"
+                stroke="#34d399"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <animate
+                  attributeName="opacity"
+                  values="0.4;1;0.4"
+                  dur="2s"
+                  repeatCount="indefinite"
+                  begin="0.5s"
+                />
+              </line>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      {showText && (
+        <span className={`text-foreground ${textSizes[size]}`}>Healix</span>
+      )}
+    </div>
+  );
+}
+
+// Stylized H with DNA
+export function LogoH({
+  size = "md",
+  showText = true,
+  className = "",
+}: LogoProps) {
+  const sizeClasses = {
+    sm: "h-7 w-7",
+    md: "h-9 w-9 md:h-11 md:w-11",
+    lg: "h-14 w-14 md:h-18 md:w-18",
+  };
+
+  const textSizes = {
+    sm: "text-base font-semibold",
+    md: "text-lg md:text-xl font-semibold",
+    lg: "text-2xl md:text-3xl font-semibold",
+  };
+
+  return (
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <div className="relative group">
+        <div
+          className={`relative flex items-center justify-center rounded-2xl bg-primary shadow-lg transition-transform duration-300 group-hover:scale-105 ${sizeClasses[size]}`}
+        >
+          <svg
+            viewBox="0 0 32 32"
+            className="w-full h-full p-2"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* H shape with DNA helix integrated */}
+            <path
+              d="M9 6 L9 26"
+              stroke="hsl(var(--primary-foreground))"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M23 6 L23 26"
+              stroke="hsl(var(--primary-foreground))"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+
+            {/* DNA helix in the middle bar */}
+            <path
+              d="M9 16 Q12 14, 16 16 Q20 18, 23 16"
+              stroke="hsl(var(--accent))"
+              strokeWidth="2"
+              fill="none"
+            />
+            <path
+              d="M9 16 Q12 18, 16 16 Q20 14, 23 16"
+              stroke="hsl(var(--accent))"
+              strokeWidth="2"
+              fill="none"
+              opacity="0.6"
+            />
+
+            {/* Accent dots */}
+            <circle
+              cx="9"
+              cy="6"
+              r="1.5"
+              fill="hsl(var(--primary-foreground))"
+            />
+            <circle
+              cx="23"
+              cy="6"
+              r="1.5"
+              fill="hsl(var(--primary-foreground))"
+            />
+            <circle cx="16" cy="16" r="2" fill="hsl(var(--accent))">
+              <animate
+                attributeName="opacity"
+                values="1;0.5;1"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </circle>
+          </svg>
+        </div>
+      </div>
+
+      {showText && (
+        <span className={`text-foreground ${textSizes[size]}`}>Healix</span>
+      )}
+    </div>
+  );
+}
+
+// Circular DNA
+export function LogoCircular({
+  size = "md",
+  showText = true,
+  className = "",
+}: LogoProps) {
+  const sizeClasses = {
+    sm: "h-7 w-7",
+    md: "h-9 w-9 md:h-11 md:w-11",
+    lg: "h-14 w-14 md:h-18 md:w-18",
+  };
+
+  const textSizes = {
+    sm: "text-base font-semibold",
+    md: "text-lg md:text-xl font-semibold",
+    lg: "text-2xl md:text-3xl font-semibold",
+  };
+
+  return (
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <div className="relative group">
+        <div
+          className={`relative flex items-center justify-center rounded-2xl bg-primary shadow-lg transition-transform duration-300 group-hover:scale-105 ${sizeClasses[size]}`}
+        >
+          <svg
+            viewBox="0 0 32 32"
+            className="w-full h-full p-1.5"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Circular DNA representation */}
+            <circle
+              cx="16"
+              cy="16"
+              r="11"
+              stroke="hsl(var(--primary-foreground))"
+              strokeWidth="2"
+              opacity="0.3"
+            />
+
+            {/* DNA spiral inside circle */}
+            <path
+              d="M16 5 Q10 10, 16 16 Q22 22, 16 27"
+              stroke="hsl(var(--primary-foreground))"
+              strokeWidth="2"
+              fill="none"
+            />
+            <path
+              d="M16 5 Q22 10, 16 16 Q10 22, 16 27"
+              stroke="hsl(var(--primary-foreground))"
+              strokeWidth="2"
+              fill="none"
+            />
+
+            {/* Connection points */}
+            <line
+              x1="13"
+              y1="10"
+              x2="19"
+              y2="10"
+              stroke="hsl(var(--accent))"
+              strokeWidth="1.5"
+            />
+            <line
+              x1="13"
+              y1="16"
+              x2="19"
+              y2="16"
+              stroke="hsl(var(--accent))"
+              strokeWidth="1.5"
+            />
+            <line
+              x1="13"
+              y1="22"
+              x2="19"
+              y2="22"
+              stroke="hsl(var(--accent))"
+              strokeWidth="1.5"
+            />
+
+            {/* Center glow */}
+            <circle
+              cx="16"
+              cy="16"
+              r="2"
+              fill="hsl(var(--accent))"
+              opacity="0.8"
+            >
+              <animate
+                attributeName="r"
+                values="2;3;2"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="0.8;0.4;0.8"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </circle>
+          </svg>
+        </div>
+      </div>
+
+      {showText && (
+        <span className={`text-foreground ${textSizes[size]}`}>Healix</span>
+      )}
+    </div>
+  );
+}
+
+// Minimal DNA strand
 export function LogoMinimal({
   size = "md",
   showText = true,
   className = "",
 }: LogoProps) {
   const sizeClasses = {
-    sm: "h-6 w-6",
-    md: "h-8 w-8 md:h-10 md:w-10",
-    lg: "h-12 w-12 md:h-16 md:w-16",
+    sm: "h-7 w-7",
+    md: "h-9 w-9 md:h-11 md:w-11",
+    lg: "h-14 w-14 md:h-18 md:w-18",
   };
 
   const textSizes = {
-    sm: "text-base font-bold",
-    md: "text-lg md:text-xl font-bold",
-    lg: "text-2xl md:text-3xl font-bold",
+    sm: "text-base font-semibold",
+    md: "text-lg md:text-xl font-semibold",
+    lg: "text-2xl md:text-3xl font-semibold",
   };
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Minimalist health cross */}
-      <div
-        className={`relative flex items-center justify-center rounded-lg bg-primary clean-shadow ${sizeClasses[size]}`}
-      >
-        <div className="relative">
-          {/* Vertical line */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-4 bg-white rounded-full"></div>
-          {/* Horizontal line */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-0.5 bg-white rounded-full"></div>
-          {/* Center dot */}
-          <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-        </div>
-      </div>
-
-      {showText && (
-        <span className={`text-foreground ${textSizes[size]}`}>Healix</span>
-      )}
-    </div>
-  );
-}
-
-// Medical H logo for Healix
-export function LogoMedical({
-  size = "md",
-  showText = true,
-  className = "",
-}: LogoProps) {
-  const sizeClasses = {
-    sm: "h-6 w-6",
-    md: "h-8 w-8 md:h-10 md:w-10",
-    lg: "h-12 w-12 md:h-16 md:w-16",
-  };
-
-  const textSizes = {
-    sm: "text-base font-bold",
-    md: "text-lg md:text-xl font-bold",
-    lg: "text-2xl md:text-3xl font-bold",
-  };
-
-  return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Stylized H for Health/Healix */}
-      <div
-        className={`relative flex items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 clean-shadow ${sizeClasses[size]}`}
-      >
-        <div className="text-white font-black text-lg leading-none">H</div>
-        {/* Small pulse indicator */}
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-      </div>
-
-      {showText && (
-        <span className={`text-foreground ${textSizes[size]}`}>Healix</span>
-      )}
-    </div>
-  );
-}
-
-// SVG-based medical logo
-export function LogoSVG({
-  size = "md",
-  showText = true,
-  className = "",
-}: LogoProps) {
-  const sizeClasses = {
-    sm: "h-6 w-6",
-    md: "h-8 w-8 md:h-10 md:w-10",
-    lg: "h-12 w-12 md:h-16 md:w-16",
-  };
-
-  const textSizes = {
-    sm: "text-base font-bold",
-    md: "text-lg md:text-xl font-bold",
-    lg: "text-2xl md:text-3xl font-bold",
-  };
-
-  return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Custom SVG health logo */}
-      <div className={`relative ${sizeClasses[size]}`}>
-        <svg
-          viewBox="0 0 40 40"
-          className={`${sizeClasses[size]} drop-shadow-md`}
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <div className="relative group">
+        <div
+          className={`relative flex items-center justify-center rounded-xl bg-primary shadow-md transition-all duration-300 group-hover:shadow-lg ${sizeClasses[size]}`}
         >
-          {/* Background circle */}
-          <circle
-            cx="20"
-            cy="20"
-            r="18"
-            fill="url(#gradient)"
-            stroke="#ffffff"
-            strokeWidth="2"
-          />
+          <svg
+            viewBox="0 0 24 24"
+            className="w-full h-full p-1.5"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Simplified helix */}
+            <path
+              d="M8 4 Q6 8, 8 12 Q10 16, 8 20"
+              stroke="hsl(var(--primary-foreground))"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <path
+              d="M16 4 Q18 8, 16 12 Q14 16, 16 20"
+              stroke="hsl(var(--primary-foreground))"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
 
-          {/* Medical cross */}
-          <rect x="17" y="10" width="6" height="20" rx="3" fill="white" />
-          <rect x="10" y="17" width="20" height="6" rx="3" fill="white" />
-
-          {/* Heart shape */}
-          <path
-            d="M20 28c-1-1-8-6-8-11a4 4 0 0 1 8 0 4 4 0 0 1 8 0c0 5-7 10-8 11z"
-            fill="#ef4444"
-            fillOpacity="0.9"
-          />
-
-          {/* Gradient definition */}
-          <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#6366f1" />
-              <stop offset="100%" stopColor="#8b5cf6" />
-            </linearGradient>
-          </defs>
-        </svg>
+            {/* Simple connections */}
+            <line
+              x1="8"
+              y1="8"
+              x2="16"
+              y2="8"
+              stroke="hsl(var(--accent))"
+              strokeWidth="1.5"
+            />
+            <line
+              x1="8"
+              y1="12"
+              x2="16"
+              y2="12"
+              stroke="hsl(var(--accent))"
+              strokeWidth="1.5"
+            />
+            <line
+              x1="8"
+              y1="16"
+              x2="16"
+              y2="16"
+              stroke="hsl(var(--accent))"
+              strokeWidth="1.5"
+            />
+          </svg>
+        </div>
       </div>
 
       {showText && (

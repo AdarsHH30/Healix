@@ -28,10 +28,7 @@ export function ExerciseSearch({
   return (
     <div className="relative w-full max-w-2xl mx-auto">
       <div className="relative">
-        <Search
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-          size={20}
-        />
+        {/* <Search className=" left-4 top-1/2  " size={20} /> */}
         <input
           type="text"
           value={searchQuery}
