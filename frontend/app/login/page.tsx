@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
+import { supabase } from "../../lib/supabase-client";
 import {
   Form,
   FormControl,
@@ -17,7 +18,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { createBrowserClient } from "@supabase/ssr";
 import { useState, Suspense } from "react";
 
 const formSchema = z.object({
@@ -30,27 +30,55 @@ const LoginForm = () => {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetStatus, setResetStatus] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
 
-  // Get the redirect parameter from URL
   const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
     },
-    resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    setError(null);
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetStatus(null);
+    setResetError(null);
 
+    if (!resetEmail) {
+      setResetError("Please enter your email address");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo:
+        typeof window !== "undefined"
+          ? `${window.location.origin}/auth/reset-password`
+          : undefined,
+    });
+
+    if (error) {
+      setResetError(error.message);
+    } else {
+      setResetStatus("Password reset email sent! Please check your inbox.");
+      setResetEmail("");
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        setShowForgot(false);
+        setResetStatus(null);
+      }, 5000);
+    }
+  };
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      setIsLoading(true);
+      setError(null);
 
       const { data: authData, error: authError } =
         await supabase.auth.signInWithPassword({
@@ -183,14 +211,62 @@ const LoginForm = () => {
             </form>
           </Form>
 
-          {/* --- Footer Links --- */}
-          <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-6 text-center">
-            <Link
-              href="/forgot-password"
-              className="text-sm sm:text-base text-muted-foreground hover:text-primary transition-colors duration-200 hover:underline block"
+          {/* --- Forgot Password Section --- */}
+          <div className="mt-6 sm:mt-8 space-y-4">
+            <button
+              type="button"
+              onClick={() => setShowForgot(!showForgot)}
+              className="text-sm sm:text-base text-muted-foreground hover:text-primary transition-colors duration-200 hover:underline block w-full text-center"
             >
               Forgot your password?
-            </Link>
+            </button>
+
+            {showForgot && (
+              <div className="p-4 sm:p-6 rounded-lg bg-muted/50 border border-border space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm sm:text-base font-medium">
+                    Reset Password
+                  </h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Enter your email and we'll send you a reset link
+                  </p>
+                </div>
+
+                <form onSubmit={handlePasswordReset} className="space-y-4">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    className="h-11 sm:h-12 text-sm sm:text-base"
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full h-10 sm:h-11 text-sm sm:text-base"
+                  >
+                    Send Reset Email
+                  </Button>
+                </form>
+
+                {resetStatus && (
+                  <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 text-xs sm:text-sm">
+                    {resetStatus}
+                  </div>
+                )}
+
+                {resetError && (
+                  <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-xs sm:text-sm">
+                    {resetError}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* --- Footer Links --- */}
+          <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-6 text-center">
             <p className="text-sm sm:text-base text-muted-foreground">
               Don't have an account?{" "}
               <Link

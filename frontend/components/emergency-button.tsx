@@ -34,19 +34,43 @@ export function EmergencyButton() {
   const { session } = useAuth();
 
   const watchIdRef = useRef<number | null>(null);
+  const bestLocationRef = useRef<LocationData | null>(null);
 
-  // Start continuous location tracking
+  // Start continuous high-accuracy location tracking
   useEffect(() => {
     if ("geolocation" in navigator) {
-      // Request high-accuracy continuous tracking
+      console.log("🎯 Starting high-accuracy GPS tracking...");
+
+      // Request high-accuracy continuous tracking with optimal settings
       watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
-          setLocation({
+          const newLocation: LocationData = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
             timestamp: position.timestamp,
+          };
+
+          console.log("📍 New GPS reading:", {
+            lat: newLocation.latitude,
+            lon: newLocation.longitude,
+            accuracy: `±${Math.round(newLocation.accuracy)}m`,
+            timestamp: new Date(newLocation.timestamp).toLocaleTimeString(),
           });
+
+          // Keep track of the best (most accurate) location
+          if (
+            !bestLocationRef.current ||
+            newLocation.accuracy < bestLocationRef.current.accuracy
+          ) {
+            bestLocationRef.current = newLocation;
+            console.log(
+              "✨ New best accuracy:",
+              `±${Math.round(newLocation.accuracy)}m`
+            );
+          }
+
+          setLocation(newLocation);
           setLocationError("");
           setIsTracking(true);
         },
@@ -57,25 +81,25 @@ export function EmergencyButton() {
           switch (error.code) {
             case error.PERMISSION_DENIED:
               setLocationError(
-                "Location access denied. Please enable location services."
+                "Location access denied. Please enable location permissions in your browser settings."
               );
               break;
             case error.POSITION_UNAVAILABLE:
               setLocationError(
-                "Location information unavailable. Please check your device settings."
+                "GPS signal unavailable. Please ensure you're outdoors or near a window."
               );
               break;
             case error.TIMEOUT:
-              setLocationError("Location request timed out. Please try again.");
+              setLocationError("GPS timeout. Retrying...");
               break;
             default:
-              setLocationError("Unable to retrieve location.");
+              setLocationError("Unable to retrieve accurate location.");
           }
         },
         {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0, // Don't use cached position
+          enableHighAccuracy: true, // Use GPS, not Wi-Fi/cell tower approximation
+          timeout: 27000, // 27 seconds timeout (longer for GPS lock)
+          maximumAge: 0, // Never use cached position
         }
       );
     } else {
@@ -85,6 +109,7 @@ export function EmergencyButton() {
     // Cleanup: stop watching when component unmounts
     return () => {
       if (watchIdRef.current !== null) {
+        console.log("🛑 Stopping GPS tracking");
         navigator.geolocation.clearWatch(watchIdRef.current);
       }
     };
@@ -102,18 +127,22 @@ export function EmergencyButton() {
         return;
       }
 
-      // Get the most recent location or fetch a new one
-      let currentLocation = location;
+      console.log("🚨 Emergency button pressed - getting precise location...");
 
-      // If we don't have a recent location (within last 5 seconds), get a fresh one
-      if (!currentLocation || Date.now() - currentLocation.timestamp > 5000) {
+      // Use the best (most accurate) location we've collected
+      let currentLocation = bestLocationRef.current || location;
+
+      // If we don't have a recent accurate location, get a fresh high-accuracy reading
+      if (!currentLocation || Date.now() - currentLocation.timestamp > 3000) {
+        console.log("🔄 Getting fresh high-accuracy GPS reading...");
+
         try {
           const position = await new Promise<GeolocationPosition>(
             (resolve, reject) => {
               navigator.geolocation.getCurrentPosition(resolve, reject, {
-                timeout: 10000,
-                enableHighAccuracy: true,
-                maximumAge: 0,
+                enableHighAccuracy: true, // Force GPS usage
+                timeout: 15000, // Wait up to 15 seconds for accurate fix
+                maximumAge: 0, // Must be fresh reading
               });
             }
           );
@@ -124,13 +153,45 @@ export function EmergencyButton() {
             accuracy: position.coords.accuracy,
             timestamp: position.timestamp,
           };
+
+          console.log("✅ Fresh GPS reading:", {
+            lat: currentLocation.latitude,
+            lon: currentLocation.longitude,
+            accuracy: `±${Math.round(currentLocation.accuracy)}m`,
+          });
+
           setLocation(currentLocation);
+
+          // Update best location if this is more accurate
+          if (
+            !bestLocationRef.current ||
+            currentLocation.accuracy < bestLocationRef.current.accuracy
+          ) {
+            bestLocationRef.current = currentLocation;
+          }
         } catch (error) {
           console.error("Failed to get fresh location:", error);
-          setStatusMessage(
-            "⚠️ Could not get your current location. Emergency call sent with last known position."
-          );
-          // Continue with last known location if available
+
+          // If fresh reading fails but we have a previous good location, use it
+          if (currentLocation) {
+            console.log("⚠️ Using last known location:", {
+              age: `${Math.round(
+                (Date.now() - currentLocation.timestamp) / 1000
+              )}s old`,
+              accuracy: `±${Math.round(currentLocation.accuracy)}m`,
+            });
+            setStatusMessage(
+              `⚠️ Using last known location (${Math.round(
+                (Date.now() - currentLocation.timestamp) / 1000
+              )}s old). Sending emergency alert...`
+            );
+          } else {
+            setStatusMessage(
+              "❌ Cannot get accurate location. Please enable GPS and try again."
+            );
+            setIsLoading(false);
+            return;
+          }
         }
       }
 
@@ -142,6 +203,14 @@ export function EmergencyButton() {
         return;
       }
 
+      // Log the exact coordinates being sent
+      console.log("📤 Sending emergency alert with coordinates:", {
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude,
+        accuracy: `±${Math.round(currentLocation.accuracy)}m`,
+        age: `${Math.round((Date.now() - currentLocation.timestamp) / 1000)}s`,
+      });
+
       // Call the emergency API with authentication
       const response = await fetch("/api/emergency/call-and-sms", {
         method: "POST",
@@ -152,6 +221,7 @@ export function EmergencyButton() {
         body: JSON.stringify({
           latitude: currentLocation.latitude,
           longitude: currentLocation.longitude,
+          accuracy: currentLocation.accuracy,
           userMessage:
             "Emergency assistance needed! User has pressed the emergency button.",
         }),
@@ -171,7 +241,9 @@ export function EmergencyButton() {
 
         if (successfulSMS > 0 || successfulCalls > 0) {
           setStatusMessage(
-            `✅ Emergency alerts sent! ${successfulCalls} call(s) and ${successfulSMS} SMS sent successfully.`
+            `✅ Emergency alerts sent! ${successfulCalls} call(s) and ${successfulSMS} SMS sent with location accuracy: ±${Math.round(
+              currentLocation.accuracy
+            )}m`
           );
         } else {
           setStatusMessage(
@@ -222,10 +294,21 @@ export function EmergencyButton() {
   const getLocationAge = () => {
     if (!location) return null;
     const ageSeconds = Math.floor((Date.now() - location.timestamp) / 1000);
-    if (ageSeconds < 5) return "just now";
+    if (ageSeconds < 3) return "just now";
     if (ageSeconds < 60) return `${ageSeconds}s ago`;
     return `${Math.floor(ageSeconds / 60)}m ago`;
   };
+
+  // Determine GPS quality based on accuracy
+  const getAccuracyStatus = () => {
+    if (!location) return null;
+    if (location.accuracy <= 10) return { color: "green", label: "Excellent" };
+    if (location.accuracy <= 30) return { color: "blue", label: "Good" };
+    if (location.accuracy <= 100) return { color: "amber", label: "Fair" };
+    return { color: "red", label: "Poor" };
+  };
+
+  const accuracyStatus = getAccuracyStatus();
 
   return (
     <div className="flex flex-col gap-2">
@@ -248,23 +331,46 @@ export function EmergencyButton() {
         )}
       </Button>
 
-      {/* Real-time location status indicator */}
-      {location && isTracking && (
-        <div className="flex items-center gap-2 mt-3 p-3 bg-green-50 dark:bg-green-950/50 rounded-lg border border-green-200 dark:border-green-800">
-          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center relative">
+      {/* Real-time location status indicator with accuracy info */}
+      {location && isTracking && accuracyStatus && (
+        <div
+          className={`flex items-center gap-2 mt-3 p-3 bg-${accuracyStatus.color}-50 dark:bg-${accuracyStatus.color}-950/50 rounded-lg border border-${accuracyStatus.color}-200 dark:border-${accuracyStatus.color}-800`}
+        >
+          <div
+            className={`w-5 h-5 bg-${accuracyStatus.color}-500 rounded-full flex items-center justify-center relative`}
+          >
             <Navigation className="h-3 w-3 text-white" />
             {/* Pulse animation for live tracking */}
-            <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75"></span>
+            <span
+              className={`absolute inset-0 rounded-full bg-${accuracyStatus.color}-500 animate-ping opacity-75`}
+            ></span>
           </div>
           <div className="flex-1">
-            <span className="text-sm font-medium text-green-700 dark:text-green-300">
-              Live location tracking
+            <span
+              className={`text-sm font-medium text-${accuracyStatus.color}-700 dark:text-${accuracyStatus.color}-300`}
+            >
+              Live GPS tracking - {accuracyStatus.label} signal
             </span>
-            <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400 mt-0.5">
+            <div
+              className={`flex items-center gap-2 text-xs text-${accuracyStatus.color}-600 dark:text-${accuracyStatus.color}-400 mt-0.5`}
+            >
               <span>Updated {getLocationAge()}</span>
               <span>•</span>
               <span>±{Math.round(location.accuracy)}m accuracy</span>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* GPS tip for better accuracy */}
+      {location && location.accuracy > 30 && (
+        <div className="flex items-start gap-2 mt-2 p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-white text-xs">💡</span>
+          </div>
+          <div className="text-xs text-blue-700 dark:text-blue-300">
+            <strong>Tip:</strong> For better accuracy, move outdoors or near a
+            window and wait a few seconds for GPS to stabilize.
           </div>
         </div>
       )}
@@ -276,7 +382,7 @@ export function EmergencyButton() {
             <MapPin className="h-3 w-3 text-white" />
           </div>
           <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
-            Acquiring location...
+            Acquiring GPS signal...
           </span>
         </div>
       )}
