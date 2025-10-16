@@ -107,7 +107,6 @@ export default function NutritionPage() {
           .order("created_at", { ascending: false });
 
         if (fetchError) {
-          console.error("Supabase error:", fetchError);
           throw fetchError;
         }
 
@@ -131,7 +130,6 @@ export default function NutritionPage() {
 
         setNutritionPlans(transformedData);
       } catch (err) {
-        console.error("Error fetching nutrition plans:", err);
         setError("Failed to load nutrition plans. Please try again later.");
       } finally {
         setLoading(false);

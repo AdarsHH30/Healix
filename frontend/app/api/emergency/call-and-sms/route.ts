@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
     const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
     if (!accountSid || !authToken || !twilioPhoneNumber) {
-      console.error('Missing required Twilio environment variables');
       return NextResponse.json(
         { error: 'Emergency service not configured' },
         { status: 500 }
@@ -42,7 +41,6 @@ export async function POST(request: NextRequest) {
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      console.error('Missing Supabase configuration');
       return NextResponse.json(
         { error: 'Database not configured' },
         { status: 500 }
@@ -100,14 +98,10 @@ export async function POST(request: NextRequest) {
     const validNumbers: string[] = [];
     if (emergencyNumber1 && validateE164(emergencyNumber1)) {
       validNumbers.push(emergencyNumber1);
-    } else if (emergencyNumber1) {
-      console.warn(`Invalid phone format for emergency number 1: ${emergencyNumber1}`);
     }
     
     if (emergencyNumber2 && validateE164(emergencyNumber2)) {
       validNumbers.push(emergencyNumber2);
-    } else if (emergencyNumber2) {
-      console.warn(`Invalid phone format for emergency number 2: ${emergencyNumber2}`);
     }
 
     if (validNumbers.length === 0) {
@@ -142,7 +136,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (typeof latitude !== 'number' || typeof longitude !== 'number' || isNaN(latitude) || isNaN(longitude)) {
-      console.error('❌ Invalid or missing latitude/longitude:', { latitude, longitude });
       return NextResponse.json(
         { error: 'Location data is required and must be valid numbers (latitude, longitude).' },
         { status: 400 }
@@ -150,7 +143,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-      console.error('❌ Out-of-bounds coordinates:', { latitude, longitude });
       return NextResponse.json(
         { error: 'Invalid location coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.' },
         { status: 400 }
@@ -160,17 +152,11 @@ export async function POST(request: NextRequest) {
     // Round coordinates to 6 decimal places for accuracy (~10cm precision)
     const roundedLat = Math.round(latitude * 1e6) / 1e6;
     const roundedLon = Math.round(longitude * 1e6) / 1e6;
-    
-    console.log('📍 Using coordinates:', { 
-      original: { latitude, longitude },
-      rounded: { latitude: roundedLat, longitude: roundedLon }
-    });
 
     const client = twilio(accountSid, authToken);
     
     // Create Google Maps URL with the actual user coordinates
     const locationUrl = `https://www.google.com/maps?q=${roundedLat},${roundedLon}`;
-    console.log('🗺️ Google Maps URL:', locationUrl);
 
     // Get current time in IST
     const currentTime = new Date().toLocaleString('en-IN', { 
@@ -196,31 +182,22 @@ This is a REAL EMERGENCY. Please:
 
 Time is critical!`;
 
-    console.log('📞 Attempting to send emergency alerts to:', validNumbers);
-    console.log('📱 Twilio Number:', twilioPhoneNumber);
-    console.log('📝 SMS Message:', smsMessage);
-    
     const smsPromises = validNumbers.map(async (toNumber) => {
       try {
-        console.log(`📤 Sending SMS to ${toNumber}...`);
         const message = await client.messages.create({
           body: smsMessage,
           from: twilioPhoneNumber,
           to: toNumber,
         });
-        console.log(`✅ SMS sent successfully to ${toNumber}, SID: ${message.sid}`);
         return { success: true, to: toNumber, sid: message.sid };
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`❌ Failed to send SMS to ${toNumber}:`, errorMessage);
-        console.error('Full error:', error);
         return { success: false, to: toNumber, error: errorMessage };
       }
     });
 
     const callPromises = validNumbers.map(async (toNumber) => {
       try {
-        console.log(`📞 Calling ${toNumber}...`);
         const call = await client.calls.create({
           twiml: `<Response>
             <Say voice="alice" language="en-US">
@@ -239,12 +216,9 @@ Time is critical!`;
           from: twilioPhoneNumber,
           to: toNumber,
         });
-        console.log(`✅ Call initiated successfully to ${toNumber}, SID: ${call.sid}`);
         return { success: true, to: toNumber, sid: call.sid };
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`❌ Failed to call ${toNumber}:`, errorMessage);
-        console.error('Full error:', error);
         return { success: false, to: toNumber, error: errorMessage };
       }
     });
@@ -254,17 +228,10 @@ Time is critical!`;
       Promise.all(callPromises),
     ]);
 
-    console.log('📊 Results Summary:');
-    console.log('SMS Results:', JSON.stringify(smsResults, null, 2));
-    console.log('Call Results:', JSON.stringify(callResults, null, 2));
-
     const smsSuccess = smsResults.some(result => result.success);
     const callSuccess = callResults.some(result => result.success);
 
-    console.log(`✅ SMS Success: ${smsSuccess}, Call Success: ${callSuccess}`);
-
     if (!smsSuccess && !callSuccess) {
-      console.error('❌ All emergency notifications failed!');
       return NextResponse.json(
         {
           error: 'Failed to send emergency notifications',
@@ -274,7 +241,6 @@ Time is critical!`;
       );
     }
 
-    console.log('🎉 Emergency alerts sent successfully!');
     return NextResponse.json({
       success: true,
       message: 'Emergency notifications sent',
@@ -289,7 +255,6 @@ Time is critical!`;
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Emergency API error:', error);
     return NextResponse.json(
       { error: 'Failed to process emergency request', details: errorMessage },
       { status: 500 }

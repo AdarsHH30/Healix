@@ -95,11 +95,6 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
         out center tags;
       `;
 
-        console.log(
-          "🔍 Searching for medical facilities (hospitals & clinics) near:",
-          location
-        );
-        console.log("📍 Search radius: 15km (15,000 meters)");
 
         const response = await fetch(
           `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
@@ -112,11 +107,8 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
         }
 
         const data = await response.json();
-        console.log("📊 Overpass API response:", data);
-        console.log("📝 Total elements received:", data.elements?.length || 0);
 
         if (!data.elements || data.elements.length === 0) {
-          console.warn("⚠️ No elements found in response");
           setError(
             `No medical facilities found within 15km. Try a different location or check if you're in a remote area.`
           );
@@ -263,24 +255,14 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
           typeCounts[type] = (typeCounts[type] || 0) + 1;
         });
 
-        console.log(`✅ Found ${hospitalData.length} medical facilities`);
-        console.log("📋 Breakdown by type:", typeCounts);
-        console.log(
-          "🏥 Top 10 nearest facilities:",
-          hospitalData
-            .slice(0, 10)
-            .map((h) => `${h.name} (${h.type}) - ${h.distance?.toFixed(2)}km`)
-        );
 
         setHospitals(hospitalData);
 
         if (hospitalData.length === 0) {
           // Try alternative search using Nominatim
-          console.log("⚠️ Trying alternative Nominatim search...");
           await searchWithNominatim(location);
         }
       } catch (err) {
-        console.error("Error fetching hospitals:", err);
         setError(
           "Could not search for hospitals. Please check your internet connection and try again."
         );
@@ -321,7 +303,6 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
   const searchWithNominatim = useCallback(
     async (location: { lat: number; lng: number }) => {
       try {
-        console.log("🔄 Starting Nominatim fallback search...");
         const searchTerms = [
           "hospital",
           "clinic",
@@ -352,7 +333,6 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
 
           if (response.ok) {
             const results = await response.json();
-            console.log(`📍 Nominatim "${term}" found:`, results.length);
 
             results.forEach(
               (result: {
@@ -428,9 +408,6 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
           .sort((a, b) => (a.distance || 0) - (b.distance || 0))
           .slice(0, 25);
 
-        console.log(
-          `✅ Nominatim found ${sortedResults.length} unique facilities`
-        );
 
         if (sortedResults.length > 0) {
           setHospitals(sortedResults);
@@ -440,7 +417,6 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
           );
         }
       } catch (err) {
-        console.error("❌ Nominatim search error:", err);
         setError(
           "No medical facilities found within 15km. The area might have limited OpenStreetMap data."
         );

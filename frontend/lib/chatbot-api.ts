@@ -71,7 +71,6 @@ export async function checkChatbotHealth(): Promise<{
 
     return await response.json();
   } catch (error) {
-    console.error('Failed to check chatbot health:', error);
     throw error;
   }
 }

@@ -61,7 +61,6 @@ const RegisterPage = () => {
         },
       });
 
-      console.log("Sign up response:", { authData, authError });
 
       if (authError) {
         setError(authError.message);
@@ -83,15 +82,6 @@ const RegisterPage = () => {
 
         // IMPORTANT: Update user profile BEFORE signing out
         // This must be done while the user is still authenticated for RLS policies
-        console.log("Updating user profile with data:", {
-          id: authData.user.id,
-          email: data.email,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          full_name: `${data.firstName} ${data.lastName}`,
-          emergency_phone_1: data.emergencyPhone1,
-          emergency_phone_2: data.emergencyPhone2,
-        });
 
         // Wait a moment for the trigger to create the initial record
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -109,10 +99,8 @@ const RegisterPage = () => {
           .eq("id", authData.user.id)
           .select();
 
-        console.log("Profile update result:", { profileData, profileError });
 
         if (profileError) {
-          console.error("Error updating user profile:", profileError);
           // Show error but don't fail registration
           setError(
             `Account created but profile update failed: ${profileError.message}. You can update your profile after logging in.`
@@ -136,7 +124,6 @@ const RegisterPage = () => {
         }, 1500);
       }
     } catch (err: unknown) {
-      console.error("Registration error:", err);
       setError(
         err instanceof Error
           ? err.message

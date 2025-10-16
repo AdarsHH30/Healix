@@ -36,13 +36,11 @@ export default function BreathingExercisesPage() {
         setLoading(true);
         setError(null);
 
-        console.log("Fetching breathing exercises from Supabase...");
 
         const { data: allData, error: allError } = await supabase
           .from("exercises")
           .select("*");
 
-        console.log("All exercises (debug):", allData, "Error:", allError);
 
         const { data, error: fetchError } = await supabase
           .from("exercises")
@@ -51,15 +49,8 @@ export default function BreathingExercisesPage() {
           .eq("is_active", true)
           .order("created_at", { ascending: false });
 
-        console.log(
-          "Filtered breathing exercises:",
-          data,
-          "Error:",
-          fetchError
-        );
 
         if (fetchError) {
-          console.error("Supabase error details:", fetchError);
           throw fetchError;
         }
 
@@ -76,10 +67,8 @@ export default function BreathingExercisesPage() {
           category: exercise.category,
         }));
 
-        console.log("Transformed breathing exercises:", transformedData);
         setExercises(transformedData);
       } catch (err: unknown) {
-        console.error("Error fetching exercises:", err);
         const errorMessage =
           err instanceof Error
             ? err.message
@@ -94,9 +83,6 @@ export default function BreathingExercisesPage() {
   }, []);
 
   const filteredExercises = useMemo(() => {
-    console.log("Filtering breathing exercises. Total:", exercises.length);
-    console.log("Search query:", searchQuery);
-    console.log("Selected difficulty:", selectedDifficulty);
 
     const filtered = exercises.filter((exercise) => {
       const matchesSearch =
@@ -113,7 +99,6 @@ export default function BreathingExercisesPage() {
       return matchesSearch && matchesDifficulty;
     });
 
-    console.log("Filtered breathing exercises count:", filtered.length);
     return filtered;
   }, [exercises, searchQuery, selectedDifficulty]);
 

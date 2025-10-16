@@ -79,22 +79,13 @@ interface SignupFormProps {
 export function SignupForm({ form, onSubmit, isLoading }: SignupFormProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("=== FORM SUBMISSION DEBUG ===");
-    console.log("Form values:", form.getValues());
-    console.log("Form errors:", form.formState.errors);
-    console.log("Is form valid?", form.formState.isValid);
-    console.log("Is form dirty?", form.formState.isDirty);
-    console.log("Touch fields:", form.formState.touchedFields);
-    console.log("===========================");
 
     // Manually trigger validation and submission
     form.handleSubmit(
       (data) => {
-        console.log("✅ Validation passed! Submitting data:", data);
         onSubmit(data);
       },
       (errors) => {
-        console.log("❌ Validation failed! Errors:", errors);
       }
     )(e);
   };

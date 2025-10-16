@@ -36,14 +36,12 @@ export default function PhysicalHealthPage() {
         setLoading(true);
         setError(null);
 
-        console.log("Fetching exercises from Supabase...");
 
         // First, let's try to fetch all exercises to debug
         const { data: allData, error: allError } = await supabase
           .from("exercises")
           .select("*");
 
-        console.log("All exercises (debug):", allData, "Error:", allError);
 
         const { data, error: fetchError } = await supabase
           .from("exercises")
@@ -52,10 +50,8 @@ export default function PhysicalHealthPage() {
           .eq("is_active", true)
           .order("created_at", { ascending: false });
 
-        console.log("Filtered exercises:", data, "Error:", fetchError);
 
         if (fetchError) {
-          console.error("Supabase error details:", fetchError);
           throw fetchError;
         }
 
@@ -72,10 +68,8 @@ export default function PhysicalHealthPage() {
           category: exercise.category,
         }));
 
-        console.log("Transformed exercises:", transformedData);
         setExercises(transformedData);
       } catch (err: unknown) {
-        console.error("Error fetching exercises:", err);
         const errorMessage =
           err instanceof Error
             ? err.message
@@ -90,9 +84,6 @@ export default function PhysicalHealthPage() {
   }, []);
 
   const filteredExercises = useMemo(() => {
-    console.log("Filtering exercises. Total:", exercises.length);
-    console.log("Search query:", searchQuery);
-    console.log("Selected difficulty:", selectedDifficulty);
 
     const filtered = exercises.filter((exercise) => {
       const matchesSearch =
@@ -109,7 +100,6 @@ export default function PhysicalHealthPage() {
       return matchesSearch && matchesDifficulty;
     });
 
-    console.log("Filtered exercises count:", filtered.length);
     return filtered;
   }, [exercises, searchQuery, selectedDifficulty]);
 

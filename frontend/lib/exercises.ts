@@ -17,7 +17,6 @@ export async function getExercisesByType(type: 'physical' | 'mental' | 'breathin
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching exercises:', error)
     return { data: null, error }
   }
 
@@ -35,7 +34,6 @@ export async function getAllExercises() {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching exercises:', error)
     return { data: null, error }
   }
 
@@ -54,7 +52,6 @@ export async function getExerciseById(id: string) {
     .single()
 
   if (error) {
-    console.error('Error fetching exercise:', error)
     return { data: null, error }
   }
 
@@ -81,7 +78,6 @@ export async function createExercise(exercise: ExerciseInsert) {
     .single()
 
   if (error) {
-    console.error('Error creating exercise:', error)
     return { data: null, error }
   }
 
@@ -100,7 +96,6 @@ export async function updateExercise(id: string, updates: ExerciseUpdate) {
     .single()
 
   if (error) {
-    console.error('Error updating exercise:', error)
     return { data: null, error }
   }
 
@@ -119,7 +114,6 @@ export async function deleteExercise(id: string) {
     .single()
 
   if (error) {
-    console.error('Error deleting exercise:', error)
     return { data: null, error }
   }
 
@@ -144,7 +138,6 @@ export async function searchExercises(query: string, type?: string) {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error searching exercises:', error)
     return { data: null, error }
   }
 
@@ -177,7 +170,6 @@ export async function trackExerciseCompletion(
     .single()
 
   if (error) {
-    console.error('Error tracking exercise:', error)
     return { data: null, error }
   }
 
@@ -205,7 +197,6 @@ export async function getUserProgress(userId?: string) {
     .order('completed_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching user progress:', error)
     return { data: null, error }
   }
 
@@ -229,7 +220,6 @@ export async function getUserStats(userId?: string) {
     .eq('user_id', targetUserId)
 
   if (error) {
-    console.error('Error fetching user stats:', error)
     return { data: null, error }
   }
 

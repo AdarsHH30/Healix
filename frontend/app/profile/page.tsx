@@ -111,7 +111,6 @@ export default function ProfilePage() {
         setQuotes(quotesWithColors);
       }
     } catch (error) {
-      console.error("Error loading quotes:", error);
     }
   }, []);
 
@@ -131,7 +130,6 @@ export default function ProfilePage() {
         setUploadedExercises(data);
       }
     } catch (error) {
-      console.error("Error loading uploaded exercises:", error);
     }
   }, [user]);
 
@@ -148,7 +146,6 @@ export default function ProfilePage() {
         setFavoriteQuotes(new Set(data.map((fav) => fav.quote_id)));
       }
     } catch (error) {
-      console.error("Error loading favorites:", error);
     }
   }, [user]);
 
@@ -166,7 +163,6 @@ export default function ProfilePage() {
       newFavorites.delete(quoteId);
       setFavoriteQuotes(newFavorites);
     } catch (error) {
-      console.error("Error removing favorite:", error);
     }
   };
 
@@ -231,7 +227,6 @@ export default function ProfilePage() {
         }));
       }
     } catch (error) {
-      console.error("Error loading profile:", error);
     } finally {
       setLoading(false);
     }
@@ -283,7 +278,6 @@ export default function ProfilePage() {
       await signOut();
       router.push("/");
     } catch (error) {
-      console.error("Error signing out:", error);
     }
   };
 

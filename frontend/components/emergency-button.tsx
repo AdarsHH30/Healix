@@ -39,7 +39,6 @@ export function EmergencyButton() {
   // Start continuous high-accuracy location tracking
   useEffect(() => {
     if ("geolocation" in navigator) {
-      console.log("🎯 Starting high-accuracy GPS tracking...");
 
       // Request high-accuracy continuous tracking with optimal settings
       watchIdRef.current = navigator.geolocation.watchPosition(
@@ -51,12 +50,6 @@ export function EmergencyButton() {
             timestamp: position.timestamp,
           };
 
-          console.log("📍 New GPS reading:", {
-            lat: newLocation.latitude,
-            lon: newLocation.longitude,
-            accuracy: `±${Math.round(newLocation.accuracy)}m`,
-            timestamp: new Date(newLocation.timestamp).toLocaleTimeString(),
-          });
 
           // Keep track of the best (most accurate) location
           if (
@@ -64,10 +57,6 @@ export function EmergencyButton() {
             newLocation.accuracy < bestLocationRef.current.accuracy
           ) {
             bestLocationRef.current = newLocation;
-            console.log(
-              "✨ New best accuracy:",
-              `±${Math.round(newLocation.accuracy)}m`
-            );
           }
 
           setLocation(newLocation);
@@ -75,7 +64,6 @@ export function EmergencyButton() {
           setIsTracking(true);
         },
         (error) => {
-          console.error("Location error:", error);
           setIsTracking(false);
 
           switch (error.code) {
@@ -109,7 +97,6 @@ export function EmergencyButton() {
     // Cleanup: stop watching when component unmounts
     return () => {
       if (watchIdRef.current !== null) {
-        console.log("🛑 Stopping GPS tracking");
         navigator.geolocation.clearWatch(watchIdRef.current);
       }
     };
@@ -127,14 +114,12 @@ export function EmergencyButton() {
         return;
       }
 
-      console.log("🚨 Emergency button pressed - getting precise location...");
 
       // Use the best (most accurate) location we've collected
       let currentLocation = bestLocationRef.current || location;
 
       // If we don't have a recent accurate location, get a fresh high-accuracy reading
       if (!currentLocation || Date.now() - currentLocation.timestamp > 3000) {
-        console.log("🔄 Getting fresh high-accuracy GPS reading...");
 
         try {
           const position = await new Promise<GeolocationPosition>(
@@ -154,11 +139,6 @@ export function EmergencyButton() {
             timestamp: position.timestamp,
           };
 
-          console.log("✅ Fresh GPS reading:", {
-            lat: currentLocation.latitude,
-            lon: currentLocation.longitude,
-            accuracy: `±${Math.round(currentLocation.accuracy)}m`,
-          });
 
           setLocation(currentLocation);
 
@@ -170,16 +150,9 @@ export function EmergencyButton() {
             bestLocationRef.current = currentLocation;
           }
         } catch (error) {
-          console.error("Failed to get fresh location:", error);
 
           // If fresh reading fails but we have a previous good location, use it
           if (currentLocation) {
-            console.log("⚠️ Using last known location:", {
-              age: `${Math.round(
-                (Date.now() - currentLocation.timestamp) / 1000
-              )}s old`,
-              accuracy: `±${Math.round(currentLocation.accuracy)}m`,
-            });
             setStatusMessage(
               `⚠️ Using last known location (${Math.round(
                 (Date.now() - currentLocation.timestamp) / 1000
@@ -204,12 +177,6 @@ export function EmergencyButton() {
       }
 
       // Log the exact coordinates being sent
-      console.log("📤 Sending emergency alert with coordinates:", {
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
-        accuracy: `±${Math.round(currentLocation.accuracy)}m`,
-        age: `${Math.round((Date.now() - currentLocation.timestamp) / 1000)}s`,
-      });
 
       // Call the emergency API with authentication
       const response = await fetch("/api/emergency/call-and-sms", {
@@ -281,7 +248,6 @@ export function EmergencyButton() {
         }
       }
     } catch (error) {
-      console.error("Emergency request failed:", error);
       setStatusMessage(
         "❌ Network error. Please call emergency services directly."
       );

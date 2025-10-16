@@ -158,7 +158,6 @@ export function Background3DScene({
   }, []);
 
   const handleError = (error: Error) => {
-    console.error("WebGL Error:", error);
     setError(error);
     setHasWebGL(false);
   };

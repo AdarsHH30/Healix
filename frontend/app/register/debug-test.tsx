@@ -13,7 +13,6 @@ const testSchema = z.object({
     .refine(
       (val) => {
         const digitsOnly = val.replace(/[\s\-\+\(\)]/g, "");
-        console.log("Phone validation - Original:", val, "Digits:", digitsOnly);
         return digitsOnly.length >= 10 && /^[0-9]+$/.test(digitsOnly);
       },
       { message: "Invalid phone" }
@@ -33,15 +32,12 @@ export default function DebugTest() {
   });
 
   const onSubmit = (data: TestData) => {
-    console.log("✅ Form submitted:", data);
     alert("Success: " + JSON.stringify(data));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Current values:", form.getValues());
     form.handleSubmit(onSubmit, (errors) => {
-      console.log("❌ Validation errors:", errors);
     })(e);
   };
 

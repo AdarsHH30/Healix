@@ -47,7 +47,6 @@ function AuthCallbackContent() {
             await supabase.auth.signOut();
           }
         } catch (error) {
-          console.error("Callback error:", error);
         }
       }
 

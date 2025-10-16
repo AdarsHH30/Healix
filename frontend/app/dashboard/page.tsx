@@ -102,7 +102,6 @@ export default function Dashboard() {
       // Force a hard redirect to clear any cached state
       window.location.href = "/login";
     } catch (error) {
-      console.error("Error signing out:", error);
       // Even if there's an error, redirect to login
       window.location.href = "/login";
     }

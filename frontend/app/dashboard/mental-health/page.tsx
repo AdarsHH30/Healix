@@ -40,14 +40,12 @@ export default function MentalHealthPage() {
         setLoading(true);
         setError(null);
 
-        console.log("Fetching mental health exercises from Supabase...");
 
         // First, let's try to fetch all exercises to debug
         const { data: allData, error: allError } = await supabase
           .from("exercises")
           .select("*");
 
-        console.log("All exercises (debug):", allData, "Error:", allError);
 
         const { data, error: fetchError } = await supabase
           .from("exercises")
@@ -56,10 +54,8 @@ export default function MentalHealthPage() {
           .eq("is_active", true)
           .order("created_at", { ascending: false });
 
-        console.log("Filtered mental exercises:", data, "Error:", fetchError);
 
         if (fetchError) {
-          console.error("Supabase error details:", fetchError);
           throw fetchError;
         }
 
@@ -76,10 +72,8 @@ export default function MentalHealthPage() {
           category: exercise.category,
         }));
 
-        console.log("Transformed mental exercises:", transformedData);
         setExercises(transformedData);
       } catch (err: unknown) {
-        console.error("Error fetching exercises:", err);
         const errorMessage =
           err instanceof Error
             ? err.message
@@ -94,9 +88,6 @@ export default function MentalHealthPage() {
   }, []);
 
   const filteredExercises = useMemo(() => {
-    console.log("Filtering mental exercises. Total:", exercises.length);
-    console.log("Search query:", searchQuery);
-    console.log("Selected difficulty:", selectedDifficulty);
 
     const filtered = exercises.filter((exercise) => {
       const matchesSearch =
@@ -113,7 +104,6 @@ export default function MentalHealthPage() {
       return matchesSearch && matchesDifficulty;
     });
 
-    console.log("Filtered mental exercises count:", filtered.length);
     return filtered;
   }, [exercises, searchQuery, selectedDifficulty]);
 

@@ -74,7 +74,6 @@ export function QuotesDisplay() {
           setQuotes(quotesWithColors);
         }
       } catch (error) {
-        console.error("Error loading quotes:", error);
       } finally {
         setLoading(false);
       }

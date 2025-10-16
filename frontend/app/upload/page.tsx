@@ -149,17 +149,11 @@ export default function UploadPage() {
         } = await supabase.auth.getSession();
 
         if (error) {
-          console.error("Error checking session:", error);
           setIsAuthenticated(false);
         } else {
           setIsAuthenticated(!!session);
-          console.log(
-            "Auth status:",
-            !!session ? "Authenticated" : "Not authenticated"
-          );
         }
       } catch (error) {
-        console.error("Error in checkAuth:", error);
         setIsAuthenticated(false);
       } finally {
         setIsCheckingAuth(false);
@@ -173,10 +167,6 @@ export default function UploadPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
-      console.log(
-        "Auth state changed:",
-        !!session ? "Authenticated" : "Not authenticated"
-      );
     });
 
     return () => {
@@ -307,7 +297,6 @@ export default function UploadPage() {
 
       return publicUrl;
     } catch (error: unknown) {
-      console.error("Error uploading image:", error);
       setMessage({
         type: "error",
         text: "Failed to upload image. Using URL instead if provided.",
@@ -360,17 +349,7 @@ export default function UploadPage() {
       // Get current user (optional - can be null)
       const {
         data: { user },
-        error: userError,
       } = await supabase.auth.getUser();
-
-      if (userError) {
-        console.error("Error getting user:", userError);
-      }
-
-      console.log(
-        "Current user:",
-        user ? `${user.id} (${user.email})` : "No user found"
-      );
 
       // Prepare exercise data
       const exerciseData = {
@@ -387,8 +366,6 @@ export default function UploadPage() {
         is_active: true,
       };
 
-      console.log("Inserting exercise data:", exerciseData);
-
       // Insert exercise into database
       const { data: insertedData, error } = await supabase
         .from("exercises")
@@ -396,19 +373,10 @@ export default function UploadPage() {
         .select();
 
       if (error) {
-        console.error("Supabase exercise upload error:", error);
-        console.error("Error details:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-        });
         throw new Error(
           error.message || "Failed to upload exercise to database"
         );
       }
-
-      console.log("Successfully inserted exercise:", insertedData);
 
       setMessage({
         type: "success",
@@ -432,7 +400,6 @@ export default function UploadPage() {
       // Scroll to top to show message
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: unknown) {
-      console.error("Upload error:", error);
       setMessage({
         type: "error",
         text:
@@ -472,13 +439,8 @@ export default function UploadPage() {
       } = await supabase.auth.getUser();
 
       if (userError) {
-        console.error("Error getting user:", userError);
       }
 
-      console.log(
-        "Current user:",
-        user ? `${user.id} (${user.email})` : "No user found"
-      );
 
       // Prepare quote data - match database schema
       const quoteDataToInsert = {
@@ -490,7 +452,6 @@ export default function UploadPage() {
         is_active: true,
       };
 
-      console.log("Inserting quote data:", quoteDataToInsert);
 
       // Insert quote into database (ID will be auto-generated as UUID)
       const { data: insertedData, error } = await supabase
@@ -499,17 +460,9 @@ export default function UploadPage() {
         .select();
 
       if (error) {
-        console.error("Supabase quote upload error:", error);
-        console.error("Error details:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-        });
         throw new Error(error.message || "Failed to upload quote to database");
       }
 
-      console.log("Quote inserted successfully:", insertedData);
 
       setMessage({
         type: "success",
@@ -527,7 +480,6 @@ export default function UploadPage() {
       // Scroll to top to show message
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: unknown) {
-      console.error("Upload error:", error);
       setMessage({
         type: "error",
         text: error instanceof Error ? error.message : "Failed to upload quote",
@@ -602,24 +554,6 @@ export default function UploadPage() {
         .map((item) => item.trim())
         .filter((item) => item.length > 0);
 
-      console.log("Nutrition data to upload:", {
-        title: nutritionData.title,
-        description: nutritionData.description,
-        image_url: finalImageUrl,
-        calories: nutritionData.calories,
-        protein: nutritionData.protein,
-        carbs: nutritionData.carbs,
-        fats: nutritionData.fats,
-        meal_type: nutritionData.mealType,
-        category: nutritionData.category,
-        prep_time: nutritionData.prepTime,
-        difficulty: nutritionData.difficulty,
-        ingredients: ingredientsArray,
-        instructions: instructionsArray,
-        benefits: benefitsArray,
-        created_by: user?.id || null,
-        is_active: true,
-      });
 
       // Insert nutrition plan into database
       const { data: _data, error } = await supabase
@@ -644,7 +578,6 @@ export default function UploadPage() {
         });
 
       if (error) {
-        console.error("Supabase nutrition upload error:", error);
         throw new Error(
           error.message || "Failed to upload nutrition plan to database"
         );
@@ -679,7 +612,6 @@ export default function UploadPage() {
       // Scroll to top to show message
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: unknown) {
-      console.error("Nutrition upload error:", error);
       setMessage({
         type: "error",
         text:
