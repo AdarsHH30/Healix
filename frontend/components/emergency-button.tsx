@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, MapPin, Phone } from "lucide-react";
+import { AlertCircle, MapPin, Phone, Navigation } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 
 interface LocationData {
   latitude: number;
   longitude: number;
+  accuracy: number;
+  timestamp: number;
 }
 
 interface EmergencyResult {
@@ -28,29 +30,64 @@ export function EmergencyButton() {
   const [location, setLocation] = useState<LocationData | null>(null);
   const [locationError, setLocationError] = useState<string>("");
   const [statusMessage, setStatusMessage] = useState<string>("");
+  const [isTracking, setIsTracking] = useState(false);
   const { session } = useAuth();
 
-  // Request location permission on component mount
+  const watchIdRef = useRef<number | null>(null);
+
+  // Start continuous location tracking
   useEffect(() => {
     if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
+      // Request high-accuracy continuous tracking
+      watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
           setLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp,
           });
           setLocationError("");
+          setIsTracking(true);
         },
         (error) => {
           console.error("Location error:", error);
-          setLocationError(
-            "Location access denied. Please enable location services."
-          );
+          setIsTracking(false);
+
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              setLocationError(
+                "Location access denied. Please enable location services."
+              );
+              break;
+            case error.POSITION_UNAVAILABLE:
+              setLocationError(
+                "Location information unavailable. Please check your device settings."
+              );
+              break;
+            case error.TIMEOUT:
+              setLocationError("Location request timed out. Please try again.");
+              break;
+            default:
+              setLocationError("Unable to retrieve location.");
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0, // Don't use cached position
         }
       );
     } else {
       setLocationError("Geolocation is not supported by your browser.");
     }
+
+    // Cleanup: stop watching when component unmounts
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+    };
   }, []);
 
   const handleEmergencyClick = async () => {
@@ -65,17 +102,18 @@ export function EmergencyButton() {
         return;
       }
 
-      // Get current location
+      // Get the most recent location or fetch a new one
       let currentLocation = location;
 
-      // If we don't have location yet, try to get it now
-      if (!currentLocation) {
+      // If we don't have a recent location (within last 5 seconds), get a fresh one
+      if (!currentLocation || Date.now() - currentLocation.timestamp > 5000) {
         try {
           const position = await new Promise<GeolocationPosition>(
             (resolve, reject) => {
               navigator.geolocation.getCurrentPosition(resolve, reject, {
                 timeout: 10000,
                 enableHighAccuracy: true,
+                maximumAge: 0,
               });
             }
           );
@@ -83,14 +121,25 @@ export function EmergencyButton() {
           currentLocation = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: position.timestamp,
           };
           setLocation(currentLocation);
-        } catch (_error) {
+        } catch (error) {
+          console.error("Failed to get fresh location:", error);
           setStatusMessage(
-            "⚠️ Could not get your location. Emergency call sent without location."
+            "⚠️ Could not get your current location. Emergency call sent with last known position."
           );
-          // Continue anyway - the API will handle missing location
+          // Continue with last known location if available
         }
+      }
+
+      if (!currentLocation) {
+        setStatusMessage(
+          "❌ No location available. Please enable location services and try again."
+        );
+        setIsLoading(false);
+        return;
       }
 
       // Call the emergency API with authentication
@@ -101,8 +150,8 @@ export function EmergencyButton() {
           Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          latitude: currentLocation?.latitude || 0,
-          longitude: currentLocation?.longitude || 0,
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude,
           userMessage:
             "Emergency assistance needed! User has pressed the emergency button.",
         }),
@@ -169,6 +218,15 @@ export function EmergencyButton() {
     }
   };
 
+  // Format timestamp for display
+  const getLocationAge = () => {
+    if (!location) return null;
+    const ageSeconds = Math.floor((Date.now() - location.timestamp) / 1000);
+    if (ageSeconds < 5) return "just now";
+    if (ageSeconds < 60) return `${ageSeconds}s ago`;
+    return `${Math.floor(ageSeconds / 60)}m ago`;
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <Button
@@ -190,24 +248,45 @@ export function EmergencyButton() {
         )}
       </Button>
 
-      {/* Clean location status indicator */}
-      {location && (
+      {/* Real-time location status indicator */}
+      {location && isTracking && (
         <div className="flex items-center gap-2 mt-3 p-3 bg-green-50 dark:bg-green-950/50 rounded-lg border border-green-200 dark:border-green-800">
-          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center relative">
+            <Navigation className="h-3 w-3 text-white" />
+            {/* Pulse animation for live tracking */}
+            <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75"></span>
+          </div>
+          <div className="flex-1">
+            <span className="text-sm font-medium text-green-700 dark:text-green-300">
+              Live location tracking
+            </span>
+            <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400 mt-0.5">
+              <span>Updated {getLocationAge()}</span>
+              <span>•</span>
+              <span>±{Math.round(location.accuracy)}m accuracy</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Location warning if not tracking */}
+      {!isTracking && !locationError && (
+        <div className="flex items-center gap-2 mt-3 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-lg border border-amber-200 dark:border-amber-800">
+          <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
             <MapPin className="h-3 w-3 text-white" />
           </div>
-          <span className="text-sm font-medium text-green-700 dark:text-green-300">
-            Location enabled
+          <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            Acquiring location...
           </span>
         </div>
       )}
 
       {locationError && (
-        <div className="flex items-center gap-2 mt-3 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-lg border border-amber-200 dark:border-amber-800">
-          <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+        <div className="flex items-center gap-2 mt-3 p-3 bg-red-50 dark:bg-red-950/50 rounded-lg border border-red-200 dark:border-red-800">
+          <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
             <AlertCircle className="h-3 w-3 text-white" />
           </div>
-          <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
+          <span className="text-sm font-medium text-red-700 dark:text-red-300">
             {locationError}
           </span>
         </div>

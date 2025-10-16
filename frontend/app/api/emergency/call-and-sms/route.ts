@@ -128,34 +128,77 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { latitude, longitude } = body;
+    
+    // Support both flat and nested location objects
+    let latitude: number | undefined;
+    let longitude: number | undefined;
+    
+    if (typeof body.latitude !== 'undefined' && typeof body.longitude !== 'undefined') {
+      latitude = typeof body.latitude === 'string' ? parseFloat(body.latitude) : body.latitude;
+      longitude = typeof body.longitude === 'string' ? parseFloat(body.longitude) : body.longitude;
+    } else if (body.location && typeof body.location.latitude !== 'undefined' && typeof body.location.longitude !== 'undefined') {
+      latitude = typeof body.location.latitude === 'string' ? parseFloat(body.location.latitude) : body.location.latitude;
+      longitude = typeof body.location.longitude === 'string' ? parseFloat(body.location.longitude) : body.location.longitude;
+    }
 
-    if (!latitude || !longitude) {
+    if (typeof latitude !== 'number' || typeof longitude !== 'number' || isNaN(latitude) || isNaN(longitude)) {
+      console.error('❌ Invalid or missing latitude/longitude:', { latitude, longitude });
       return NextResponse.json(
-        { error: 'Location data is required' },
+        { error: 'Location data is required and must be valid numbers (latitude, longitude).' },
         { status: 400 }
       );
     }
 
-    if (typeof latitude !== 'number' || typeof longitude !== 'number' ||
-        latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      console.error('❌ Out-of-bounds coordinates:', { latitude, longitude });
       return NextResponse.json(
-        { error: 'Invalid location coordinates' },
+        { error: 'Invalid location coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.' },
         { status: 400 }
       );
     }
+
+    // Round coordinates to 6 decimal places for accuracy (~10cm precision)
+    const roundedLat = Math.round(latitude * 1e6) / 1e6;
+    const roundedLon = Math.round(longitude * 1e6) / 1e6;
+    
+    console.log('📍 Using coordinates:', { 
+      original: { latitude, longitude },
+      rounded: { latitude: roundedLat, longitude: roundedLon }
+    });
 
     const client = twilio(accountSid, authToken);
-    const locationUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    
+    // Create Google Maps URL with the actual user coordinates
+    const locationUrl = `https://www.google.com/maps?q=${roundedLat},${roundedLon}`;
+    console.log('🗺️ Google Maps URL:', locationUrl);
 
+    // Get current time in IST
+    const currentTime = new Date().toLocaleString('en-IN', { 
+      timeZone: 'Asia/Kolkata',
+      hour12: true,
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Simple, clean SMS message without emojis (some carriers block emojis)
     const smsMessage = `EMERGENCY ALERT!
-Your contact needs immediate help.
+
+Your contact needs IMMEDIATE help!
+
 Location: ${locationUrl}
-Time: ${new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}
-Call emergency services now!`;
+
+Time: ${currentTime}
+
+This is a REAL EMERGENCY. Please:
+1. Call them NOW
+2. Check their location
+3. Contact emergency services
+
+Time is critical!`;
 
     console.log('📞 Attempting to send emergency alerts to:', validNumbers);
     console.log('📱 Twilio Number:', twilioPhoneNumber);
+    console.log('📝 SMS Message:', smsMessage);
     
     const smsPromises = validNumbers.map(async (toNumber) => {
       try {
@@ -188,7 +231,7 @@ Call emergency services now!`;
             <Pause length="1"/>
             <Say voice="alice" language="en-US">
               I repeat: Your contact has pressed the emergency button.
-              Their location has been sent to you via S M S text message.
+              Their current location has been sent to you via S M S text message.
               Please go to their location immediately or call emergency services.
               This is an urgent emergency. Please respond now.
             </Say>
@@ -235,6 +278,11 @@ Call emergency services now!`;
     return NextResponse.json({
       success: true,
       message: 'Emergency notifications sent',
+      location: {
+        latitude: roundedLat,
+        longitude: roundedLon,
+        url: locationUrl
+      },
       sms: smsResults,
       calls: callResults,
     });
