@@ -1,48 +1,22 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+# .gitignore for rag-chatbot
 venv/
-env/
-ENV/
-
-# Environment variables
+__pycache__/
+*.pyc
 .env
 .env.local
 .env.*.local
-
-# ChromaDB
-chroma_db/
-
-# Logs
 *.log
-logs/
-
-# IDE
-.vscode/
-.idea/
+.DS_Store
 *.swp
 *.swo
-*~
-
+# VSCode
+.vscode/
 # OS
-.DS_Store
 Thumbs.db
 ehthumbs.db
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Build artifacts
-*.egg-info/
-dist/
-build/
-
-# Temporary files
+# Python
+*.pyo
+*.pyd
+# Misc
 *.bak
 *.tmp
-.cache/
