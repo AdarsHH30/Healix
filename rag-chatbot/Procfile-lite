@@ -1,1 +1,0 @@
-web: gunicorn -c gunicorn-lite.conf.py src.app:app
