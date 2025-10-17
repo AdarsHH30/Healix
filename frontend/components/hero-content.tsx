@@ -63,7 +63,7 @@ export function HeroContent() {
             <Button
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto text-sm md:text-base px-6 md:px-8 h-12 md:h-14 rounded-full border-2 border-primary/30 bg-white/50 backdrop-blur-sm hover:bg-accentz hover:border-primary hover:scale-105 transition-all duration-500"
+              className="w-full sm:w-auto text-sm md:text-base px-6 md:px-8 h-12 md:h-14 rounded-full border-2 border-primary/30 backdrop-blur-sm hover:border-primary hover:text-primary hover:scale-105 transition-all duration-500"
               onClick={() => {
                 router.push("/profile");
               }}
@@ -90,8 +90,11 @@ export function HeroContent() {
               size="lg"
               variant="outline"
               className="w-full sm:w-auto text-sm md:text-base px-6 md:px-8 h-12 md:h-14 rounded-full border-2 border-primary/30 backdrop-blur-sm hover:border-primary hover:text-primary hover:scale-105 transition-all duration-500"
+              onClick={() => {
+                router.push("/profile");
+              }}
             >
-              Learn Healix
+              View Profile
             </Button>
           </>
         )}
