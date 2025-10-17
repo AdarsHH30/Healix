@@ -19,6 +19,8 @@ import {
   Search,
   Sparkles,
   Star,
+  Youtube,
+  ExternalLink,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { DashboardFloatingActions } from "@/components/dashboard-floating-actions";
@@ -30,6 +32,7 @@ interface NutritionPlan {
   title: string;
   description: string;
   imageUrl: string;
+  youtubeUrl?: string | null;
   calories: string;
   protein: string;
   carbs: string;
@@ -115,6 +118,7 @@ export default function NutritionPage() {
           title: plan.title,
           description: plan.description,
           imageUrl: plan.image_url,
+          youtubeUrl: plan.youtube_url,
           calories: plan.calories,
           protein: plan.protein,
           carbs: plan.carbs,
@@ -181,10 +185,14 @@ export default function NutritionPage() {
           <div className="flex items-center justify-between h-16">
             <button
               onClick={() => router.push("/dashboard")}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all hover:gap-3"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all hover:gap-3 group relative"
+              title="Go back to dashboard"
             >
               <ArrowLeft size={20} />
               <span className="font-medium">Back</span>
+              <span className="absolute -bottom-8 left-0 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                Go back to dashboard
+              </span>
             </button>
             <div className="flex items-center gap-2">
               <div className="p-2 rounded-xl bg-gradient-to-br from-green-500 to-green-600">
@@ -240,12 +248,16 @@ export default function NutritionPage() {
                     onClick={() =>
                       setSelectedMealType(isSelected ? null : type)
                     }
-                    className={`p-4 rounded-2xl backdrop-blur-sm border transition-all hover:scale-105 ${
+                    className={`p-4 rounded-2xl backdrop-blur-sm border transition-all hover:scale-105 relative group ${
                       isSelected
                         ? `bg-gradient-to-br ${config.gradient} border-transparent shadow-lg`
                         : `bg-gradient-to-br ${config.bg} ${config.border} hover:shadow-md`
                     }`}
+                    title={isSelected ? `Clear ${config.label} filter` : `Filter by ${config.label}`}
                   >
+                    <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                      {isSelected ? `Clear ${config.label} filter` : `Filter by ${config.label}`}
+                    </span>
                     <div className="flex items-center justify-between mb-2">
                       <Icon
                         className={`w-6 h-6 ${
@@ -286,9 +298,13 @@ export default function NutritionPage() {
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-muted transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-muted transition-colors group relative"
+                    title="Clear search"
                   >
                     <X size={18} className="text-muted-foreground" />
+                    <span className="absolute -bottom-8 right-0 px-2 py-1 bg-black/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                      Clear search
+                    </span>
                   </button>
                 )}
               </div>
@@ -312,9 +328,13 @@ export default function NutritionPage() {
                       }
                       <button
                         onClick={() => setSelectedMealType(null)}
-                        className="hover:bg-background rounded-full p-0.5 transition-colors"
+                        className="hover:bg-background rounded-full p-0.5 transition-colors group relative"
+                        title="Remove filter"
                       >
                         <X size={14} />
+                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                          Remove filter
+                        </span>
                       </button>
                     </span>
                   )}
@@ -324,9 +344,13 @@ export default function NutritionPage() {
                         setSearchQuery("");
                         setSelectedMealType(null);
                       }}
-                      className="text-sm text-green-500 hover:text-green-400 font-medium"
+                      className="text-sm text-green-500 hover:text-green-400 font-medium group relative"
+                      title="Remove all filters"
                     >
                       Clear all
+                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                        Remove all filters
+                      </span>
                     </button>
                   )}
                 </div>
@@ -368,25 +392,71 @@ export default function NutritionPage() {
             )}
 
             {filteredPlans.length === 0 && nutritionPlans.length > 0 && (
-              <div className="text-center py-20">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/20 flex items-center justify-center mx-auto mb-6">
-                  {/* <Search className="w-10 h-10 text-orange-500" /> */}
+              <div className="flex items-center justify-center py-20">
+                <div className="max-w-md w-full mx-4">
+                  <div className="relative">
+                    {/* Animated background circles */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500/20 to-pink-500/20 blur-2xl animate-pulse" />
+                    </div>
+                    
+                    {/* Main content */}
+                    <div className="relative bg-card/50 backdrop-blur-sm rounded-3xl border border-border/50 p-8 shadow-xl">
+                      {/* Icon */}
+                      <div className="relative mx-auto mb-6 w-24 h-24">
+                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 rounded-2xl rotate-6 opacity-20 blur-sm" />
+                        <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-orange-500/10 to-pink-500/10 border border-orange-500/20 flex items-center justify-center backdrop-blur-sm">
+                          <Search className="w-12 h-12 text-orange-500" />
+                        </div>
+                      </div>
+
+                      {/* Text */}
+                      <h3 className="text-2xl font-bold text-foreground mb-3 text-center">
+                        No plans match your search
+                      </h3>
+                      <p className="text-muted-foreground text-center mb-6 leading-relaxed">
+                        We couldn't find any nutrition plans matching your criteria. Try adjusting your filters or search term.
+                      </p>
+
+                      {/* Active filters display */}
+                      {(searchQuery || selectedMealType) && (
+                        <div className="mb-6 p-4 rounded-xl bg-muted/30 border border-border/50">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                            Active Filters:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {searchQuery && (
+                              <span className="px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-600 text-sm font-medium border border-orange-500/20">
+                                Search: "{searchQuery}"
+                              </span>
+                            )}
+                            {selectedMealType && (
+                              <span className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 text-sm font-medium border border-blue-500/20">
+                                {mealTypeColors[selectedMealType as keyof typeof mealTypeColors].label}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action button */}
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSelectedMealType(null);
+                        }}
+                        className="w-full px-6 py-3.5 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold hover:shadow-lg hover:shadow-green-500/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative"
+                        title="Reset all search filters and show all plans"
+                      >
+                        <X size={18} />
+                        Clear All Filters
+                        <span className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                          Reset all filters
+                        </span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-2">
-                  No plans match your search
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  Try adjusting your filters or search term
-                </p>
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedMealType(null);
-                  }}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-medium hover:shadow-lg transition-all hover:scale-105"
-                >
-                  Clear All Filters
-                </button>
               </div>
             )}
           </>
@@ -539,8 +609,9 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
           onClick={() => setShowDetails(false)}
         >
           <div
-            className="bg-background rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300"
+            className="bg-background rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300 scrollbar-hide"
             onClick={(e) => e.stopPropagation()}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {/* Header Image */}
             <div className="relative h-80">
@@ -555,9 +626,13 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
 
               <button
                 onClick={() => setShowDetails(false)}
-                className="absolute top-4 right-4 p-2.5 rounded-full bg-white/90 hover:bg-white transition-all shadow-lg hover:scale-110"
+                className="absolute top-4 right-4 p-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all shadow-lg hover:scale-110 group relative"
+                title="Close details"
               >
                 <X size={20} />
+                <span className="absolute -bottom-10 right-0 px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                  Close details
+                </span>
               </button>
 
               <div className="absolute bottom-6 left-6 right-6">
@@ -698,6 +773,32 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
                   ))}
                 </ul>
               </div>
+
+              {/* YouTube Video Button */}
+              {plan.youtubeUrl && (
+                <div>
+                  <h4 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-red-500/10">
+                      <Youtube size={20} className="text-red-500" />
+                    </div>
+                    Video Tutorial
+                  </h4>
+                  <a
+                    href={plan.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-3 w-full px-6 py-4 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300 hover:scale-105 active:scale-95 group relative"
+                    title="Watch cooking tutorial on YouTube"
+                  >
+                    <Youtube size={24} />
+                    <span>Watch Recipe Video</span>
+                    <ExternalLink size={18} />
+                    <span className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                      Watch cooking tutorial on YouTube
+                    </span>
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -562,6 +562,7 @@ export default function UploadPage() {
           title: nutritionData.title,
           description: nutritionData.description,
           image_url: finalImageUrl,
+          youtube_url: nutritionData.youtubeUrl.trim() || null,
           calories: nutritionData.calories,
           protein: nutritionData.protein,
           carbs: nutritionData.carbs,
