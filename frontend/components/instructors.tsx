@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Award, Users, Clock } from "lucide-react";
@@ -64,13 +65,14 @@ export function Instructors() {
               className="group relative overflow-hidden bg-white border-border shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
             >
               <div className="relative h-56 md:h-64 overflow-hidden">
-                <img
+                <Image
                   src={
                     instructor.image ||
                     "https://api.dicebear.com/7.x/avataaars/svg?seed=instructor"
                   }
                   alt={instructor.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                 <div className="absolute bottom-3 md:bottom-4 left-3 md:left-4 right-3 md:right-4">

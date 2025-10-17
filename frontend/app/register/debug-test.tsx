@@ -37,7 +37,7 @@ export default function DebugTest() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    form.handleSubmit(onSubmit, (errors) => {
+    form.handleSubmit(onSubmit, () => {
     })(e);
   };
 

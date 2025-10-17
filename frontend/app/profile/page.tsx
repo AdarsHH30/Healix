@@ -110,7 +110,7 @@ export default function ProfilePage() {
 
         setQuotes(quotesWithColors);
       }
-    } catch (error) {
+    } catch {
     }
   }, []);
 
@@ -129,7 +129,7 @@ export default function ProfilePage() {
       if (data) {
         setUploadedExercises(data);
       }
-    } catch (error) {
+    } catch {
     }
   }, [user]);
 
@@ -145,7 +145,7 @@ export default function ProfilePage() {
       if (data) {
         setFavoriteQuotes(new Set(data.map((fav) => fav.quote_id)));
       }
-    } catch (error) {
+    } catch {
     }
   }, [user]);
 
@@ -162,7 +162,7 @@ export default function ProfilePage() {
       const newFavorites = new Set(favoriteQuotes);
       newFavorites.delete(quoteId);
       setFavoriteQuotes(newFavorites);
-    } catch (error) {
+    } catch {
     }
   };
 
@@ -174,7 +174,7 @@ export default function ProfilePage() {
       }
 
       // Try to get profile from users table
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileData } = await supabase
         .from("users")
         .select("*")
         .eq("id", user.id)
@@ -226,7 +226,7 @@ export default function ProfilePage() {
           memberSince: memberSinceDate,
         }));
       }
-    } catch (error) {
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -277,7 +277,7 @@ export default function ProfilePage() {
     try {
       await signOut();
       router.push("/");
-    } catch (error) {
+    } catch {
     }
   };
 

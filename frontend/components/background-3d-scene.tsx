@@ -152,7 +152,7 @@ export function Background3DScene({
       if (!gl) {
         setHasWebGL(false);
       }
-    } catch (_e) {
+    } catch {
       setHasWebGL(false);
     }
   }, []);

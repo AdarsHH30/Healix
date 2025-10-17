@@ -133,7 +133,7 @@ export default function NutritionPage() {
         }));
 
         setNutritionPlans(transformedData);
-      } catch (err) {
+      } catch {
         setError("Failed to load nutrition plans. Please try again later.");
       } finally {
         setLoading(false);
@@ -412,7 +412,7 @@ export default function NutritionPage() {
                         No plans match your search
                       </h3>
                       <p className="text-muted-foreground text-center mb-6 leading-relaxed">
-                        We couldn't find any nutrition plans matching your criteria. Try adjusting your filters or search term.
+                        We couldn&apos;t find any nutrition plans matching your criteria. Try adjusting your filters or search term.
                       </p>
 
                       {/* Active filters display */}
@@ -424,7 +424,7 @@ export default function NutritionPage() {
                           <div className="flex flex-wrap gap-2">
                             {searchQuery && (
                               <span className="px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-600 text-sm font-medium border border-orange-500/20">
-                                Search: "{searchQuery}"
+                                Search: &quot;{searchQuery}&quot;
                               </span>
                             )}
                             {selectedMealType && (

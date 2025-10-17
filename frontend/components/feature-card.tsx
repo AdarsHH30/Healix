@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, TrendingUp, ArrowRight, Sparkles } from "lucide-react";
@@ -153,14 +154,15 @@ export function FeatureCard({
           {instructorName && instructorName.trim() !== "" && (
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-5 md:mb-6 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-muted/10 dark:bg-muted/5 backdrop-blur-sm border border-border/30">
               <div className="relative">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-border shadow-lg">
-                  <img
+                <div className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-border shadow-lg">
+                  <Image
                     src={
                       instructorImage ||
                       "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
                     }
                     alt={instructorName}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 <div
@@ -352,14 +354,15 @@ export function WellnessPillarCard({
           {/* Enhanced instructor section */}
           <div className="flex items-center gap-3 md:gap-4 mb-5 md:mb-6 p-3 rounded-2xl bg-muted/10 dark:bg-muted/5 backdrop-blur-sm border border-border/30">
             <div className="relative">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-border shadow-lg">
-                <img
+              <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-border shadow-lg">
+                <Image
                   src={
                     instructorImage ||
                     "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
                   }
                   alt={instructorName}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
               <div

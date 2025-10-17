@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Activity } from "lucide-react";
+// Removed unused import
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";

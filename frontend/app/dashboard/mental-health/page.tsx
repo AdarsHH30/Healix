@@ -41,12 +41,6 @@ export default function MentalHealthPage() {
         setError(null);
 
 
-        // First, let's try to fetch all exercises to debug
-        const { data: allData, error: allError } = await supabase
-          .from("exercises")
-          .select("*");
-
-
         const { data, error: fetchError } = await supabase
           .from("exercises")
           .select("*")

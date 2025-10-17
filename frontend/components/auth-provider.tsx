@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(session);
           setUser(session?.user ?? null);
         }
-      } catch (error) {
+      } catch {
       } finally {
         if (mounted) {
           setLoading(false);
@@ -73,10 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-      }
-    } catch (error) {
+      await supabase.auth.signOut();
+    } catch {
     }
   };
 

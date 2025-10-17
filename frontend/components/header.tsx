@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
-import { Leaf, Heart, Users, BookOpen, LogOut, Menu, X } from "lucide-react";
+import { Heart, Users, BookOpen, LogOut, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

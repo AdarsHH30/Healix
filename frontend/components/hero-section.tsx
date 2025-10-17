@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Activity, Brain, Heart } from "lucide-react";
-import dynamic from "next/dynamic";
 
 import { Header } from "./header";
 import { HeroContent } from "./hero-content";
 import { FeatureCard } from "./feature-card";
-import { StatsDisplay } from "./stats-display";
 import { VisualHero } from "./visual-hero";
 
 export function HeroSection() {

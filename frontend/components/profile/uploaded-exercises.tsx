@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   Upload as UploadIcon,
   Calendar,
@@ -41,7 +42,7 @@ export function UploadedExercises({ exercises }: UploadedExercisesProps) {
               Share Your Knowledge
             </h3>
             <p className="text-sm text-muted-foreground">
-              You haven't uploaded any exercises yet. Share your favorite
+              You haven&apos;t uploaded any exercises yet. Share your favorite
               workouts and wellness tips with the community.
             </p>
           </div>
@@ -81,7 +82,7 @@ export function UploadedExercises({ exercises }: UploadedExercisesProps) {
     ),
   };
 
-  const typeConfig: Record<string, { icon: any; label: string }> = {
+  const typeConfig: Record<string, { icon: React.ElementType; label: string }> = {
     physical: { icon: Dumbbell, label: "Physical" },
     mental: { icon: Brain, label: "Mental" },
     breathing: { icon: Wind, label: "Breathing" },
@@ -100,7 +101,7 @@ export function UploadedExercises({ exercises }: UploadedExercisesProps) {
               Your Exercises
             </h3>
             <p className="text-sm text-muted-foreground">
-              Exercises you've shared
+              Exercises you&apos;ve shared
             </p>
           </div>
         </div>
@@ -136,17 +137,18 @@ export function UploadedExercises({ exercises }: UploadedExercisesProps) {
                   >
                     {exercise.image_url && (
                       <div className="relative h-32 overflow-hidden bg-muted">
-                        <img
+                        <Image
                           src={exercise.image_url}
                           alt={exercise.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = "none";
                           }}
                         />
                         <div className="absolute top-2 right-2">
-                          <span className="px-2 py-1 rounded-md bg-background/90 backdrop-blur-sm text-xs font-medium text-foreground border">
+                          <span className="px-2 py-1 rounded-md bg-background/90 text-xs font-medium text-foreground border backdrop-blur-sm">
                             {exercise.difficulty}
                           </span>
                         </div>

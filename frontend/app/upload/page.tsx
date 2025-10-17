@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   ArrowLeft,
   Upload,
@@ -153,7 +154,7 @@ export default function UploadPage() {
         } else {
           setIsAuthenticated(!!session);
         }
-      } catch (error) {
+      } catch {
         setIsAuthenticated(false);
       } finally {
         setIsCheckingAuth(false);
@@ -172,7 +173,7 @@ export default function UploadPage() {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase.auth]);
 
   const [formData, setFormData] = useState<ExerciseFormData>({
     name: "",
@@ -296,7 +297,7 @@ export default function UploadPage() {
       } = supabase.storage.from("exercises").getPublicUrl(filePath);
 
       return publicUrl;
-    } catch (error: unknown) {
+    } catch {
       setMessage({
         type: "error",
         text: "Failed to upload image. Using URL instead if provided.",
@@ -367,7 +368,7 @@ export default function UploadPage() {
       };
 
       // Insert exercise into database
-      const { data: insertedData, error } = await supabase
+      const { error } = await supabase
         .from("exercises")
         .insert(exerciseData)
         .select();
@@ -454,7 +455,7 @@ export default function UploadPage() {
 
 
       // Insert quote into database (ID will be auto-generated as UUID)
-      const { data: insertedData, error } = await supabase
+      const { error } = await supabase
         .from("quotes")
         .insert(quoteDataToInsert)
         .select();
@@ -556,7 +557,7 @@ export default function UploadPage() {
 
 
       // Insert nutrition plan into database
-      const { data: _data, error } = await supabase
+      const { error } = await supabase
         .from("nutrition_plans")
         .insert({
           title: nutritionData.title,
@@ -917,10 +918,11 @@ export default function UploadPage() {
                   {/* Image Preview if file selected */}
                   {imagePreview && formData.imageFile && (
                     <div className="relative w-full h-48 rounded-xl overflow-hidden border-2 border-green-500">
-                      <img
+                      <Image
                         src={imagePreview}
                         alt="Preview"
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                       <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                         <Check size={14} />
@@ -1143,10 +1145,11 @@ export default function UploadPage() {
                 {/* Image Preview */}
                 {imagePreview && nutritionData.imageFile && (
                   <div className="relative w-full h-48 rounded-xl overflow-hidden border-2 border-green-500">
-                    <img
+                    <Image
                       src={imagePreview}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                     <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                       <Check size={14} />

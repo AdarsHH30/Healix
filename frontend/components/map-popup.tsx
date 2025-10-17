@@ -259,17 +259,18 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
         setHospitals(hospitalData);
 
         if (hospitalData.length === 0) {
-          // Try alternative search using Nominatim
-          await searchWithNominatim(location);
+          setError(
+            "No medical facilities found nearby. The area might have limited OpenStreetMap data."
+          );
         }
-      } catch (err) {
+      } catch {
         setError(
           "Could not search for hospitals. Please check your internet connection and try again."
         );
       }
     },
     []
-  ); // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   // Get user location
   useEffect(() => {
@@ -285,7 +286,7 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
             searchNearbyHospitals(location);
             setLoading(false);
           },
-          (_err) => {
+          () => {
             setError(
               "Unable to get your location. Please enable location services."
             );
@@ -299,7 +300,8 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
     }
   }, [isOpen, userLocation, searchNearbyHospitals]);
 
-  // Alternative search using Nominatim API
+  // Alternative search using Nominatim API (currently unused but kept for future use)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const searchWithNominatim = useCallback(
     async (location: { lat: number; lng: number }) => {
       try {
@@ -416,7 +418,7 @@ export function MapPopup({ isOpen, onClose }: MapPopupProps) {
             "No medical facilities found within 15km. The area might have limited OpenStreetMap data."
           );
         }
-      } catch (err) {
+      } catch {
         setError(
           "No medical facilities found within 15km. The area might have limited OpenStreetMap data."
         );

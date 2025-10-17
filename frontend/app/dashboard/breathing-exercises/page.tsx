@@ -37,11 +37,6 @@ export default function BreathingExercisesPage() {
         setError(null);
 
 
-        const { data: allData, error: allError } = await supabase
-          .from("exercises")
-          .select("*");
-
-
         const { data, error: fetchError } = await supabase
           .from("exercises")
           .select("*")

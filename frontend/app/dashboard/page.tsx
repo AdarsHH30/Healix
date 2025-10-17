@@ -6,10 +6,8 @@ import { useState, useEffect, useRef } from "react";
 import {
   ArrowLeft,
   User,
-  Phone,
   LogOut,
   Upload,
-  MoreHorizontal,
 } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 import { DashboardFloatingActions } from "@/components/dashboard-floating-actions";
@@ -101,7 +99,7 @@ export default function Dashboard() {
 
       // Force a hard redirect to clear any cached state
       window.location.href = "/login";
-    } catch (error) {
+    } catch {
       // Even if there's an error, redirect to login
       window.location.href = "/login";
     }

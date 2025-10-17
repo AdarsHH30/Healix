@@ -149,7 +149,7 @@ export function EmergencyButton() {
           ) {
             bestLocationRef.current = currentLocation;
           }
-        } catch (error) {
+        } catch {
 
           // If fresh reading fails but we have a previous good location, use it
           if (currentLocation) {
@@ -247,7 +247,7 @@ export function EmergencyButton() {
           );
         }
       }
-    } catch (error) {
+    } catch {
       setStatusMessage(
         "❌ Network error. Please call emergency services directly."
       );

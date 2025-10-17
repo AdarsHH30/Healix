@@ -74,13 +74,13 @@ export function QuotesDisplay() {
           setQuotes(quotesWithColors);
         }
       } catch (error) {
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
     loadQuotes();
   }, []);
-
   // Load user's favorite quotes
   useEffect(() => {
     const loadFavorites = async () => {

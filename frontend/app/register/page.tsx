@@ -87,7 +87,7 @@ const RegisterPage = () => {
         await new Promise((resolve) => setTimeout(resolve, 500));
 
         // Now update it with the correct data
-        const { data: profileData, error: profileError } = await supabase
+        const { error: profileError } = await supabase
           .from("users")
           .update({
             first_name: data.firstName,

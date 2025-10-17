@@ -46,7 +46,7 @@ function AuthCallbackContent() {
 
             await supabase.auth.signOut();
           }
-        } catch (error) {
+        } catch {
         }
       }
 

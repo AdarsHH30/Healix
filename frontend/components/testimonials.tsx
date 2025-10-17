@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Star, CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -90,14 +91,15 @@ export function Testimonials() {
                     <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start">
                       <div className="flex-shrink-0">
                         <div className="relative">
-                          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-lg">
-                            <img
+                          <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-lg">
+                            <Image
                               src={
                                 testimonial.image ||
                                 "https://api.dicebear.com/7.x/avataaars/svg?seed=user"
                               }
                               alt={testimonial.name}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
                             />
                           </div>
                           {testimonial.verified && (

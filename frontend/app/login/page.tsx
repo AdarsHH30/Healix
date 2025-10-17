@@ -228,7 +228,7 @@ const LoginForm = () => {
                     Reset Password
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    Enter your email and we'll send you a reset link
+                    Enter your email and we&apos;ll send you a reset link
                   </p>
                 </div>
 
@@ -268,7 +268,7 @@ const LoginForm = () => {
           {/* --- Footer Links --- */}
           <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-6 text-center">
             <p className="text-sm sm:text-base text-muted-foreground">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 href="/register"
                 className="font-medium text-primary hover:underline underline-offset-4 transition-colors duration-200"

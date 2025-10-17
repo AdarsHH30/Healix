@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Video, ArrowRight, Heart, CheckCircle2, Shield } from "lucide-react";
+import { ArrowRight, Heart, CheckCircle2, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 
