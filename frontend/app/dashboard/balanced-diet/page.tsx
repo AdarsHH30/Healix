@@ -287,7 +287,7 @@ export default function NutritionPage() {
             {/* Search Bar */}
             <div className="mb-8">
               <div className="relative max-w-2xl mx-auto">
-                {/* <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" /> */}
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search by name, description, or category..."
@@ -298,13 +298,10 @@ export default function NutritionPage() {
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-muted transition-colors group relative"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-muted transition-colors"
                     title="Clear search"
                   >
                     <X size={18} className="text-muted-foreground" />
-                    <span className="absolute -bottom-8 right-0 px-2 py-1 bg-black/90 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                      Clear search
-                    </span>
                   </button>
                 )}
               </div>
@@ -609,10 +606,22 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
           onClick={() => setShowDetails(false)}
         >
           <div
-            className="bg-background rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300 scrollbar-hide"
+            className="bg-background rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300 scrollbar-hide relative"
             onClick={(e) => e.stopPropagation()}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowDetails(false)}
+              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all shadow-lg hover:scale-110 group"
+              title="Close details"
+            >
+              <X size={20} />
+              <span className="absolute -bottom-10 right-0 px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                Close details
+              </span>
+            </button>
+
             {/* Header Image */}
             <div className="relative h-80">
               <Image
@@ -623,17 +632,6 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-
-              <button
-                onClick={() => setShowDetails(false)}
-                className="absolute top-4 right-4 p-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all shadow-lg hover:scale-110 group relative"
-                title="Close details"
-              >
-                <X size={20} />
-                <span className="absolute -bottom-10 right-0 px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                  Close details
-                </span>
-              </button>
 
               <div className="absolute bottom-6 left-6 right-6">
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
