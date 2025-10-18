@@ -28,10 +28,21 @@ export async function POST(request: NextRequest) {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+    
+    // CRITICAL: For Twilio free tier, you MUST have a verified number
+    // This is the number that will actually receive the call/SMS
+    const verifiedEmergencyNumber = process.env.TWILIO_VERIFIED_NUMBER;
 
     if (!accountSid || !authToken || !twilioPhoneNumber) {
       return NextResponse.json(
         { error: 'Emergency service not configured' },
+        { status: 500 }
+      );
+    }
+
+    if (!verifiedEmergencyNumber) {
+      return NextResponse.json(
+        { error: 'No verified emergency number configured. Please add TWILIO_VERIFIED_NUMBER to your environment variables.' },
         { status: 500 }
       );
     }
@@ -68,47 +79,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get user's emergency contacts (for display in message only)
     const { data: userData, error: dbError } = await supabase
       .from('users')
-      .select('emergency_phone_1, emergency_phone_2')
+      .select('emergency_phone_1, emergency_phone_2, full_name')
       .eq('id', user.id)
       .single();
 
     let emergencyNumber1: string | null = null;
     let emergencyNumber2: string | null = null;
+    let userName = user.email || 'Unknown User';
 
     if (dbError || !userData) {
       emergencyNumber1 = user.user_metadata?.emergency_phone_1 || null;
       emergencyNumber2 = user.user_metadata?.emergency_phone_2 || null;
+      userName = user.user_metadata?.full_name || user.email || 'Unknown User';
     } else {
       emergencyNumber1 = userData.emergency_phone_1;
       emergencyNumber2 = userData.emergency_phone_2;
-    }
-
-    if (!emergencyNumber1 && !emergencyNumber2) {
-      return NextResponse.json(
-        { error: 'No emergency contacts configured. Please add emergency contacts in your profile.' },
-        { status: 400 }
-      );
-    }
-
-    // Validate phone numbers are in E.164 format (+[country code][number])
-    const validateE164 = (phone: string) => /^\+[1-9]\d{1,14}$/.test(phone);
-    
-    const validNumbers: string[] = [];
-    if (emergencyNumber1 && validateE164(emergencyNumber1)) {
-      validNumbers.push(emergencyNumber1);
-    }
-    
-    if (emergencyNumber2 && validateE164(emergencyNumber2)) {
-      validNumbers.push(emergencyNumber2);
-    }
-
-    if (validNumbers.length === 0) {
-      return NextResponse.json(
-        { error: 'No valid emergency contacts found. Phone numbers must be in E.164 format (e.g., +1234567890).' },
-        { status: 400 }
-      );
+      userName = userData.full_name || user.email || 'Unknown User';
     }
 
     const forwardedFor = request.headers.get('x-forwarded-for');
@@ -163,98 +152,113 @@ export async function POST(request: NextRequest) {
       timeZone: 'Asia/Kolkata',
       hour12: true,
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
     });
 
-    // Simple, clean SMS message without emojis (some carriers block emojis)
+    // Build list of user's intended contacts for the message
+    const intendedContacts = [emergencyNumber1, emergencyNumber2]
+      .filter(Boolean)
+      .join(', ') || 'Not specified';
+
+    // Enhanced SMS message with user info
     const smsMessage = `EMERGENCY ALERT!
 
-Your contact needs IMMEDIATE help!
+User: ${userName}
+Time: ${currentTime}
+
+IMMEDIATE HELP NEEDED!
 
 Location: ${locationUrl}
 
-Time: ${currentTime}
+Intended Emergency Contacts: ${intendedContacts}
 
-This is a REAL EMERGENCY. Please:
-1. Call them NOW
-2. Check their location
-3. Contact emergency services
+USER PRESSED THE EMERGENCY BUTTON
 
-Time is critical!`;
+Please:
+1. Call the user immediately
+2. Check their location above
+3. Contact emergency services if needed
 
-    const smsPromises = validNumbers.map(async (toNumber) => {
-      try {
-        const message = await client.messages.create({
-          body: smsMessage,
-          from: twilioPhoneNumber,
-          to: toNumber,
-        });
-        return { success: true, to: toNumber, sid: message.sid };
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return { success: false, to: toNumber, error: errorMessage };
-      }
-    });
+This is a REAL EMERGENCY!`;
 
-    const callPromises = validNumbers.map(async (toNumber) => {
-      try {
-        const call = await client.calls.create({
-          twiml: `<Response>
-            <Say voice="alice" language="en-US">
-              Emergency Alert! Emergency Alert! 
-              Your contact has pressed the emergency button and needs immediate help.
-              Please check your text messages right now for their exact location.
-            </Say>
-            <Pause length="1"/>
-            <Say voice="alice" language="en-US">
-              I repeat: Your contact has pressed the emergency button.
-              Their current location has been sent to you via S M S text message.
-              Please go to their location immediately or call emergency services.
-              This is an urgent emergency. Please respond now.
-            </Say>
-          </Response>`,
-          from: twilioPhoneNumber,
-          to: toNumber,
-        });
-        return { success: true, to: toNumber, sid: call.sid };
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        return { success: false, to: toNumber, error: errorMessage };
-      }
-    });
+    // Enhanced TwiML for voice call
+    const callTwiml = `<Response>
+      <Say voice="alice" language="en-US">
+        Emergency Alert! Emergency Alert! 
+        User ${userName} has pressed the emergency button and needs immediate help.
+        Please check your text messages right now for their exact location and contact information.
+      </Say>
+      <Pause length="1"/>
+      <Say voice="alice" language="en-US">
+        I repeat: ${userName} has activated an emergency alert.
+        Their current location and emergency contact numbers have been sent to you via S M S text message.
+        Please respond immediately. This is an urgent emergency.
+      </Say>
+      <Pause length="1"/>
+      <Say voice="alice" language="en-US">
+        Check your S M S now for location details. Time is critical.
+      </Say>
+    </Response>`;
 
-    const [smsResults, callResults] = await Promise.all([
-      Promise.all(smsPromises),
-      Promise.all(callPromises),
-    ]);
+    // IMPORTANT: Always send to the verified number (Twilio free tier requirement)
+    // The user's entered numbers are included in the MESSAGE CONTENT only
+    try {
+      // Send SMS to verified number
+      const smsResult = await client.messages.create({
+        body: smsMessage,
+        from: twilioPhoneNumber,
+        to: verifiedEmergencyNumber,
+      });
 
-    const smsSuccess = smsResults.some(result => result.success);
-    const callSuccess = callResults.some(result => result.success);
+      // Make call to verified number
+      const callResult = await client.calls.create({
+        twiml: callTwiml,
+        from: twilioPhoneNumber,
+        to: verifiedEmergencyNumber,
+      });
 
-    if (!smsSuccess && !callSuccess) {
+      return NextResponse.json({
+        success: true,
+        message: 'Emergency notification sent to verified contact',
+        location: {
+          latitude: roundedLat,
+          longitude: roundedLon,
+          url: locationUrl
+        },
+        sms: [{
+          success: true,
+          to: verifiedEmergencyNumber,
+          sid: smsResult.sid
+        }],
+        calls: [{
+          success: true,
+          to: verifiedEmergencyNumber,
+          sid: callResult.sid
+        }],
+        note: 'Free tier: Call/SMS sent to verified number. User contacts included in message.'
+      });
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Twilio error:', errorMessage);
+      
       return NextResponse.json(
         {
           error: 'Failed to send emergency notifications',
-          details: { sms: smsResults, calls: callResults }
+          details: errorMessage,
+          hint: 'Verify that TWILIO_VERIFIED_NUMBER is correct and verified in your Twilio console'
         },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Emergency notifications sent',
-      location: {
-        latitude: roundedLat,
-        longitude: roundedLon,
-        url: locationUrl
-      },
-      sms: smsResults,
-      calls: callResults,
-    });
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Emergency API error:', errorMessage);
+    
     return NextResponse.json(
       { error: 'Failed to process emergency request', details: errorMessage },
       { status: 500 }
