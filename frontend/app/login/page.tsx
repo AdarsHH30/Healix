@@ -118,8 +118,8 @@ const LoginForm = () => {
         // Small delay for session
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        router.push(redirectTo);
-        router.refresh();
+        // Use window.location for reliable redirect
+        window.location.href = redirectTo;
       } else {
         setError("Login failed. Please try again.");
         setIsLoading(false);

@@ -51,7 +51,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-
       if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
@@ -74,7 +73,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-    } catch {
+      // Immediately clear local state
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error("Sign out error:", error);
+      // Still clear local state even if signOut fails
+      setUser(null);
+      setSession(null);
     }
   };
 

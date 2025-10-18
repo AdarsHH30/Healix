@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
+import { supabase } from "@/lib/supabase";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -24,8 +25,16 @@ export function Header() {
   }, []);
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push("/");
+    try {
+      await signOut();
+      // Small delay to ensure auth state is cleared
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Force a hard redirect to clear any cached state
+      window.location.href = "/";
+    } catch {
+      // Even if there's an error, redirect to home
+      window.location.href = "/";
+    }
   };
 
   return (

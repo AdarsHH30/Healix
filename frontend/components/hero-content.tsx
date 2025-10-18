@@ -91,10 +91,10 @@ export function HeroContent() {
               variant="outline"
               className="w-full sm:w-auto text-sm md:text-base px-6 md:px-8 h-12 md:h-14 rounded-full border-2 border-primary/30 backdrop-blur-sm hover:border-primary hover:text-primary hover:scale-105 transition-all duration-500"
               onClick={() => {
-                router.push("/profile");
+                router.push("/register");
               }}
             >
-              View Profile
+              Join Now
             </Button>
           </>
         )}

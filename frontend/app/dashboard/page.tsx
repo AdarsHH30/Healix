@@ -3,15 +3,11 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import {
-  ArrowLeft,
-  User,
-  LogOut,
-  Upload,
-} from "lucide-react";
+import { ArrowLeft, User, LogOut, Upload } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 import { DashboardFloatingActions } from "@/components/dashboard-floating-actions";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth } from "@/components/auth-provider";
 
 const categories = [
   {
@@ -50,6 +46,7 @@ const categories = [
 
 export default function Dashboard() {
   const router = useRouter();
+  const { signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -94,14 +91,14 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     try {
-      // Sign out with SSR client to properly clear cookies
-      await supabase.auth.signOut();
-
+      await signOut();
+      // Small delay to ensure auth state is cleared
+      await new Promise((resolve) => setTimeout(resolve, 100));
       // Force a hard redirect to clear any cached state
-      window.location.href = "/login";
+      window.location.href = "/";
     } catch {
-      // Even if there's an error, redirect to login
-      window.location.href = "/login";
+      // Even if there's an error, redirect to home
+      window.location.href = "/";
     }
   };
 

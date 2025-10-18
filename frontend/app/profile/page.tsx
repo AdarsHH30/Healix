@@ -110,8 +110,7 @@ export default function ProfilePage() {
 
         setQuotes(quotesWithColors);
       }
-    } catch {
-    }
+    } catch {}
   }, []);
 
   const loadUploadedExercises = useCallback(async () => {
@@ -129,8 +128,7 @@ export default function ProfilePage() {
       if (data) {
         setUploadedExercises(data);
       }
-    } catch {
-    }
+    } catch {}
   }, [user]);
 
   const loadFavorites = useCallback(async () => {
@@ -145,8 +143,7 @@ export default function ProfilePage() {
       if (data) {
         setFavoriteQuotes(new Set(data.map((fav) => fav.quote_id)));
       }
-    } catch {
-    }
+    } catch {}
   }, [user]);
 
   const handleRemoveFavorite = async (quoteId: string) => {
@@ -162,8 +159,7 @@ export default function ProfilePage() {
       const newFavorites = new Set(favoriteQuotes);
       newFavorites.delete(quoteId);
       setFavoriteQuotes(newFavorites);
-    } catch {
-    }
+    } catch {}
   };
 
   const loadProfile = useCallback(async () => {
@@ -276,8 +272,13 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     try {
       await signOut();
-      router.push("/");
+      // Small delay to ensure auth state is cleared
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Force a hard redirect to clear any cached state
+      window.location.href = "/";
     } catch {
+      // Even if there's an error, redirect to home
+      window.location.href = "/";
     }
   };
 
