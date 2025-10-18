@@ -253,10 +253,16 @@ export default function NutritionPage() {
                         ? `bg-gradient-to-br ${config.gradient} border-transparent shadow-lg`
                         : `bg-gradient-to-br ${config.bg} ${config.border} hover:shadow-md`
                     }`}
-                    title={isSelected ? `Clear ${config.label} filter` : `Filter by ${config.label}`}
+                    title={
+                      isSelected
+                        ? `Clear ${config.label} filter`
+                        : `Filter by ${config.label}`
+                    }
                   >
                     <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                      {isSelected ? `Clear ${config.label} filter` : `Filter by ${config.label}`}
+                      {isSelected
+                        ? `Clear ${config.label} filter`
+                        : `Filter by ${config.label}`}
                     </span>
                     <div className="flex items-center justify-between mb-2">
                       <Icon
@@ -396,7 +402,7 @@ export default function NutritionPage() {
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500/20 to-pink-500/20 blur-2xl animate-pulse" />
                     </div>
-                    
+
                     {/* Main content */}
                     <div className="relative bg-card/50 backdrop-blur-sm rounded-3xl border border-border/50 p-8 shadow-xl">
                       {/* Icon */}
@@ -412,7 +418,8 @@ export default function NutritionPage() {
                         No plans match your search
                       </h3>
                       <p className="text-muted-foreground text-center mb-6 leading-relaxed">
-                        We couldn&apos;t find any nutrition plans matching your criteria. Try adjusting your filters or search term.
+                        We couldn&apos;t find any nutrition plans matching your
+                        criteria. Try adjusting your filters or search term.
                       </p>
 
                       {/* Active filters display */}
@@ -429,7 +436,11 @@ export default function NutritionPage() {
                             )}
                             {selectedMealType && (
                               <span className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 text-sm font-medium border border-blue-500/20">
-                                {mealTypeColors[selectedMealType as keyof typeof mealTypeColors].label}
+                                {
+                                  mealTypeColors[
+                                    selectedMealType as keyof typeof mealTypeColors
+                                  ].label
+                                }
                               </span>
                             )}
                           </div>
@@ -598,22 +609,20 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
           <div className="absolute inset-0 bg-gradient-to-t from-green-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
       </div>
-
-      {/* Details Modal */}
       {showDetails && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
           onClick={() => setShowDetails(false)}
         >
           <div
-            className="bg-background rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300 scrollbar-hide relative"
+            className="bg-background rounded-2xl sm:rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300 scrollbar-hide relative"
             onClick={(e) => e.stopPropagation()}
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {/* Close Button */}
             <button
               onClick={() => setShowDetails(false)}
-              className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all shadow-lg hover:scale-110 group"
+              className="sticky top-4 right-4 z-20 p-2 sm:p-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all shadow-lg hover:scale-110 group ml-auto block"
               title="Close details"
             >
               <X size={20} />
@@ -623,7 +632,7 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
             </button>
 
             {/* Header Image */}
-            <div className="relative h-80">
+            <div className="relative h-48 sm:h-64 md:h-80">
               <Image
                 src={plan.imageUrl}
                 alt={plan.title}
@@ -633,70 +642,79 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-              <div className="absolute bottom-6 left-6 right-6">
-                <div className="flex items-center gap-2 mb-3 flex-wrap">
-                  <span className="px-3 py-1.5 rounded-lg bg-white/90 text-xs font-bold text-gray-800 uppercase flex items-center gap-1.5">
+              <div className="absolute bottom-3 sm:bottom-6 left-3 sm:left-6 right-3 sm:right-6">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3 flex-wrap">
+                  <span className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-xs font-bold bg-white/90 text-gray-800 uppercase flex items-center gap-1.5">
                     <Star size={12} fill="currentColor" />
                     {plan.category}
                   </span>
                   <span
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold backdrop-blur-md border ${
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-bold backdrop-blur-md border ${
                       difficultyColors[plan.difficulty]
                     }`}
                   >
                     {plan.difficulty}
                   </span>
-                  <span className="px-3 py-1.5 rounded-lg bg-white/90 text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+                  <span className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-xs font-semibold bg-white/90 text-gray-800 flex items-center gap-1.5">
                     <Clock size={14} />
                     {plan.prepTime}
                   </span>
                 </div>
-                <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1 sm:mb-2 drop-shadow-lg line-clamp-2">
                   {plan.title}
                 </h2>
-                <p className="text-white/95 text-lg drop-shadow-md">
+                <p className="text-white/95 text-xs sm:text-sm md:text-lg drop-shadow-md line-clamp-2">
                   {plan.description}
                 </p>
               </div>
             </div>
 
             {/* Content */}
-            <div className="p-8 space-y-8">
+            <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
               {/* Nutrition Grid */}
-              <div className="grid grid-cols-4 gap-4">
-                <div className="text-center p-5 rounded-2xl bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/20 hover:scale-105 transition-transform">
-                  <Flame size={24} className="text-orange-500 mx-auto mb-2" />
-                  <p className="text-xl font-bold text-foreground">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+                <div className="text-center p-3 sm:p-5 rounded-lg sm:rounded-2xl bg-gradient-to-br from-orange-500/10 to-orange-500/5 border border-orange-500/20 hover:scale-105 transition-transform">
+                  <Flame
+                    size={20}
+                    className="text-orange-500 mx-auto mb-1 sm:mb-2"
+                  />
+                  <p className="text-lg sm:text-xl font-bold text-foreground break-words">
                     {plan.calories}
                   </p>
                   <p className="text-xs text-muted-foreground font-medium">
                     Calories
                   </p>
                 </div>
-                <div className="text-center p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 hover:scale-105 transition-transform">
-                  <Zap size={24} className="text-blue-500 mx-auto mb-2" />
-                  <p className="text-xl font-bold text-foreground">
+                <div className="text-center p-3 sm:p-5 rounded-lg sm:rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 hover:scale-105 transition-transform">
+                  <Zap
+                    size={20}
+                    className="text-blue-500 mx-auto mb-1 sm:mb-2"
+                  />
+                  <p className="text-lg sm:text-xl font-bold text-foreground break-words">
                     {plan.protein}
                   </p>
                   <p className="text-xs text-muted-foreground font-medium">
                     Protein
                   </p>
                 </div>
-                <div className="text-center p-5 rounded-2xl bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/20 hover:scale-105 transition-transform">
+                <div className="text-center p-3 sm:p-5 rounded-lg sm:rounded-2xl bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 border border-yellow-500/20 hover:scale-105 transition-transform">
                   <TrendingUp
-                    size={24}
-                    className="text-yellow-500 mx-auto mb-2"
+                    size={20}
+                    className="text-yellow-500 mx-auto mb-1 sm:mb-2"
                   />
-                  <p className="text-xl font-bold text-foreground">
+                  <p className="text-lg sm:text-xl font-bold text-foreground break-words">
                     {plan.carbs}
                   </p>
                   <p className="text-xs text-muted-foreground font-medium">
                     Carbs
                   </p>
                 </div>
-                <div className="text-center p-5 rounded-2xl bg-gradient-to-br from-red-500/10 to-red-500/5 border border-red-500/20 hover:scale-105 transition-transform">
-                  <Heart size={24} className="text-red-500 mx-auto mb-2" />
-                  <p className="text-xl font-bold text-foreground">
+                <div className="text-center p-3 sm:p-5 rounded-lg sm:rounded-2xl bg-gradient-to-br from-red-500/10 to-red-500/5 border border-red-500/20 hover:scale-105 transition-transform">
+                  <Heart
+                    size={20}
+                    className="text-red-500 mx-auto mb-1 sm:mb-2"
+                  />
+                  <p className="text-lg sm:text-xl font-bold text-foreground break-words">
                     {plan.fats}
                   </p>
                   <p className="text-xs text-muted-foreground font-medium">
@@ -707,22 +725,22 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
 
               {/* Ingredients */}
               <div>
-                <h4 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <h4 className="text-lg sm:text-xl font-bold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-green-500/10">
-                    <Utensils size={20} className="text-green-500" />
+                    <Utensils size={18} className="text-green-500" />
                   </div>
                   Ingredients
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   {plan.ingredients.map((ingredient, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
+                      className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg sm:rounded-xl bg-muted/50 hover:bg-muted transition-colors"
                     >
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center text-xs font-bold mt-0.5">
+                      <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-green-500/20 text-green-600 flex items-center justify-center text-xs font-bold">
                         {index + 1}
                       </span>
-                      <span className="text-sm text-foreground">
+                      <span className="text-xs sm:text-sm text-foreground">
                         {ingredient}
                       </span>
                     </div>
@@ -732,22 +750,22 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
 
               {/* Instructions */}
               <div>
-                <h4 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <h4 className="text-lg sm:text-xl font-bold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-blue-500/10">
-                    <Sparkles size={20} className="text-blue-500" />
+                    <Sparkles size={18} className="text-blue-500" />
                   </div>
                   Instructions
                 </h4>
-                <div className="space-y-4">
+                <div className="space-y-2 sm:space-y-4">
                   {plan.instructions.map((instruction, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-4 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
+                      className="flex items-start gap-2 sm:gap-4 p-2 sm:p-4 rounded-lg sm:rounded-xl bg-muted/50 hover:bg-muted transition-colors"
                     >
-                      <span className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center text-sm font-bold shadow-md">
+                      <span className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-green-500 to-green-600 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-md">
                         {index + 1}
                       </span>
-                      <span className="text-sm text-foreground pt-1">
+                      <span className="text-xs sm:text-sm text-foreground pt-0 sm:pt-1">
                         {instruction}
                       </span>
                     </div>
@@ -757,15 +775,18 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
 
               {/* Benefits */}
               <div>
-                <h4 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <h4 className="text-lg sm:text-xl font-bold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-purple-500/10">
-                    <Heart size={20} className="text-purple-500" />
+                    <Heart size={18} className="text-purple-500" />
                   </div>
                   Benefits
                 </h4>
-                <ul className="list-disc list-inside space-y-2">
+                <ul className="list-disc list-inside space-y-1 sm:space-y-2">
                   {plan.benefits.map((benefit, index) => (
-                    <li key={index} className="text-sm text-foreground">
+                    <li
+                      key={index}
+                      className="text-xs sm:text-sm text-foreground"
+                    >
                       {benefit}
                     </li>
                   ))}
@@ -775,9 +796,9 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
               {/* YouTube Video Button */}
               {plan.youtubeUrl && (
                 <div>
-                  <h4 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                  <h4 className="text-lg sm:text-xl font-bold text-foreground mb-3 sm:mb-4 flex items-center gap-2">
                     <div className="p-2 rounded-lg bg-red-500/10">
-                      <Youtube size={20} className="text-red-500" />
+                      <Youtube size={18} className="text-red-500" />
                     </div>
                     Video Tutorial
                   </h4>
@@ -785,10 +806,10 @@ function NutritionCard({ plan }: { plan: NutritionPlan }) {
                     href={plan.youtubeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-3 w-full px-6 py-4 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300 hover:scale-105 active:scale-95 group relative"
+                    className="flex items-center justify-center gap-2 sm:gap-3 w-full px-4 sm:px-6 py-3 sm:py-4 rounded-lg sm:rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white text-sm sm:text-base font-semibold hover:shadow-lg hover:shadow-red-500/50 transition-all duration-300 hover:scale-105 active:scale-95 group relative"
                     title="Watch cooking tutorial on YouTube"
                   >
-                    <Youtube size={24} />
+                    <Youtube size={20} />
                     <span>Watch Recipe Video</span>
                     <ExternalLink size={18} />
                     <span className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
