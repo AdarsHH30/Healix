@@ -152,6 +152,104 @@ FLASK_DEBUG=false           # Set to true for development
 
 ---
 
+## OS-specific installation and run
+
+Below are concise, separate instructions for Windows and Ubuntu users. Use the section that matches your operating system.
+
+### Windows
+
+1. Open Command Prompt or PowerShell (run as Administrator if you plan to install system-wide packages).
+
+2. Navigate to the project folder and create a virtual environment:
+
+```powershell
+cd path\to\Healix\rag-chatbot
+python -m venv venv
+# Activate the virtualenv in PowerShell
+venv\Scripts\Activate.ps1
+# Or in Command Prompt
+venv\Scripts\activate
+```
+
+3. Install dependencies (from the repo root `rag-chatbot`):
+
+```powershell
+# If you have the provided helper script
+.\build-.sh
+# Or install via pip ilitef you prefer
+pip install -r requirements.txt
+```
+
+4. Prepare `.env` (copy `.env.example` and edit values) and add your `GROQ_API_KEY`.
+
+5. Ingest documents:
+
+```powershell
+python ingest_documents.py
+```
+
+6. Run the server (development) or production with Gunicorn (WSL recommended for Gunicorn on Windows):
+
+```powershell
+# Development (Flask built-in)
+python -m src.app-working
+
+# If using WSL or a Unix-like layer you can run Gunicorn
+# gunicorn src.app-working:app
+```
+
+7. Test the server:
+
+```powershell
+curl -X POST http://localhost:5000/query -H "Content-Type: application/json" -d '{"query":"What are the symptoms of flu?"}'
+```
+
+### Ubuntu
+
+1. Open a terminal.
+
+2. Navigate to the project folder and create a virtual environment:
+
+```bash
+cd ~/path/to/Healix/rag-chatbot
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Install dependencies:
+
+```bash
+./build-lite.sh
+# or
+pip install -r requirements.txt
+```
+
+4. Prepare `.env` (copy `.env.example` and edit values) and add your `GROQ_API_KEY`.
+
+5. Ingest documents:
+
+```bash
+python ingest_documents.py
+```
+
+6. Run the server (development or production):
+
+```bash
+# Development
+python -m src.app-working
+
+# Production with Gunicorn
+gunicorn -c gunicorn.conf.py src.app:app
+```
+
+7. Test the server:
+
+```bash
+curl -X POST http://localhost:5000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What are the symptoms of flu?"}'
+```
+
 ## 📚 How to Add Medical Knowledge
 
 The chatbot learns from documents you provide. Here's how to add them:

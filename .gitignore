@@ -24,6 +24,7 @@ next-env.d.ts
 .stylelintcache
 .tailwindcss-cache/
 .vscode/
+.venv/
 .idea/
 *.swp
 *.swo
